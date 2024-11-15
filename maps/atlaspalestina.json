@@ -1,0 +1,801 @@
+{
+  "map": {
+    "zoom": 6.25,
+    "center": [
+      32.94,32.25
+    ],
+    "pitch": 0,
+    "bearing": 0
+  },
+  "datacatalog": [
+    {
+      "type": "group",
+      "title": "Achtergrond",
+      "id": "worldachtergrondlagen",
+      "checked": false,
+      "opened": false,
+      "sublayers": [
+        {
+          "type": "reference",
+          "title": "Topografisch",
+          "layerInfo": {
+            "id": "bingmaproad",
+            "metadata": {
+              "reference": true,
+              "bing": true,
+              "title": "Topografisch",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "attribution": "© 2022 Microsoft Corporation|© 2022 TomTom|© 2022 Zenrin",
+              "tiles": [
+                "https://ecn.t0.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=11850&mkt=nl-BE&shading=hill",
+                "https://ecn.t1.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=11850&mkt=nl-BE&shading=hill",
+                "https://ecn.t2.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=11850&mkt=nl-BE&shading=hill",
+                "https://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=11850&mkt=nl-BE&shading=hill"
+              ],
+              "maxzoom": 19
+            }
+          },
+          "id": "Microsoft_BING Kaart_reference_id",
+          "checked": false
+        },
+        {
+          "type": "reference",
+          "title": "Mapbox | Satelliet",
+          "layerInfo": {
+            "id": "satellite",
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.webp?access_token={mapboxkey}"
+              ],
+              "attribution": "mapbox"
+            },
+            "metadata": {
+              "title": "Mapbox | Satelliet",
+              "reference": true,
+              "userlayer": true
+            }
+          },
+          "id": "Mapbox_satellite_wmts_id",
+          "checked": false
+        },
+        {
+          "type": "reference",
+          "title": "ESRI | Satelliet",
+          "layerInfo": {
+            "id": "esriworldimagery",
+            "metadata": {
+              "reference": true,
+              "title": "ESRI | Satelliet",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tiles": [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              ],
+              "tileSize": 256,
+              "maxzoom": 22,
+              "attribution": "ESRI World Imagery"
+            }
+          },
+          "id": "Luchtfoto_(ESRI World Imagery)_reference_id",
+          "checked": true
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "title": "Algemeen",
+      "id": "AlgemeneLayers",
+      "sublayers": [
+        {
+          "id": "003ea2b1-9e7a-4492-b560-f21234",
+          "title": "Landsgrenzen",
+          "layerInfo": {
+            "id":"64ffc0c1-ee27-4771-953c-3cda91327752",
+            "type":"line",
+            "source":{
+                "type":"vector",
+                "tiles":["https://tiles.edugis.nl/data/public.ne_10m_admin_0_countries_lakes/mvt/{z}/{x}/{y}?geom_column=geom&columns=name_nl&include_nulls=0"],
+                "bounds":[-180,-89,180,83.6341006530001]},
+            "source-layer":"public.ne_10m_admin_0_countries_lakes",
+            "paint":{
+            "line-color": "black",
+            "line-width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "title": "Palestina",
+      "id": "extralayers",
+      "opened": true,
+      "sublayers": [
+        {
+          "type": "geojson",
+          "title": "Palestina",
+          "checked": false,
+          "layerInfo": {
+            "id": "ba2be98b-a160-417d-9074-643dcf303463",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/palestina.geo.json"
+            },
+            "metadata": {
+              "title": "Palestina",
+              "visible": true,
+              
+              "transparency": 25.777791341145832,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(211,66,66,1)",
+              "fill-opacity": 0.74,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Administratieve grenzen Gaza",
+          "checked": false,
+          "layerInfo": {
+            "id": "6282d98a-7018-4d80-b9ff-177e6a943196",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/gaza_admin_grenzen.geo.json"
+            },
+            "metadata": {
+              "title": "Administratieve grenzen Gaza",
+              "transparency": 16.34026421440972,
+              
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(211,66,66,1)",
+              "fill-opacity": 0.84,
+              "fill-outline-color": "rgba(255,255,255,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Militaire bufferzone Gaza",
+          "checked": false,
+          "layerInfo": {
+            "id": "4e0b55d7-5f27-4ee1-967a-750eed3c5490",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/militaire_buffer_zones.geo.json"
+            },
+            "metadata": {
+              "title": "Militaire bufferzone Gaza",
+              "visible": true,
+              "reference": false,
+              
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(255,232,0,1)",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Oslo-akkoorden Westelijke Jordaanoever",
+          "checked": false,
+          "layerInfo": {
+            "id": "0b47fb5e-5c4c-4df1-92ef-306adefea7d0",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/oslo_akkoorden_westelijke_jordaanoever.geo.json"
+            },
+            "metadata": {
+              "title": "Oslo-akkoorden Westelijke Jordaanoever",
+              "abstract": "Gebied A beslaat ongeveer 17 procent van de Westelijke Jordaanoever en het is voor Israëlische burgers verboden er te komen. In gebied B is de Palestijnse autoriteit de administratieve wetgever,  terwijl zij samen met Israel verantwoordelijk is voor de veiligheid. Dit gebied omvat 22 procent van de Westoever. Gebied C staat onder Israëlisch bestuur. Het gaat om staatsgronden, zo’n 135 Joodse steden en dorpen (exclusief Jeruzalem) en enkele honderden kleine Arabische nederzettingen. Gebied H1 uit het Hebron-Protocol is circa 80% van de stad met ongeveer 140.000 Palestijnse inwoners, onder het bestuur van de Palestijnse Autoriteit. Gebied H2 is de overige 20% met ongeveer 30.000 Joodse Israëliërs en ongeveer 500 Joodse rechts-nationalistische kolonisten in vier nederzettingen onder de verantwoordelijkheid van Israël",
+              
+              "transparency": 20.11806911892361,
+              "legendclipped": false,
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": [
+                "match",
+                [
+                  "get",
+                  "CLASS"
+                ],
+                "Gebied A",
+                "rgba(59.143,225.949,43.158,1)",
+                "Gebied B",
+                "#444",
+                "Gebied C",
+                "rgba(213,62,79,1)",
+                "Natuur Reservaat",
+                "rgba(33,139,69,1)",
+                "H1 gebied Hebron",
+                "rgba(255,193,7,1)",
+                "H2 gebied Hebron",
+                "rgba(158,202,225,1)",
+                "Israeli Declared East Jerusalem",
+                "rgba(170.631,87.75,240.071,1)",
+                "No Man's Land",
+                "rgba(121.044,121.044,121.044,1)",
+                "#444"
+              ],
+              "fill-opacity": 0.8,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Militaire bufferzone Westelijke Jordaanoever",
+          "checked": false,
+          "layerInfo": {
+            "id": "0579f88e-246f-4345-a1d5-e2f0298c80dd",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/militaire_bufferzone_westelijke_jordaanoever.geo.json"
+            },
+            "metadata": {
+              "title": "Militaire bufferzone Westelijke Jordaanoever",
+              "visible": true,
+              
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(255,232,0,1)",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Israelisch militair oefenterrein",
+          "checked": false,
+          "layerInfo": {
+            "id": "d452b689-94dc-4848-878b-d148a7caa813",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/israelisch_militair_oefenterrein.geo.json"
+            },
+            "metadata": {
+              "title": "Israelisch militair oefenterrein",
+              
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(103,58,183,1)",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Barrières",
+          "checked": false,
+          "layerInfo": {
+            "id": "933fbc60-8d3a-4e94-803e-d4c5f965857c",
+            "type": "line",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/barrieres.geo.json"
+            },
+            "metadata": {
+              "title": "Barrières",
+              "visible": true,
+              "reference": false,
+              
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "line-color": "#000",
+              "line-width": 2
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Grensposten",
+          "checked": false,
+          "layerInfo": {
+            "id": "308e927c-9d45-4ae0-8730-01eeec834c03",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":"https://kaart.edugis.nl/data/palestina/grensposten.geo.json"
+            },
+            "metadata": {
+              "title": "Grensposten",
+              "visible": true,
+              
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-color": "rgba(0,0,0,1)",
+              "circle-radius": 3.3,
+              "circle-stroke-width": 2.8,
+              "circle-stroke-color": "#FFF"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Grensovergangen",
+          "checked": false,
+          "layerInfo": {
+            "id": "d588d602-e7e9-4b9f-810b-fe036ed66703",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/grensovergangen.geo.json"
+            },
+            "metadata": {
+              "title": "Grensovergangen",
+              
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-color": "rgba(103,58,183,1)",
+              "circle-radius": 4.3,
+              "circle-stroke-width": 1.8,
+              "circle-stroke-color": "#FFF"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Israelische nederzettingen",
+          "checked": false,
+          "layerInfo": {
+            "id": "b2e21dcb-e7a8-4d0c-8999-3b04e8d555b6",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data":"https://kaart.edugis.nl/data/palestina/israelische_nederzettingen.geo.json"
+            },
+            "metadata": {
+              "title": "Israelische nederzettingen",
+              "visible": true,
+              "transparency": 15.999959309895834,
+              
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(255,255,0,1)",
+              "fill-opacity": 0.84,
+              "fill-outline-color": "rgba(255,255,0,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Palestijnse dorpen",
+          "checked": false,
+          "layerInfo": {
+            "id": "76321272-ce96-45e0-a289-75b2e05a2ede",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/palestijnse_dorpen.geo.json"
+            },
+            "metadata": {
+              "title": "Palestijnse dorpen",
+              
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-color": "rgba(250.562,177.083,185.355,1)",
+              "circle-radius": 3.1,
+              "circle-stroke-width": 1.2,
+              "circle-stroke-color": "rgba(222.318,23.938,23.938,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Scholen",
+          "checked": false,
+          "layerInfo": {
+            "id": "68d8bbe5-28ec-4053-a24e-b81b7469ae78",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/scholen.geo.json"
+            },
+            "metadata": {
+              "title": "Scholen",
+              "visible": true,
+              "reference": false,
+              
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-radius": 3.3,
+              "circle-color": "rgba(171.092,222.318,156.147,1)",
+              "circle-stroke-color": "rgba(98.491,144.043,85.202,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Ziekenhuizen",
+          "checked": false,
+          "layerInfo": {
+            "id": "d354f1c1-521b-46ec-b920-710a317f23f2",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/ziekenhuizen.geo.json"
+            },
+            "metadata": {
+              "title": "Ziekenhuizen",
+              "visible": true,
+              "reference": false,
+              
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-color": "rgba(211,66,66,1)",
+              "circle-radius": 3.6,
+              "circle-stroke-width": 3.9,
+              "circle-stroke-color": "rgba(255,255,255,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Gezondheidscentra",
+          "checked": false,
+          "layerInfo": {
+            "id": "76f5490b-f2a0-4254-8e03-381d9528b652",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/gezondheidscentra.geo.json"
+            },
+            "metadata": {
+              "title": "Gezondheidscentra",
+              
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-color": "rgba(211,66,66,1)",
+              "circle-radius": 2.9,
+              "circle-stroke-width": 1.7,
+              "circle-stroke-color": "rgba(255,255,255,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Wateren",
+          "checked": false,
+          "layerInfo": {
+            "id": "c4176722-1ea2-4845-af55-e1ce2beef0fb",
+            "type": "line",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/wateren.geo.json"
+            },
+            "metadata": {
+              "title": "Wateren",
+              "visible": true,
+              "reference": false,
+              
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "line-color": "rgba(47.166,178.355,246.93,1)",
+              "line-width": 6.8
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Vliegvelden en Havens",
+          "checked": false,
+          "layerInfo": {
+            "id": "25b3b5a2-bceb-4803-9c82-2930337067d5",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/vliegvelden_havens.geo.json"
+            },
+            "metadata": {
+              "title": "Vliegvelden en Havens",
+              
+              "visible": true,
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "red"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Rioolafvoer",
+          "checked": false,
+          "layerInfo": {
+            "id": "4da6588d-3f3f-41ff-aa7f-22470658da93",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/rioolafvoer.geo.json"
+            },
+            "metadata": {
+              "title": "Rioolafvoer",
+              "visible": true,
+              "reference": false,
+              
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-color": "#FA0",
+              "circle-radius": 10,
+              "circle-stroke-width": 1,
+              "circle-stroke-color": "#FFF"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Viszones",
+          "checked": false,
+          "layerInfo": {
+            "id": "003ea2b1-9e7a-4492-b560-f51221b6ee12",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "data": "https://kaart.edugis.nl/data/palestina/viszones.geo.json"
+            },
+            "metadata": {
+              "title": "Viszones",
+              "visible": true,
+              
+              "reference": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "fill-color": "rgba(158,202,225,1)",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+        {
+          "type": "wms",
+          "title": "Sykes-Picotverdrag 1916",
+          "checked": false,
+          "layerInfo": {
+            "id": "003ea2b1-9e7a-4492-b560-f22222",
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tiles": [
+                "https://map.edugis.nl/cgi-bin/qgis_mapserv.fcgi?dpi=90&map=data/eduqgis/files/sykespicot1916.qgs&layers=sykes_picot_1916"
+              ]
+            },
+            "metadata": {
+              "legendurl": "https://map.edugis.nl/legends2/sykes_picot_1916_legend.png",
+              "title": "Sykes-Picotverdrag 1916",
+              "abstract": "Het Sykes-Picotverdrag was een geheime overeenkomst tussen het Verenigd Koninkrijk en Frankrijk in mei 1916 waarin zij afspraken maakten over hun invloedssfeer in Zuidwest-Azië als de Triple Entente erin zou slagen het Ottomaanse Rijk te verslaan tijdens de Eerste Wereldoorlog. Het was opgesteld door de Franse onderhandelaar Georges Picot en de Brit Mark Sykes. De Italianen en de Russen gingen ermee akkoord. De verdeling van het gebied tussen de twee overwinnaars had grote gevolgen voor de relaties tussen het Westen en de Arabische bevolking. Sykes-Picot leidde tot weerzin van de Arabische tegen de Westerse wereld.",
+              "attribution": "Royal Geographic Society",
+              "bounds": [32,29,51,43]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "tools": {
+    "toolbar": {
+      "visible": true,
+      "position": "opened",
+      "order": 0
+    },
+    "search": {
+      "visible": true,
+      "position": "",
+      "order": 1
+    },
+    "datacatalog": {
+      "opened": 1,
+      "visible": true,
+      "position": "opened",
+      "search": 1,
+      "order": 2
+    },
+    "measure": {
+      "visible": true,
+      "position": "",
+      "order": 3
+    },
+    "info": {
+      "visible": true,
+      "position": "",
+      "order": 4
+    },
+    "maplanguage": {
+      "visible": true,
+      "position": "",
+      "order": 5
+    },
+    "pitch": {
+      "visible": true,
+      "position": "",
+      "order": 6
+    },
+    "geolocate": {
+      "visible": true,
+      "position": "",
+      "order": 7
+    },
+    "draw": {
+      "visible": true,
+      "position": "",
+      "order": 8
+    },
+    "importexport": {
+      "visible": false,
+      "position": "",
+      "order": 100
+    },
+    "datatoolbox": {
+      "visible": true,
+      "position": "",
+      "order": 10
+    },
+    "sheetimport": {
+      "visible": true,
+      "position": "",
+      "order": 11
+    },
+    "projchooser": {
+      "visible": true,
+      "position": "",
+      "order": 120
+    },
+    "zoomlevel": {
+      "visible": 1,
+      "position": "bottom-left",
+      "order": 0
+    },
+    "navigation": {
+      "visible": 1,
+      "position": "bottom-left",
+      "order": 1
+    },
+    "coordinates": {
+      "visible": 1,
+      "position": "bottom-center",
+      "order": 202
+    },
+    "scalebar": {
+      "visible": true,
+      "position": "bottom-right",
+      "order": 203
+    },
+    "legend": {
+      "opened": 1,
+      "visible": 1,
+      "position": "top-right",
+      "order": 204
+    }
+  },
+  "keys": {},
+  "baseUrl": "https://kaart.edugis.nl/v2/maps/atlaspalestina.json"
+}
