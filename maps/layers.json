@@ -9892,16 +9892,19 @@
               "title": "Alle scholen",
               "layerInfo": {
                 "id": "allescholen20241122",
+                "metadata": {
+                  "abstract": "Alle schoolvestigingen in Nederland, gebaseerd op de datasets van DUO. De data is in EduGIS geupdate op 22 november 2024"
+                },
                 "type": "circle",
                 "source": {
                   "type": "vector",
                   "tiles": [
-                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen"
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen,denominatie,internetadres,straat,huisnummer,huisletter,huisnummertoevoeging,postcode,plaats,brin_nummer"
                   ]
                 },
                 "source-layer": "public.scholen20241122_geo",
                 "paint": {
-                  "circle-radius": 3,
+                  "circle-radius": 4,
                   "circle-color": "gray",
                   "circle-stroke-color": "gray",
                   "circle-stroke-width": 1
@@ -9912,16 +9915,19 @@
               "title": "Basisscholen",
               "layerInfo": {
                 "id": "basisscholen20241122",
+                "metadata": {
+                  "abstract": "Vestigingen van basisscholen in Nederland, gebaseerd op de datasets van DUO. De data is in EduGIS geupdate op 22 november 2024"
+                },
                 "type": "circle",
                 "source": {
                   "type": "vector",
                   "tiles": [
-                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen"
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen,denominatie,internetadres,straat,huisnummer,huisletter,huisnummertoevoeging,postcode,plaats,brin_nummer"
                   ]
                 },
                 "source-layer": "public.scholen20241122_geo",
                 "paint": {
-                  "circle-radius": 3,
+                  "circle-radius": 4,
                   "circle-color": "#e31a1c",
                   "circle-stroke-color": "gray",
                   "circle-stroke-width": 1
@@ -9937,16 +9943,19 @@
               "title": "Voorgezet onderwijs",
               "layerInfo": {
                 "id": "voortgezetonderwijs20241122",
+                "metadata": {
+                  "abstract": "Vestigingen van voortgezet onderwijs in Nederland, gebaseerd op de datasets van DUO. Meegenomen zijn brugjaar,pro,vbo,mavo,havo en vwo. De data is in EduGIS geupdate op 22 november 2024"
+                },
                 "type": "circle",
                 "source": {
                   "type": "vector",
                   "tiles": [
-                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen"
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen,denominatie,internetadres,straat,huisnummer,huisletter,huisnummertoevoeging,postcode,plaats,brin_nummer"
                   ]
                 },
                 "source-layer": "public.scholen20241122_geo",
                 "paint": {
-                  "circle-radius": 3,
+                  "circle-radius": 4,
                   "circle-color": "yellow",
                   "circle-stroke-color": "gray",
                   "circle-stroke-width": 1
@@ -9954,7 +9963,59 @@
                 "filter": [  
                   "in",
                   ["get", "type"],
-                  "BRUGJAAR|HAVO|HAVO/VWO|VWO|VBO|PRO|VBO/PRO|MAVO|VBO/MAVO|VBO/MAVO/HAVO|VBO/MAVO/HAVO/VWO|MAVO/HAVO/VWO|VBO/MAVO/HAVO/VWO/PRO"
+                  ["literal", 
+                    [
+                      "BRUGJAAR",
+                      "HAVO",
+                      "HAVO/VWO",
+                      "VWO",
+                      "VBO",
+                      "PRO",
+                      "VBO/PRO",
+                      "MAVO",
+                      "VBO/MAVO",
+                      "VBO/MAVO/HAVO",
+                      "VBO/MAVO/HAVO/VWO",
+                      "MAVO/HAVO/VWO",
+                      "VBO/MAVO/HAVO/VWO/PRO"
+                    ]
+                  ]
+                ]
+              }
+            },
+            {
+              "title": "Speciaal onderwijs",
+              "layerInfo": {
+                "id": "Speciaalonderwijs20241122",
+                "metadata": {
+                  "abstract": "Vestigingen van het speciaal onderwijs in Nederland, gebaseerd op de datasets van DUO. Meegenomen zijn sbao,so en vso. De data is in EduGIS geupdate op 22 november 2024"
+                },
+                
+                "type": "circle",
+                "source": {
+                  "type": "vector",
+                  "tiles": [
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen,denominatie,internetadres,straat,huisnummer,huisletter,huisnummertoevoeging,postcode,plaats,brin_nummer"
+                  ]
+                },
+                "source-layer": "public.scholen20241122_geo",
+                "paint": {
+                  "circle-radius": 4,
+                  "circle-color": "green",
+                  "circle-stroke-color": "gray",
+                  "circle-stroke-width": 1
+                },
+                "filter": [  
+                  "in",
+                  ["get", "type"],
+                  ["literal", 
+                    [
+                      "SBAO",
+                      "SO",
+                      "VSO",
+                      "(V)SO"
+                    ]
+                  ]
                 ]
               }
             },
