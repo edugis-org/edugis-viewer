@@ -21,11 +21,13 @@
           "layerInfo": {
             "id": "a1afd5e3-bd90-4cce-b9f5-f704e45e79ee",
             "type": "fill",
-            "source": {
-              "type": "geojson",
-              "attribution": "EduGIS",
-              "data": "https://kaart.edugis.nl/data/colombia/koffie_uit_colombia.geo.json"
+            "source":{
+              "type":"vector",
+              "tiles":["https://tiles.edugis.nl/data/public.koffie_uit_colombia_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=name,code,area,number+of+coffee+communities,number+of+coffee+growers,number+of+farms,planted+area+(ha),area+of+productive+crops+(ha),agricultural+area+(ha)&include_nulls=0"],
+              "bounds":[-79.01021097499995,-0.705840043976677,-69.42755517199998,12.459443307602038],
+              "attribution":"EduGIS"
             },
+            "source-layer": "public.koffie_uit_colombia_geo",
             "metadata": {
               "title": "Koffieteelt per departement",
               "abstract": "informatie over de laag",
@@ -41,7 +43,7 @@
                 ],
                 [
                   "get",
-                  "Agricultural Area (ha)"
+                  "agricultural area (ha)"
                 ],
                 100,
                 "#F9E79F",
@@ -66,11 +68,13 @@
           "layerInfo": {
             "id": "a1afd5e3-bd60-4cce-b9f5-f704e45e79dd",
             "type": "fill",
-            "source": {
-              "type": "geojson",
-              "attribution": "EduGIS",
-              "data": "https://kaart.edugis.nl/data/colombia/cooperativas_fill.geo.json"
+            "source":{
+              "type":"vector",
+              "tiles":["https://tiles.edugis.nl/data/public.cooperativas_fill_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=nombre_coo,indicativo,telefono,direccion,ciudad_mun,departamen,pais,sitio_web,codmun&include_nulls=0"],
+              "bounds":[-77.90859376194744,0.542830582055258,-71.83392168537647,11.349113520299522],
+              "attribution":"EduGIS"
             },
+            "source-layer": "public.cooperativas_fill_geo",
             "metadata": {
               "title": "Cooperaties",
               "abstract": "informatie over de laag",
@@ -83,7 +87,7 @@
                 "match",
                 [
                   "get",
-                  "NOMBRE_COO"
+                  "nombre_coo"
                 ],
                 "Cadefihuila",
                 "#BF4A3A",
