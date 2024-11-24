@@ -9889,16 +9889,92 @@
           "title": "Onderwijs",
           "sublayers": [
             {
-              "type": "getcapabilities",
-              "title": "Onderwijs",
+              "title": "Alle scholen",
               "layerInfo": {
-                "id": "voorzieningenonderwijs",
-                "url": "https://kaart.edugis.nl/data/nederland/voorzieningen_onderwijs.xml",
-                "tilecacheurl": [
-                  "https://t1.edugis.nl/tiles/tilecache.py",
-                  "https://t2.edugis.nl/tiles/tilecache.py"
+                "id": "allescholen20241122",
+                "type": "circle",
+                "source": {
+                  "type": "vector",
+                  "tiles": [
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen"
+                  ]
+                },
+                "source-layer": "public.scholen20241122_geo",
+                "paint": {
+                  "circle-radius": 3,
+                  "circle-color": "gray",
+                  "circle-stroke-color": "gray",
+                  "circle-stroke-width": 1
+                }
+              }
+            },
+            {
+              "title": "Basisscholen",
+              "layerInfo": {
+                "id": "basisscholen20241122",
+                "type": "circle",
+                "source": {
+                  "type": "vector",
+                  "tiles": [
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen"
+                  ]
+                },
+                "source-layer": "public.scholen20241122_geo",
+                "paint": {
+                  "circle-radius": 3,
+                  "circle-color": "#e31a1c",
+                  "circle-stroke-color": "gray",
+                  "circle-stroke-width": 1
+                },
+                "filter": [
+                  "==",
+                  ["get", "type"],
+                  "basisschool"
                 ]
               }
+            },
+            {
+              "title": "Voorgezet onderwijs",
+              "layerInfo": {
+                "id": "voortgezetonderwijs20241122",
+                "type": "circle",
+                "source": {
+                  "type": "vector",
+                  "tiles": [
+                    "https://tiles.edugis.nl/data/public.scholen20241122_geo/mvt/{z}/{x}/{y}?geom_column=geom&columns=naam,type,leerlingen"
+                  ]
+                },
+                "source-layer": "public.scholen20241122_geo",
+                "paint": {
+                  "circle-radius": 3,
+                  "circle-color": "yellow",
+                  "circle-stroke-color": "gray",
+                  "circle-stroke-width": 1
+                },
+                "filter": [  
+                  "in",
+                  ["get", "type"],
+                  "BRUGJAAR|HAVO|HAVO/VWO|VWO|VBO|PRO|VBO/PRO|MAVO|VBO/MAVO|VBO/MAVO/HAVO|VBO/MAVO/HAVO/VWO|MAVO/HAVO/VWO|VBO/MAVO/HAVO/VWO/PRO"
+                ]
+              }
+            },
+            {
+              "type": "group",
+              "title": "2015",
+              "sublayers":[
+                {
+                  "type": "getcapabilities",
+                  "title": "Onderwijs",
+                  "layerInfo": {
+                    "id": "voorzieningenonderwijs",
+                    "url": "https://kaart.edugis.nl/data/nederland/voorzieningen_onderwijs.xml",
+                    "tilecacheurl": [
+                      "https://t1.edugis.nl/tiles/tilecache.py",
+                      "https://t2.edugis.nl/tiles/tilecache.py"
+                    ]
+                  }
+                }
+              ]
             }
           ]
         },
