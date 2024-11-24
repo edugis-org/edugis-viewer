@@ -1,215 +1,496 @@
 {
   "map": {
-    "zoom": 13.11,
+    "zoom": 4.73,
     "center": [
-      -75.4283,2.4887    ],
+      -72.69,
+      3.71
+    ],
     "pitch": 0,
     "bearing": 0,
     "maxPitch": 85
   },
   "datacatalog": [
     {
+      "title": "Colombia",
       "type": "group",
-      "title": "Achtergrondlagen",
-      "id": "worldachtergrondlagen",
       "sublayers": [
-{
-          "type": "reference",
-          "title": "Satelliet | ESRI",
-          "layerInfo": {
-            "id": "esriworldimagery",
-            "metadata": {
-              "reference": true,
-              "title": "ESRI | Satelliet",
-              "userlayer": true
-            },
-            "type": "raster",
-            "source": {
-              "type": "raster",
-              "tiles": [
-                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              ],
-              "tileSize": 256,
-              "maxzoom": 22,
-              "attribution": "ESRI World Imagery"
-            }
-          },
-          "id": "Luchtfoto_(ESRI World Imagery)_reference_id",
-          "checked": false
-        },
         {
-          "type": "reference",
-          "title": "Topografisch | Bing ",
+          "type": "geojson",
+          "title": "Koffie uit Colombia",
           "checked": false,
           "layerInfo": {
-            "id": "bingmaproad",
-            "metadata": {
-              "reference": true,
-              "bing": true,
-              "title": "Bing | Topografisch ",
-              "userlayer": true
-            },
-            "type": "raster",
+            "id": "a1afd5e3-bd90-4cce-b9f5-f704e45e79ee",
+            "type": "fill",
             "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "attribution": "© 2022 Microsoft Corporation|© 2022 TomTom|© 2022 Zenrin",
-              "tiles": [
-                "https://ecn.t0.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
-                "https://ecn.t1.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
-                "https://ecn.t2.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
-                "https://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill"
+              "type": "geojson",
+              "attribution": "EduGIS",
+              "data": "https://kaart.edugis.nl/data/colombia/koffie_uit_colombia.geo.json"
+            },
+            "metadata": {
+              "title": "Koffieteelt per departement",
+              "abstract": "informatie over de laag",
+              "transparency": 10,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "fill-color": [
+                "interpolate",
+                [
+                  "linear"
+                ],
+                [
+                  "get",
+                  "Agricultural Area (ha)"
+                ],
+                100,
+                "#F9E79F",
+                3500,
+                "#F5B041",
+                20000,
+                "#DC7633",
+                35000,
+                "#A04000",
+                60000,
+                "#5B2C0F"
               ],
-              "maxzoom": 19
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#FFFFFF"
             }
-          },
-          "id": "Bing_| Topografisch _reference_id"
+          }
         },
         {
-          "type": "reference",
-          "title": "Bing | Satelliet",
-          "layerInfo": {
-            "id": "bingmapaerial",
-            "metadata": {
-              "reference": true,
-              "bing": true,
-              "title": "Bing | Satelliet",
-              "userlayer": true
-            },
-            "type": "raster",
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "attribution": "© 2024 Microsoft Corporation|© 2024 Maxar|©CNES (2024) Distribution Airbus DS|© 2024 TMAP MOBILITY|Earthstar Geographics  SIO",
-              "tiles": [
-                "https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327",
-                "https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327",
-                "https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327",
-                "https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327"
-              ],
-              "maxzoom": 18
-            }
-          },
-          "id": "Bing_| Satelliet_reference_id",
-          "checked": false
-        },
-        {
-          "type": "reference",
-          "title": "Bing | Combinatie",
-          "layerInfo": {
-            "id": "bingmaphybrid",
-            "metadata": {
-              "reference": true,
-              "bing": true,
-              "title": "Bing | Combinatie",
-              "userlayer": true
-            },
-            "type": "raster",
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "attribution": "© 2023 Microsoft Corporation|© 2023 Maxar|©CNES (2023) Distribution Airbus DS|© 2023 TMAP MOBILITY|Earthstar Geographics  SIO|© 2023 TomTom|© 2023 Zenrin",
-              "tiles": [
-                "https://ecn.t0.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE",
-                "https://ecn.t1.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE",
-                "https://ecn.t2.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE",
-                "https://ecn.t3.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE"
-              ],
-              "maxzoom": 18
-            }
-          },
-          "id": "Bing_| Combinatie_reference_id",
-          "checked": false
-        },
-        {
-          "title": "OpenStreetMap",
-          "type": "reference",
-          "layerInfo": {
-            "id": "openstreetmap",
-            "type": "raster",
-            "metadata": {
-              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
-              "title": "OpenStreetMap",
-              "reference": true
-            },
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://tiles.edugis.nl/mapproxy/osm/tiles/osm_EPSG900913/{z}/{x}/{y}.png?origin=nw"
-              ],
-              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
-            }
-          },
-          "id": "OpenStreetMap_reference_id",
-          "checked": false
-        },
-        {
-          "title": "OpenStreetMap | Grijs",
-          "type": "reference",
-          "layerInfo": {
-            "id": "openstreetmapgray",
-            "type": "raster",
-            "metadata": {
-              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
-              "title": "OpenStreetMap | Grijs",
-              "reference": true
-            },
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://tiles.edugis.nl/mapproxy/osm/tiles/osmgrayscale_EPSG900913/{z}/{x}/{y}.png?origin=nw"
-              ],
-              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
-            }
-          },
-          "id": "OpenStreetMap_| Grijs_reference_id",
-          "checked": false
-        },
-        {
-          "type": "reference",
-          "title": "OpenStreetMap | Helder",
+          "type": "geojson",
+          "title": "Cooperaties",
           "checked": false,
           "layerInfo": {
-            "id": "OsmBright",
-            "type": "style",
-            "source": "styles/openmaptiles/osmbright.json",
-            "metadata": {
-              "reference": true,
-              "title": "OpenStreetMap | Helder",
-              "styleid": "OsmBright",
-              "styletitle": "OpenStreetMap | Helder"
-            }
-          },
-          "id": "OpenStreetMap_| Helder_reference_id"
-        },
-        {
-          "type": "reference",
-          "title": "Mapbox | Satelliet",
-          "layerInfo": {
-            "id": "satellite",
-            "type": "raster",
+            "id": "a1afd5e3-bd60-4cce-b9f5-f704e45e79dd",
+            "type": "fill",
             "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.webp?access_token={mapboxkey}"
-              ],
-              "attribution": "mapbox"
+              "type": "geojson",
+              "attribution": "EduGIS",
+              "data": "https://kaart.edugis.nl/data/colombia/cooperativas_fill.geo.json"
             },
             "metadata": {
-              "title": "Mapbox | Satelliet",
-              "reference": true,
-              "userlayer": true
+              "title": "Cooperaties",
+              "abstract": "informatie over de laag",
+              "transparency": 10,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "fill-color": [
+                "match",
+                [
+                  "get",
+                  "NOMBRE_COO"
+                ],
+                "Cadefihuila",
+                "#BF4A3A",
+                "Cafenortenariño",
+                "#4BAF4B",
+                "Cafeoccidente",
+                "#4A6FBB",
+                "Caficaicedonia",
+                "#D35A8E",
+                "Caficauca",
+                "#4BB3B3",
+                "Caficentro",
+                "#C2C53C",
+                "Caficosta",
+                "#7A4B8A",
+                "Cafimeta",
+                "#D33A73",
+                "Cafinorte - Cooperativa de Caficultores del Norte del Cauca",
+                "#4BB2A0",
+                "Cafinorte - Cooperativa de Caficultores del Norte del Tolima",
+                "#A9C65D",
+                "Cafioccidente",
+                "#4A4BBB",
+                "Cafisevilla",
+                "#BF4A74",
+                "Cafisurtolima",
+                "#4B8A7A",
+                "Cafitolima",
+                "#D3A24D",
+                "Coocentral",
+                "#FFFFBF",
+                "Coodecafec",
+                "#4BAF4B",
+                "Coopcafenor",
+                "#4A4B8A",
+                "Coopcafer",
+                "#BF4A3A",
+                "Coopeartiva de Caficultores de Aguadas",
+                "#4B7B6E",
+                "Coopeoccidente",
+                "#7A4B8A",
+                "Cooperacafe",
+                "#BF3A5A",
+                "Cooperativa Manizales",
+                "#4B8A4F",
+                "Cooperativa de Caficultores Anserma",
+                "#A8C65D",
+                "Cooperativa de Caficultores de Alto Occidente de Caldas",
+                "#BF5A3A",
+                "Cooperativa de Caficultores de Antioquia",
+                "#4BB2A0",
+                "Cooperativa de Caficultores de Salgar",
+                "#4BAF4B",
+                "Cooperativa de Caficultores de Santander",
+                "#4A6FBB",
+                "Cooperativa de Caficultores del Líbano",
+                "#BF4A3A",
+                "Cooperativa de Caficultores del Quindío",
+                "#4BAF4B",
+                "Cooperativa de caficultores Norte de Caldas",
+                "#7A4B8A",
+                "Cooperativa de caficultores de Caquetá",
+                "#BF4A5A",
+                "Cooperativa de caficultores de Támara",
+                "#4BB2A0",
+                "Cooperativa de los Andes",
+                "#4A6FBB",
+                "#ccc"
+              ],
+              "fill-opacity": 1,
+              "fill-outline-color": "#444"
             }
-          },
-          "id": "Mapbox_satellite_wmts_id",
-          "checked": false
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Departement Huila",
+          "checked": false,
+          "layerInfo": {
+            "id": "a1afd5e3-bd90-4cce-b9f5-f704e45e79ff",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "attribution": "EduGIS",
+              "data": "https://kaart.edugis.nl/data/colombia/huila.geo.json"
+            },
+            "metadata": {
+              "title": "Departement Huila",
+              "abstract": "informatie over de laag",
+              "transparency": 10,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "fill-color": "#5B2C0F",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#FFFFFF"
+            }
+          }
+        },
+
+ {
+          "type": "geojson",
+          "title": "Caficultura Huila",
+          "checked": false,
+          "layerInfo": {
+            "id": "a1afd5e3-bd90-4cce-b9f5-f704e45e79gg",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "attribution": "EduGIS",
+              "data": "https://kaart.edugis.nl/data/colombia/caficultura_huila.geo.json"
+            },
+            "metadata": {
+              "title": "Koffieteelt Departement Huila",
+              "abstract": "informatie over de laag",
+              "transparency": 10,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "fill-color": "rgba(169, 97, 50, 1)",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#FFFFFF"
+            }
+          }
+        },
+
+
+
+
+        {
+          "type": "geojson",
+          "title": "Cooperatie Cadefihuila",
+          "checked": false,
+          "layerInfo": {
+            "id": "a1afd5e3-bd90-4cce-b9f5-f704e45e79dd",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "attribution": "EduGIS",
+              "data": "https://kaart.edugis.nl/data/colombia/cadefihuila.geo.json"
+            },
+            "metadata": {
+              "title": "Cooperatie Cadefihuila",
+              "abstract": "informatie over de laag",
+              "transparency": 10,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "fill-color": [
+                "match",
+                [
+                  "get",
+                  "NOMBRE_COO"
+                ],
+                "Cadefihuila",
+                "#BF4A3A",
+                "#ccc"
+              ],
+              "fill-opacity": 1,
+              "fill-outline-color": "#444"
+            }
+          }
+        },
+ {
+          "type": "geojson",
+          "title": "Hobo",
+          "checked": false,
+          "layerInfo": {
+            "id": "a1afd5e3-bd90-4cce-b9f5-f704e45e79pp",
+            "type": "fill",
+            "source": {
+              "type": "geojson",
+              "attribution": "EduGIS",
+              "data": "https://kaart.edugis.nl/data/colombia/hobo.geo.json"
+            },
+            "metadata": {
+              "title": "Hobo",
+              "abstract": "informatie over de laag",
+              "transparency": 10,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "fill-color": "#FFC107",
+              "fill-opacity": 0.6,
+              "fill-outline-color": "#FFFFFF"
+            }
+          }
+        },
+
+
+        {
+          "title": "Catastro publico Marzo 2024",
+          "layerInfo": {
+            "id": "e1e6e8fb-b5d3-43ec-b620-8135e8fc14b6",
+            "type": "fill",
+            "source": {
+              "type": "vector",
+              "tiles": [
+                "https://tiles.edugis.nl/data/public.catastro_publico_marzo_2024/mvt/{z}/{x}/{y}?geom_column=geom&columns=codigo_municipio&include_nulls=0"
+              ],
+              "bounds": [
+                -76.0286933762233,
+                1.78169943011444,
+                -74.943721681178,
+                2.98275742319354
+              ]
+            },
+            "source-layer": "public.catastro_publico_marzo_2024",
+            "paint": {
+              "fill-color": [
+                "case",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41615"
+                ],
+                "#a6cee3",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41306"
+                ],
+                "#1f78b4",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41132"
+                ],
+                "#b2df8a",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41801"
+                ],
+                "#33a02c",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41357"
+                ],
+                "#fb9a99",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41885"
+                ],
+                "#e31a1c",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41524"
+                ],
+                "#fdbf6f",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41349"
+                ],
+                "#ff7f00",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41797"
+                ],
+                "#cab2d6",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41013"
+                ],
+                "#6a3d9a",
+                [
+                  "==",
+                  [
+                    "get",
+                    "codigo_municipio"
+                  ],
+                  "41518"
+                ],
+                "#ffff99",
+                "#b15928"
+              ],
+              "fill-outline-color": "white",
+              "fill-opacity": 0.8
+            }
+          }
+        },
+        {
+          "title": "percelen Batan",
+          "layerInfo": {
+            "id": "percelen_batan",
+            "type": "fill",
+            "source": {
+              "type": "vector",
+              "tiles": [
+                "https://tiles.edugis.nl/data/public.parcels_batan/mvt/{z}/{x}/{y}?geom_column=geom&columns=landuse_de&include_nulls=0"
+              ],
+              "bounds": [
+                -75.443880022,
+                2.46682306100007,
+                -75.414098369,
+                2.51384896400004
+              ]
+            },
+            "source-layer": "public.parcels_batan",
+            "paint": {
+              "fill-color": [
+                "match",
+                [
+                  "get",
+                  "landuse_de"
+                ],
+                "Koffieteelt",
+                "#7fc97f",
+                "Leeg",
+                "#beaed4",
+                "Onbekend",
+                "#fdc086",
+                "School",
+                "#ffff99",
+                "Veeteelt",
+                "#386cb0",
+                "Woning",
+                "#f0027f",
+                "#f0027f"
+              ],
+              "fill-outline-color": "white"
+            }
+          }
+        },
+        {
+          "title": "Zonificacion Ley 2 Septiembre 2023",
+          "layerInfo": {
+            "id": "5b274253-9d65-4f39-a28f-a9d7d6c92ef9",
+            "type": "fill",
+            "source": {
+              "type": "vector",
+              "tiles": [
+                "https://tiles.edugis.nl/data/public.zonificacion_ley2_septiembre_2023_geo_json/mvt/{z}/{x}/{y}?geom_column=geom&columns=tipo_zoni,id_ley2,nom_ley2,soporte,departamen,area_ha,fecha_ingr,fecha_reco&include_nulls=0"
+              ],
+              "bounds": [
+                -79.0090316339999,
+                -4.04713367899995,
+                -66.84721544,
+                11.341593007
+              ]
+            },
+            "source-layer": "public.zonificacion_ley2_septiembre_2023_geo_json",
+            "paint": {
+              "fill-color": [
+                "match",
+                [
+                  "get",
+                  "tipo_zoni"
+                ],
+                "Tipo A",
+                "#fbb4ae",
+                "Tipo B",
+                "#b3cde3",
+                "Tipo C",
+                "#ccebc5",
+                "Áreas con Previa Decisión de Ordenamiento",
+                "#decbe4",
+                "black"
+              ],
+              "fill-outline-color": "white",
+              "fill-opacity": 0.8
+            }
+          }
         }
-        
       ]
-    },{
+    },
+    {
       "type": "group",
       "title": "Geografische lijnen",
       "id": "Geografische_lijnen_group_id",
@@ -1147,13 +1428,20 @@
             "type": "hillshade",
             "metadata": {
               "opacity": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        12, 20, 
-        6, 50, 
-        2, 100  
-      ],
+                "interpolate",
+                [
+                  "linear"
+                ],
+                [
+                  "zoom"
+                ],
+                12,
+                20,
+                6,
+                50,
+                2,
+                100
+              ],
               "title": "Reliëf"
             },
             "source": {
@@ -1174,33 +1462,6 @@
             }
           },
           "id": "Relief_rasterdem_id",
-          "checked": false
-        },
-        {
-          "title": "Landbedekking",
-          "id": "worldlandcover",
-          "type": "wmts",
-          "layerInfo": {
-            "id": "worldlandcover",
-            "type": "raster",
-            "minzoom": 0,
-            "maxzoom": 22.5,
-            "metadata": {
-              "getFeatureInfoUrl": "https://tiles.edugis.nl/mapproxy/landcover/wms?version=1.1.1&request=GetFeatureInfo&styles=&layers=landcover&query_layers=landcover",
-              "getFeatureInfoFormat": "application/vnd.ogc.gml",
-              "abstract": "Landbedekkingskaart. Deze kaart geeft aan warmee het land wordt bedekt zoals bijvoorbeeld verschillende soorten vegetatie, zand, steen of ijs.",
-              "legendurl": "https://tiles.edugis.nl/mapproxy/landcover/wms?version=1.1.1&request=GetLegendGraphic&styles=&layer=landcover&format=image/png",
-              "title": "Landbedekking"
-            },
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://tiles.edugis.nl/mapproxy/landcover/wmts/landcover/GLOBAL_WEBMERCATOR/{z}/{x}/{y}.png"
-              ],
-              "attribution": "&copy; <a href=\"https://github.com/globalmaps/gm_lc_v3\" target=\"copyright\">GLCNMO Version 3</a>"
-            }
-          },
           "checked": false
         },
         {
@@ -1245,6 +1506,33 @@
               "attribution": "Forest Observatory (EU)"
             }
           }
+        },
+        {
+          "title": "Landbedekking",
+          "id": "worldlandcover",
+          "type": "wmts",
+          "layerInfo": {
+            "id": "worldlandcover",
+            "type": "raster",
+            "minzoom": 0,
+            "maxzoom": 22.5,
+            "metadata": {
+              "getFeatureInfoUrl": "https://tiles.edugis.nl/mapproxy/landcover/wms?version=1.1.1&request=GetFeatureInfo&styles=&layers=landcover&query_layers=landcover",
+              "getFeatureInfoFormat": "application/vnd.ogc.gml",
+              "abstract": "Landbedekkingskaart. Deze kaart geeft aan warmee het land wordt bedekt zoals bijvoorbeeld verschillende soorten vegetatie, zand, steen of ijs.",
+              "legendurl": "https://tiles.edugis.nl/mapproxy/landcover/wms?version=1.1.1&request=GetLegendGraphic&styles=&layer=landcover&format=image/png",
+              "title": "Landbedekking"
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/landcover/wmts/landcover/GLOBAL_WEBMERCATOR/{z}/{x}/{y}.png"
+              ],
+              "attribution": "&copy; <a href=\"https://github.com/globalmaps/gm_lc_v3\" target=\"copyright\">GLCNMO Version 3</a>"
+            }
+          },
+          "checked": false
         },
         {
           "type": "group",
@@ -2307,7 +2595,7 @@
           "title": "Klimaat",
           "id": "Klimaat_group_id",
           "sublayers": [
-           {
+            {
               "type": "geojson",
               "title": "Klimaat Koppen 2017",
               "layerInfo": {
@@ -2343,87 +2631,86 @@
                   "userlayer": true,
                   "cansave": true
                 },
-              
-
-"paint": {
-      "fill-outline-color": "rgba(255,255,255,0)",
-      "fill-color": [
-        "match",
-        [
-          "get",
-          "Code"
-        ],
-        "Af",
-        "#1300FC",
-        "Am",
-        "#0E73FC",
-        "Aw",
-        "#3AAAFC",
-        "As",
-        "#3AAAFC",
-        "BWh",
-        "#FD0000",
-        "BWk",
-        "#FE9594",
-        "BSh",
-        "rgba(200, 164, 43, 1)",
-        "BSk",
-        "#FDDA62",
-        "Csa",
-        "#FCFE04",
-        "Csb",
-        "#CECC08",
-        "Csc",
-        "#9B9A03",
-        "Cwa",
-        "#94FE97",
-        "Cwb",
-        "#5FC765",
-        "Cwc",
-        "#369633",
-        "Cfa",
-        "#C5FE4B",
-        "Cfb",
-        "#63FD32",
-        "Cfc",
-        "#35C600",
-        "Dsa",
-        "#FC00FB",
-        "Dsb",
-        "#C900C4",
-        "Dsc",
-        "#983396",
-        "Dsd",
-        "#8E5D92",
-        "Dwa",
-        "#A5AFFF",
-        "Dwb",
-        "#4A78E3",
-        "Dwc",
-        "#484EB4",
-        "Dwd",
-        "#30008A",
-        "Dfa",
-        "#00FCFD",
-        "Dfb",
-        "#3DC6FA",
-        "Dfc",
-        "#007E7E",
-        "Dfd",
-        "#004660",
-        "ET",
-        "#AEB0AD",
-        "EH",
-        "#FFFFFF",
-        "EF",
-        "#686967",
-        "#000000"
-      ],
-      "fill-opacity": 0.8
-               }   },
+                "paint": {
+                  "fill-outline-color": "rgba(255,255,255,0)",
+                  "fill-color": [
+                    "match",
+                    [
+                      "get",
+                      "Code"
+                    ],
+                    "Af",
+                    "#1300FC",
+                    "Am",
+                    "#0E73FC",
+                    "Aw",
+                    "#3AAAFC",
+                    "As",
+                    "#3AAAFC",
+                    "BWh",
+                    "#FD0000",
+                    "BWk",
+                    "#FE9594",
+                    "BSh",
+                    "rgba(200, 164, 43, 1)",
+                    "BSk",
+                    "#FDDA62",
+                    "Csa",
+                    "#FCFE04",
+                    "Csb",
+                    "#CECC08",
+                    "Csc",
+                    "#9B9A03",
+                    "Cwa",
+                    "#94FE97",
+                    "Cwb",
+                    "#5FC765",
+                    "Cwc",
+                    "#369633",
+                    "Cfa",
+                    "#C5FE4B",
+                    "Cfb",
+                    "#63FD32",
+                    "Cfc",
+                    "#35C600",
+                    "Dsa",
+                    "#FC00FB",
+                    "Dsb",
+                    "#C900C4",
+                    "Dsc",
+                    "#983396",
+                    "Dsd",
+                    "#8E5D92",
+                    "Dwa",
+                    "#A5AFFF",
+                    "Dwb",
+                    "#4A78E3",
+                    "Dwc",
+                    "#484EB4",
+                    "Dwd",
+                    "#30008A",
+                    "Dfa",
+                    "#00FCFD",
+                    "Dfb",
+                    "#3DC6FA",
+                    "Dfc",
+                    "#007E7E",
+                    "Dfd",
+                    "#004660",
+                    "ET",
+                    "#AEB0AD",
+                    "EH",
+                    "#FFFFFF",
+                    "EF",
+                    "#686967",
+                    "#000000"
+                  ],
+                  "fill-opacity": 0.8
+                }
+              },
               "checked": false
             },
- {
+            {
               "title": "Klimaat Koppen 2007",
               "id": "klimaat",
               "layerInfo": {
@@ -3111,11 +3398,11 @@
             },
             "source-layer": "public.ne_10m_admin_0_countries",
             "paint": {
-              "line-color": "black",
+              "line-color": "white",
               "line-width": 2
             }
           },
-          "checked": false
+          "checked": true
         },
         {
           "title": "Staten en provincies",
@@ -3193,16 +3480,54 @@
             "paint": {
               "circle-radius": [
                 "interpolate",
-                ["exponential", 2 ],
-                ["zoom"], 
-                0, ["+", 1,["*", 0.00025, ["sqrt", ["get","pop_est"] ] ] ],
-
-                6, ["*", 0.016,           ["sqrt", ["get","pop_est"] ] ],
-
-                14, ["*", 0.016,          ["sqrt", ["get","pop_est"] ] ]
-              ]
-
-,
+                [
+                  "exponential",
+                  2
+                ],
+                [
+                  "zoom"
+                ],
+                0,
+                [
+                  "+",
+                  1,
+                  [
+                    "*",
+                    0.00025,
+                    [
+                      "sqrt",
+                      [
+                        "get",
+                        "pop_est"
+                      ]
+                    ]
+                  ]
+                ],
+                6,
+                [
+                  "*",
+                  0.016,
+                  [
+                    "sqrt",
+                    [
+                      "get",
+                      "pop_est"
+                    ]
+                  ]
+                ],
+                14,
+                [
+                  "*",
+                  0.016,
+                  [
+                    "sqrt",
+                    [
+                      "get",
+                      "pop_est"
+                    ]
+                  ]
+                ]
+              ],
               "circle-color": "#a63603",
               "circle-stroke-color": "white",
               "circle-stroke-width": 1,
@@ -4185,138 +4510,394 @@
       ]
     },
     {
-    "type": "group",
-    "title": "Topografie lagen",
-    "sublayers": [
-      {
-        "title": "Water en waterwegen",
-        "layerInfo": "./layers/osmbrightwater.json"
-      },
-      {
-        "title": "Waternamen",
-        "layerInfo": "./layers/osmbrightwatername.json"
-      },
-      {
-        "title": "Administratieve grenzen",
-        "layerInfo": "./layers/osmbrightadminborders.json"
-      },
-      {
-        "title": "Snelwegen",
-        "layerInfo": "./layers/osmbrightroads.json"
-      },
-      {
-        "title": "Snelwegnamen",
-        "layerInfo": "./layers/brightmotorwayname.json"
-      },
-      {
-        "title": "Wegen",
-        "layerInfo": "./layers/osmbrightallroads.json"
-      },
-      {
-        "title": "Wegnamen",
-        "layerInfo": "./layers/osmbrightallroadnames.json"
-      },
-      {
-        "title":"Spoorwegen",
-        "layerInfo": "./layers/osmbrightrail.json"
-      },
-      {
-        "title": "Plaatsen",
-        "layerInfo": "./layers/osmbrightpoi.json"
-      },
-      {
-        "title": "Plaatsnamen",
-        "layerInfo": "./layers/osmbrightpoiname.json"
-      },
-      {
-        "title": "Gebouwen",
-        "layerInfo": "./layers/osmbrightbuildings.json"
-      }                  
-    ]},
-      {
-        "title": "Colombia",
-        "type": "group",
-        "sublayers": [
-          {
-            "title": "percelen Batan",
-            "layerInfo": {
-              "id": "percelen_batan",
-              "type": "fill",
-              "source": {
-                "type": "vector",
-                "tiles": [
-                  "https://tiles.edugis.nl/data/public.parcels_batan/mvt/{z}/{x}/{y}?geom_column=geom&columns=landuse_de&include_nulls=0"
-                ],
-                "bounds":[-75.443880022,2.46682306100007,-75.414098369,2.51384896400004]
-              },
-              "source-layer": "public.parcels_batan",
-              "paint": {
-                "fill-color":[
-                  "match",["get","landuse_de"],
-                  "Koffieteelt","#7fc97f",
-                  "Leeg","#beaed4",
-                  "Onbekend","#fdc086",
-                  "School","#ffff99",
-                  "Veeteelt","#386cb0",
-                  "Woning","#f0027f",
-                  "#f0027f"
-                ],
-                "fill-outline-color":"white"
-              }
-            }
-          },
-          {
-            "title": "Zonificacion Ley 2 Septiembre 2023",
-            "layerInfo": {
-              "id":"5b274253-9d65-4f39-a28f-a9d7d6c92ef9",
-              "type":"fill",
-              "source":{
-                  "type":"vector",
-                  "tiles":["https://tiles.edugis.nl/data/public.zonificacion_ley2_septiembre_2023_geo_json/mvt/{z}/{x}/{y}?geom_column=geom&columns=tipo_zoni,id_ley2,nom_ley2,soporte,departamen,area_ha,fecha_ingr,fecha_reco&include_nulls=0"],
-                  "bounds":[-79.0090316339999,-4.04713367899995,-66.84721544,11.341593007]},
-              "source-layer":"public.zonificacion_ley2_septiembre_2023_geo_json",
-              "paint":{
-              "fill-color":[
-                "match", ["get","tipo_zoni"],
-                "Tipo A","#fbb4ae",
-                "Tipo B","#b3cde3",
-                "Tipo C","#ccebc5",
-                "Áreas con Previa Decisión de Ordenamiento","#decbe4",
-                "black"
+      "type": "group",
+      "title": "Topografie lagen",
+      "sublayers": [
+        {
+          "title": "Water en waterwegen",
+          "layerInfo": "./layers/osmbrightwater.json"
+        },
+        {
+          "title": "Waternamen",
+          "layerInfo": "./layers/osmbrightwatername.json"
+        },
+        {
+          "title": "Administratieve grenzen",
+          "layerInfo": "./layers/osmbrightadminborders.json"
+        },
+        {
+          "title": "Snelwegen",
+          "layerInfo": "./layers/osmbrightroads.json"
+        },
+        {
+          "title": "Snelwegnamen",
+          "layerInfo": "./layers/brightmotorwayname.json"
+        },
+        {
+          "title": "Wegen",
+          "layerInfo": "./layers/osmbrightallroads.json"
+        },
+        {
+          "title": "Wegnamen",
+          "layerInfo": "./layers/osmbrightallroadnames.json"
+        },
+        {
+          "title": "Spoorwegen",
+          "layerInfo": "./layers/osmbrightrail.json"
+        },
+        {
+          "title": "Plaatsen",
+          "layerInfo": "./layers/osmbrightpoi.json"
+        },
+        {
+          "title": "Plaatsnamen",
+          "layerInfo": "./layers/osmbrightpoiname.json"
+        },
+        {
+          "title": "Gebouwen",
+          "layerInfo": "./layers/osmbrightbuildings.json"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "title": "Achtergrondlagen",
+      "sublayers": [
+        {
+          "title": "Topografisch",
+          "type": "layergroup"
+        },
+        {
+          "title": "Standaard (OSM)",
+          "type": "reference",
+          "checked": false,
+          "layerInfo": {
+            "id": "openstreetmap",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png"
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "maxzoom": 19,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/osm/tiles/osm_EPSG900913/{z}/{x}/{y}.png?origin=nw"
               ],
-              "fill-outline-color":"white","fill-opacity":0.8}
-            }
-          },
-          {
-            "title": "Catastro publico Marzo 2024",
-            "layerInfo": {
-              "id":"e1e6e8fb-b5d3-43ec-b620-8135e8fc14b6",
-              "type":"fill",
-              "source":{
-                  "type":"vector",
-                  "tiles":["https://tiles.edugis.nl/data/public.catastro_publico_marzo_2024/mvt/{z}/{x}/{y}?geom_column=geom&columns=codigo_municipio&include_nulls=0"],
-                  "bounds":[-76.0286933762233,1.78169943011444,-74.943721681178,2.98275742319354]},
-              "source-layer":"public.catastro_publico_marzo_2024",
-              "paint":{
-              "fill-color":[
-                  "case",["==",["get","codigo_municipio"],"41615"],"#a6cee3",
-                  ["==",["get","codigo_municipio"],"41306"],"#1f78b4",
-                  ["==",["get","codigo_municipio"],"41132"],"#b2df8a",
-                  ["==",["get","codigo_municipio"],"41801"],"#33a02c",
-                  ["==",["get","codigo_municipio"],"41357"],"#fb9a99",
-                  ["==",["get","codigo_municipio"],"41885"],"#e31a1c",
-                  ["==",["get","codigo_municipio"],"41524"],"#fdbf6f",
-                  ["==",["get","codigo_municipio"],"41349"],"#ff7f00",
-                  ["==",["get","codigo_municipio"],"41797"],"#cab2d6",
-                  ["==",["get","codigo_municipio"],"41013"],"#6a3d9a",
-                  ["==",["get","codigo_municipio"],"41518"],"#ffff99",
-                  "#b15928"],
-                  "fill-outline-color":"white",
-                  "fill-opacity":0.8}
+              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
             }
           }
-        ]
-      }
+        },
+        {
+          "type": "reference",
+          "title": "Helder (OSM)",
+          "layerInfo": {
+            "id": "OsmBright",
+            "type": "style",
+            "source": "styles/openmaptiles/osmbright.json",
+            "metadata": {
+              "reference": true
+            }
+          }
+        },
+        {
+          "title": "Grijs (OSM)",
+          "type": "reference",
+          "layerInfo": {
+            "id": "openstreetmapgray",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png"
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "maxzoom": 19,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/osm/tiles/osmgrayscale_EPSG900913/{z}/{x}/{y}.png?origin=nw"
+              ],
+              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Donker (OSM)",
+          "layerInfo": {
+            "id": "DarkMatter",
+            "type": "style",
+            "source": "styles/openmaptiles/dark-matter.json",
+            "metadata": {
+              "reference": true
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Eenvoudig (OSM)",
+          "layerInfo": {
+            "id": "klokantechbasic",
+            "type": "style",
+            "source": "styles/openmaptiles/klokantech-basic.json",
+            "metadata": {
+              "reference": true
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Eenvoudig grijs (OSM)",
+          "layerInfo": {
+            "id": "Positron",
+            "type": "style",
+            "source": "styles/openmaptiles/positron.json",
+            "metadata": {
+              "reference": true
+            }
+          }
+        },
+        {
+          "title": "Standaard (NL BRT)",
+          "type": "reference",
+          "layerInfo": {
+            "id": "brtachtergrondkaart",
+            "type": "raster",
+            "metadata": {
+              "reference": true,
+              "legendurl": "https://kaart.edugis.nl/data/img/brt.png"
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png"
+              ],
+              "attribution": "PDOK",
+              "minzoom": 5,
+              "maxzoom": 18,
+              "bounds": [
+                -1.6,
+                47.5,
+                13,
+                56
+              ]
+            }
+          }
+        },
+        {
+          "title": "Wateren (NL BRT)",
+          "type": "reference",
+          "checked": false,
+          "layerInfo": {
+            "id": "BRT_achtergrondkaart Water [tms]_id",
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/water/EPSG:3857/{z}/{x}/{y}.png"
+              ],
+              "attribution": "� CC-BY Kadaster"
+            },
+            "metadata": {}
+          },
+          "id": "1275"
+        },
+        {
+          "type": "reference",
+          "title": "Standaard (Bing)",
+          "layerInfo": {
+            "id": "bingmaproad",
+            "metadata": {
+              "reference": true,
+              "bing": true
+            },
+            "type": "raster",
+            "source": {
+              "url": "https://dev.virtualearth.net/REST/V1/Imagery/Metadata/Road?output=json&include=ImageryProviders&uriScheme=https&key={bingkey}",
+              "maxzoom": 19
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Zwart-Wit (Stamen)",
+          "layerInfo": {
+            "id": "stamentoner",
+            "metadata": {
+              "reference": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png"
+              ],
+              "attribution": "&copy; <a href=\"https://www.stamen.com\" target=\"attribution\">Stamen Design</a>,<a href=\"https://www.openstreetmap.org/about\" target=\"attribution\">OpenStreetMap contributors</a>",
+              "maxzoom": 17
+            }
+          }
+        },
+        {
+          "type": "layergroup",
+          "title": "Luchtfoto"
+        },
+        {
+          "type": "reference",
+          "checked": true,
+          "title": "Wereld (ESRI World Imagery)",
+          "layerInfo": {
+            "id": "esriworldimagery",
+            "metadata": {
+              "reference": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tiles": [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              ],
+              "tileSize": 256,
+              "maxzoom": 22,
+              "attribution": "ESRI World Imagery"
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Wereld (Microsoft Bing)",
+          "layerInfo": {
+            "id": "bingmapaerial",
+            "metadata": {
+              "reference": true,
+              "bing": true
+            },
+            "type": "raster",
+            "source": {
+              "url": "https://dev.virtualearth.net/REST/V1/Imagery/Metadata/Aerial?output=json&include=ImageryProviders&uriScheme=https&key={bingkey}",
+              "maxzoom": 18
+            }
+          }
+        },
+        {
+          "title": "Nederland-2016 (PDOK)",
+          "type": "reference",
+          "layerInfo": {
+            "id": "pdokluchtfotowmts2016",
+            "type": "raster",
+            "metadata": {
+              "reference": true,
+              "legendurl": "https://map.edugis.nl/legends2/pdoklufolegend2016.png"
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/2016_ortho25/EPSG:3857/{z}/{x}/{y}.jpeg"
+              ],
+              "attribution": "PDOK",
+              "minzoom": 5,
+              "maxzoom": 18,
+              "bounds": [
+                2.75,
+                50.5,
+                7.5,
+                53.6
+              ]
+            }
+          }
+        },
+        {
+          "title": "Nederland Actueel (PDOK)",
+          "type": "reference",
+          "layerInfo": {
+            "id": "pdokluchtfotowmtsactueel",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://map.edugis.nl/legends2/pdoklufolegend.png",
+              "reference": true
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_ortho25/EPSG:3857/{z}/{x}/{y}.jpeg"
+              ],
+              "attribution": "PDOK",
+              "minzoom": 5,
+              "maxzoom": 18,
+              "bounds": [
+                2.75,
+                50.5,
+                7.5,
+                53.6
+              ]
+            }
+          }
+        },
+        {
+          "type": "layergroup",
+          "title": "Overig"
+        },
+        {
+          "type": "reference",
+          "title": "Hybride | Wereld (Microsoft Bing)",
+          "layerInfo": {
+            "id": "bingmaphybrid",
+            "metadata": {
+              "reference": true,
+              "bing": true
+            },
+            "type": "raster",
+            "source": {
+              "url": "https://dev.virtualearth.net/REST/V1/Imagery/Metadata/AerialWithLabels?output=json&include=ImageryProviders&uriScheme=https&key={bingkey}",
+              "maxzoom": 18
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Waterverf (Stamen)",
+          "layerInfo": {
+            "id": "stamenwatercolor",
+            "metadata": {
+              "reference": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
+              ],
+              "attribution": "&copy; <a href=\"https://www.stamen.com\" target=\"attribution\">Stamen Design</a>,<a href=\"https://www.openstreetmap.org/about\" target=\"attribution\">OpenStreetMap contributors</a>",
+              "maxzoom": 17
+            }
+          }
+        },
+        {
+          "type": "reference",
+          "title": "Terrein | Relief (Stamen)",
+          "layerInfo": {
+            "id": "stamenterrain",
+            "metadata": {
+              "reference": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png"
+              ],
+              "attribution": "&copy; <a href=\"https://www.stamen.com\" target=\"attribution\">Stamen Design</a>,<a href=\"https://www.openstreetmap.org/about\" target=\"attribution\">OpenStreetMap contributors</a>",
+              "maxzoom": 16
+            }
+          }
+        }
+      ]
+    }
   ],
   "tools": {
     "toolbar": {
@@ -4371,7 +4952,7 @@
       "order": 99999
     },
     "datatoolbox": {
-      "visible": 0,
+      "visible": 1,
       "position": "",
       "order": 10
     },
@@ -4413,5 +4994,5 @@
     }
   },
   "keys": {},
-  "baseUrl": "https://kaart.edugis.nl/v2/maps/test.json"
+  "baseUrl": "https://kaart.edugis.nl/v2/maps/colombia.json"
 }
