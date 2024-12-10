@@ -6,8 +6,7 @@
       -0.7238730987698005
     ],
     "pitch": 0,
-    "bearing": 0,
-    "maxPitch": 85
+    "bearing": 0
   },
   "datacatalog": [
     {
@@ -15,14 +14,19 @@
       "title": "Achtergrondlagen",
       "id": "worldachtergrondlagen",
       "sublayers": [
+ {
+          "title": "Luchtfoto- en satellietachtergrond",
+          "type": "layergroup"
+        },
+
 {
           "type": "reference",
-          "title": "Satelliet | ESRI",
+          "title": "Wereld (ESRI World Imagery)",
           "layerInfo": {
             "id": "esriworldimagery",
             "metadata": {
               "reference": true,
-              "title": "ESRI | Satelliet",
+              "title": "Wereld (ESRI World Imagery)",
               "userlayer": true
             },
             "type": "raster",
@@ -39,43 +43,40 @@
           "id": "Luchtfoto_(ESRI World Imagery)_reference_id",
           "checked": false
         },
+
         {
           "type": "reference",
-          "title": "Topografisch | Bing ",
-          "checked": false,
+          "title": "Wereld (Mapbox)",
           "layerInfo": {
-            "id": "bingmaproad",
-            "metadata": {
-              "reference": true,
-              "bing": true,
-              "title": "Bing | Topografisch ",
-              "userlayer": true
-            },
+            "id": "satellite",
             "type": "raster",
             "source": {
               "type": "raster",
               "tileSize": 256,
-              "attribution": "© 2022 Microsoft Corporation|© 2022 TomTom|© 2022 Zenrin",
               "tiles": [
-                "https://ecn.t0.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
-                "https://ecn.t1.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
-                "https://ecn.t2.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
-                "https://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill"
+                "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.webp?access_token={mapboxkey}"
               ],
-              "maxzoom": 19
+              "attribution": "Mapbox World Imagery"
+            },
+            "metadata": {
+              "title": "Wereld (Mapbox)",
+              "reference": true,
+              "userlayer": true
             }
           },
-          "id": "Bing_| Topografisch _reference_id"
+          "id": "Mapbox_satellite_wmts_id",
+          "checked": false
         },
-        {
+
+{
           "type": "reference",
-          "title": "Bing | Satelliet",
+          "title": "Wereld (Bing)",
           "layerInfo": {
             "id": "bingmapaerial",
             "metadata": {
               "reference": true,
               "bing": true,
-              "title": "Bing | Satelliet",
+              "title": "Wereld (Bing)",
               "userlayer": true
             },
             "type": "raster",
@@ -95,9 +96,109 @@
           "id": "Bing_| Satelliet_reference_id",
           "checked": false
         },
+
+ {
+          "title": "Topografische achtergrondlagen",
+          "type": "layergroup"
+        },
+
+ {
+          "title": "Standaard (OSM)",
+          "type": "reference",
+          "layerInfo": {
+            "id": "openstreetmap",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
+              "title": "Standaard (OSM)",
+              "reference": true
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/osm/tiles/osm_EPSG900913/{z}/{x}/{y}.png?origin=nw"
+              ],
+              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
+            }
+          },
+          "id": "OpenStreetMap_reference_id",
+          "checked": false
+        },
+        {
+          "title": "Grijs (OSM)",
+          "type": "reference",
+          "layerInfo": {
+            "id": "openstreetmapgray",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
+              "title": "Grijs (OSM)",
+              "reference": true
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/osm/tiles/osmgrayscale_EPSG900913/{z}/{x}/{y}.png?origin=nw"
+              ],
+              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
+            }
+          },
+          "id": "OpenStreetMap_| Grijs_reference_id",
+          "checked": false
+        },
         {
           "type": "reference",
-          "title": "Bing | Combinatie",
+          "title": "Helder (OSM)",
+          "checked": false,
+          "layerInfo": {
+            "id": "OsmBright",
+            "type": "style",
+            "source": "styles/openmaptiles/osmbright.json",
+            "metadata": {
+              "reference": true,
+              "title": "Helder (OSM)",
+              "styleid": "OsmBright",
+              "styletitle": "OpenStreetMap | Helder"
+            }
+          },
+          "id": "OpenStreetMap_| Helder_reference_id"
+        },
+
+
+        {
+          "type": "reference",
+          "title": "Standaard (Bing)",
+          "checked": false,
+          "layerInfo": {
+            "id": "bingmaproad",
+            "metadata": {
+              "reference": true,
+              "bing": true,
+              "title": "Standaard (Bing)",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "attribution": "© 2022 Microsoft Corporation|© 2022 TomTom|© 2022 Zenrin",
+              "tiles": [
+                "https://ecn.t0.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
+                "https://ecn.t1.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
+                "https://ecn.t2.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
+                "https://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill"
+              ],
+              "maxzoom": 19
+            }
+          },
+          "id": "Bing_| Topografisch _reference_id"
+        },
+        
+        {
+          "type": "reference",
+          "title": "Hybride (Bing)",
           "layerInfo": {
             "id": "bingmaphybrid",
             "metadata": {
@@ -122,99 +223,15 @@
           },
           "id": "Bing_| Combinatie_reference_id",
           "checked": false
-        },
-        {
-          "title": "OpenStreetMap",
-          "type": "reference",
-          "layerInfo": {
-            "id": "openstreetmap",
-            "type": "raster",
-            "metadata": {
-              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
-              "title": "OpenStreetMap",
-              "reference": true
-            },
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://tiles.edugis.nl/mapproxy/osm/tiles/osm_EPSG900913/{z}/{x}/{y}.png?origin=nw"
-              ],
-              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
-            }
-          },
-          "id": "OpenStreetMap_reference_id",
-          "checked": false
-        },
-        {
-          "title": "OpenStreetMap | Grijs",
-          "type": "reference",
-          "layerInfo": {
-            "id": "openstreetmapgray",
-            "type": "raster",
-            "metadata": {
-              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
-              "title": "OpenStreetMap | Grijs",
-              "reference": true
-            },
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://tiles.edugis.nl/mapproxy/osm/tiles/osmgrayscale_EPSG900913/{z}/{x}/{y}.png?origin=nw"
-              ],
-              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
-            }
-          },
-          "id": "OpenStreetMap_| Grijs_reference_id",
-          "checked": false
-        },
-        {
-          "type": "reference",
-          "title": "OpenStreetMap | Helder",
-          "checked": false,
-          "layerInfo": {
-            "id": "OsmBright",
-            "type": "style",
-            "source": "styles/openmaptiles/osmbright.json",
-            "metadata": {
-              "reference": true,
-              "title": "OpenStreetMap | Helder",
-              "styleid": "OsmBright",
-              "styletitle": "OpenStreetMap | Helder"
-            }
-          },
-          "id": "OpenStreetMap_| Helder_reference_id"
-        },
-        {
-          "type": "reference",
-          "title": "Mapbox | Satelliet",
-          "layerInfo": {
-            "id": "satellite",
-            "type": "raster",
-            "source": {
-              "type": "raster",
-              "tileSize": 256,
-              "tiles": [
-                "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.webp?access_token={mapboxkey}"
-              ],
-              "attribution": "mapbox"
-            },
-            "metadata": {
-              "title": "Mapbox | Satelliet",
-              "reference": true,
-              "userlayer": true
-            }
-          },
-          "id": "Mapbox_satellite_wmts_id",
-          "checked": false
         }
+       
         
       ]
     },{
       "type": "group",
       "title": "Geografische lijnen",
       "id": "Geografische_lijnen_group_id",
+      "checked": false,
       "sublayers": [
         {
           "title": "Evenaar | Keerkringen | Poolcirkels",
@@ -1143,7 +1160,7 @@
       "sublayers": [
         {
           "type": "rasterdem",
-          "title": "Reliëf",
+          "title": "Relief",
           "layerInfo": {
             "id": "mapzenhillshading",
             "type": "hillshade",
@@ -1156,7 +1173,7 @@
         6, 50, 
         2, 100  
       ],
-              "title": "Reliëf"
+              "title": "Relief"
             },
             "source": {
               "id": "mapzenhillshading",
@@ -2265,10 +2282,12 @@
           "type": "group",
           "title": "Klimaat",
           "id": "Klimaat_group_id",
+          "checked": false,
           "sublayers": [
            {
               "type": "geojson",
               "title": "Klimaat Koppen 2017",
+              "checked": false,
               "layerInfo": {
                 "id": "cd35f895-2af4-1111-b996-aa6d820b0a89",
                 "type": "fill",
@@ -2298,7 +2317,6 @@
                     }
                   ],
                   "visible": true,
-                  "maplayeropen": false,
                   "userlayer": true,
                   "cansave": true
                 },
@@ -2545,6 +2563,80 @@
                 }
               }
             },
+
+ {
+              "type": "geojson",
+              "title": "Thermohaliene circulatie",
+              "checked": false,
+              "layerInfo": {
+                "id": "cd1ae11e-7725-439a-a6ee-decccd44634e",
+                "type": "line",
+                "source": {
+                  "type": "geojson",
+                  "data": "https://kaart.edugis.nl/data/world/thermohalienecirculatie.geo.json"
+                },
+                "metadata": {
+                  "title": "Thermohaliene circulatie",
+                  "abstract": "Langzame diepe stroming, gedreven door verschillen in zoutgehalte en temperatuur."
+                },
+               "paint": {
+      "line-color":[
+        "match", ["get","Position"],
+        "Surface","rgba(100, 202, 255, 1)",
+        "Transition","rgba(0, 167, 255, 1)",
+        "Deep","rgba(0, 118, 180, 1)",
+        "#f0027f"
+        ],
+      "line-width": 12
+    }              }
+            },
+
+{
+              "type": "geojson",
+              "title": "Afzinkgebieden",
+              "checked": false,
+              "layerInfo": {
+                "id": "cd1ae11e-2425-439a-a6ee-decccd44634e",
+                "type": "fill",
+                "source": {
+                  "type": "geojson",
+                  "data": "https://kaart.edugis.nl/data/world/afzinkendwater.geo.json"
+                },
+                "metadata": {
+                  "title": "Afzinkgebieden",
+                  "abstract": "Diepzeepomp, hier zakt, na verdamping en warmte afgifte, koud en zout water naar diepere lagen van de oceaan."
+                },
+               "paint": {
+      "fill-color": "rgba(223.774,89.732,104.823,1)",
+      "fill-opacity": 0.63,
+      "fill-outline-color": "#444"
+    }             }
+            },
+{
+              "type": "geojson",
+              "title": "Opwellend water",
+              "checked": false,
+              "layerInfo": {
+                "id": "cd1ae11e-8725-439a-a6ee-decccd44634e",
+                "type": "fill",
+                "source": {
+                  "type": "geojson",
+                  "data": "https://kaart.edugis.nl/data/world/opwellendwater.geo.json"
+                },
+                "metadata": {
+                  "title": "Opwellend water",
+                  "abstract": "Hier welt koud water naar boven."
+                },
+             "paint": {
+      "fill-color": "rgba(76.344,214.519,239.264,1)",
+      "fill-opacity": 0.6,
+      "fill-outline-color": "#444"
+    }              }
+            },
+
+
+
+
             {
               "title": "Neerslag gemiddeld (jaarlijks)",
               "layerInfo": {
@@ -4140,6 +4232,405 @@
             }
           },
           "checked": false
+        }
+      ]
+    },
+
+ {
+      "type": "group",
+      "title": "Energie",
+      "id": "energiecentrales",
+      "sublayers": [
+        {
+          "type": "geojson",
+          "title": "Zon",
+          "checked": false,
+          "layerInfo": {
+            "id": "df104f3d-e312-447d-9768-36cf5313b4fb",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Zon.geo.json"
+
+            },
+            "metadata": {
+              "title": "Zon",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(227.956,227.956,19.517,1)",
+              "circle-stroke-color": "rgba(0,0,0,1)",
+              "circle-stroke-width": 0.3
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Wind",
+          "checked": false,
+          "layerInfo": {
+            "id": "801bfd79-71a3-47f4-ac29-2b7843263c7c",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Wind.geo.json"
+
+            },
+            "metadata": {
+              "title": "Wind",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(83.167,211.817,126.859,1)",
+              "circle-stroke-width": 0.7
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Waterkracht",
+          "checked": false,
+          "layerInfo": {
+            "id": "cb36d79a-7f8b-47ff-b0af-03a641fb959d",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Waterkracht.geo.json"
+
+            },
+            "metadata": {
+              "title": "Waterkracht",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(0,165.6,252.163,1)",
+              "circle-stroke-width": 1.6,
+              "circle-stroke-color": "rgba(0,0,0,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Warmtekracht_koppeling",
+          "checked": false,
+          "layerInfo": {
+            "id": "4c78e3b6-8408-4e1e-b033-ba412fcfe544",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Warmtekracht_koppeling.geo.json"
+
+            },
+            "metadata": {
+              "title": "Warmtekracht_koppeling",
+              "maplayeropen": false,
+              "visible": true,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(220.559,44.861,44.861,1)",
+              "circle-stroke-color": "rgba(236.697,236.697,236.697,1)",
+              "circle-stroke-width": 2
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Petcokes",
+          "checked": false,
+          "layerInfo": {
+            "id": "daa1623d-dac8-4759-8c05-c624249b3c04",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Petcokes.geo.json"
+
+            },
+            "metadata": {
+              "title": "Petcokes",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(103,58,183,1)",
+              "circle-stroke-width": 1.1,
+              "circle-stroke-color": "rgba(255,255,255,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Overig",
+          "checked": false,
+          "layerInfo": {
+            "id": "51bb4cad-1309-4b31-9af4-ccbd8f5b1d4e",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Overig.geo.json"
+
+            },
+            "metadata": {
+              "title": "Overig",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(40.905,137.233,159.367,1)",
+              "circle-stroke-width": 1.6,
+              "circle-stroke-color": "rgba(0,165.6,252.163,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Opslag",
+          "checked": false,
+          "layerInfo": {
+            "id": "f9720b91-5709-40bb-9b15-add9187f372b",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Opslag.geo.json"
+
+            },
+            "metadata": {
+              "title": "Opslag",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(255,255,255,1)",
+              "circle-stroke-width": 2.1
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Olie",
+          "checked": false,
+          "layerInfo": {
+            "id": "0f507d18-f72c-46df-8a35-91eebac591af",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Olie.geo.json"
+
+            },
+            "metadata": {
+              "title": "Olie",
+              "maplayeropen": false,
+              "visible": true,
+              "userlayer": true,
+              "cansave": true
+            },
+            "layout": {
+              "visibility": "visible"
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(0,0,0,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Kolen",
+          "checked": false,
+          "layerInfo": {
+            "id": "42ea2a81-9e5e-46b2-b160-976f14953eea",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Kolen.geo.json"
+
+            },
+            "metadata": {
+              "title": "Kolen",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(135.159,101.369,0,1)",
+              "circle-stroke-width": 1
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Kern",
+          "checked": false,
+          "layerInfo": {
+            "id": "504cd4dd-c3c7-4434-ab1e-3eb95959b5e3",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Kern.geo.json"
+
+            },
+            "metadata": {
+              "title": "Kern",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(153.015,95.648,255,1)",
+              "circle-stroke-width": 1.4
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Huisvuil",
+          "checked": false,
+          "layerInfo": {
+            "id": "459f1527-b808-4d7a-bc4d-abffcd687ec8",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Huisvuil.geo.json"
+
+            },
+            "metadata": {
+              "title": "Huisvuil",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(48.316,123.056,73.699,1)",
+              "circle-stroke-width": 0.9
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Golf_Getijde",
+          "checked": false,
+          "layerInfo": {
+            "id": "b1defc0f-456c-45fd-a140-835905c4dbe4",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Golf_Getijde.geo.json"
+
+            },
+            "metadata": {
+              "title": "Golf_Getijde",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(38.513,227.956,212.198,1)",
+              "circle-stroke-width": 1,
+              "circle-stroke-color": "rgba(0,153.345,166.091,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Geothermie",
+          "checked": false,
+          "layerInfo": {
+            "id": "c6a98886-feaa-443c-991f-f35a43888192",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Geothermie.geo.json"
+
+            },
+            "metadata": {
+              "title": "Geothermie",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(255,49.793,49.793,1)",
+              "circle-stroke-width": 1.7,
+              "circle-stroke-color": "rgba(255,193,7,1)"
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Gas",
+          "checked": false,
+          "layerInfo": {
+            "id": "93d12b48-7397-4789-9c7a-402ec50bb116",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Gas.geo.json"
+
+            },
+            "metadata": {
+              "title": "Gas",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(139.194,139.194,139.194,1)",
+              "circle-stroke-color": "rgba(220.559,44.861,44.861,1)",
+              "circle-stroke-width": 1.2
+            }
+          }
+        },
+        {
+          "type": "geojson",
+          "title": "Biomassa",
+          "checked": false,
+          "layerInfo": {
+            "id": "8a5648b1-2161-49ff-8bbc-383798de7be6",
+            "type": "circle",
+            "source": {
+              "type": "geojson",
+              "data":  "https://kaart.edugis.nl/data/world/Biomassa.geo.json"
+
+            },
+            "metadata": {
+              "title": "Biomassa",
+              "maplayeropen": false,
+              "userlayer": true,
+              "cansave": true
+            },
+            "paint": {
+              "circle-radius": 5,
+              "circle-color": "rgba(171.471,128.603,0,1)",
+              "circle-stroke-width": 1.5,
+              "circle-stroke-color": "rgba(77.183,57.887,0,1)"
+            }
+          }
         }
       ]
     },
