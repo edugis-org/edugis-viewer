@@ -1,0 +1,329 @@
+{
+  "map": {
+    "zoom": 12,
+    "center": [
+      4.6488,52.5549
+    ],
+    "pitch": 0,
+    "bearing": 0
+  },
+  "datacatalog": [
+    {
+      "type": "group",
+      "title": "Historische Vereniging Castricum",
+      "sublayers": [
+        {
+          "title": "casgis",
+          "type": "getcapabilities",
+          "layerInfo": {
+            "id": "casgis",
+            "type": "getcapabilities",
+            "url": "https://map.edugis.nl/cgi-bin/qgis_mapserv.fcgi?dpi=90&map=data/casgis/files/casgis/casgis.qgz",
+            "deniedlayers": "casgis,historische_streetview,kaartlaag1930,kaartlaag_1930,1832-KAARTLAAG",
+            "metadata": {
+              "title": "CasGIS"
+            }
+          },
+          "id": "casgis",
+          "checked": false
+        }
+      ],
+      "id": "casgis",
+      "checked": false
+    },
+ 
+    {
+      "type": "group",
+      "title": "Achtergrondlagen",
+      "id": "worldachtergrondlagen",
+      "sublayers": [
+        {
+          "type": "reference",
+          "title": "Bing | Topografisch ",
+          "checked": true,
+          "layerInfo": {
+            "id": "bingmaproad",
+            "metadata": {
+              "reference": true,
+              "bing": true,
+              "title": "Bing | Topografisch ",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "attribution": "© 2022 Microsoft Corporation|© 2022 TomTom|© 2022 Zenrin",
+              "tiles": [
+                "https://ecn.t0.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
+                "https://ecn.t1.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
+                "https://ecn.t2.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill",
+                "https://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=12327&mkt=nl-BE&shading=hill"
+              ],
+              "maxzoom": 19
+            }
+          },
+          "id": "Bing_| Topografisch _reference_id"
+        },
+        {
+          "type": "reference",
+          "title": "Bing | Satelliet",
+          "layerInfo": {
+            "id": "bingmapaerial",
+            "metadata": {
+              "reference": true,
+              "bing": true,
+              "title": "Bing | Satelliet",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "attribution": "© 2022 Microsoft Corporation|© 2022 Maxar|©CNES (2022) Distribution Airbus DS|© 2022 TMAP MOBILITY|Earthstar Geographics  SIO",
+              "tiles": [
+                "https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327",
+                "https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327",
+                "https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327",
+                "https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12327"
+              ],
+              "maxzoom": 18
+            }
+          },
+          "id": "Bing_| Satelliet_reference_id",
+          "checked": false
+        },
+        {
+          "type": "reference",
+          "title": "Bing | Combinatie",
+          "layerInfo": {
+            "id": "bingmaphybrid",
+            "metadata": {
+              "reference": true,
+              "bing": true,
+              "title": "Bing | Combinatie",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "attribution": "© 2022 Microsoft Corporation|© 2022 Maxar|©CNES (2022) Distribution Airbus DS|© 2022 TMAP MOBILITY|Earthstar Geographics  SIO|© 2022 TomTom|© 2022 Zenrin",
+              "tiles": [
+                "https://ecn.t0.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE",
+                "https://ecn.t1.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE",
+                "https://ecn.t2.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE",
+                "https://ecn.t3.tiles.virtualearth.net/tiles/h{quadkey}.jpeg?g=12327&mkt=nl-BE"
+              ],
+              "maxzoom": 18
+            }
+          },
+          "id": "Bing_| Combinatie_reference_id",
+          "checked": false
+        },
+        {
+          "title": "OpenStreetMap",
+          "type": "reference",
+          "layerInfo": {
+            "id": "openstreetmap",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
+              "title": "OpenStreetMap",
+              "reference": true
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/osm/tiles/osm_EPSG900913/{z}/{x}/{y}.png?origin=nw"
+              ],
+              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
+            }
+          },
+          "id": "OpenStreetMap_reference_id",
+          "checked": false
+        },
+        {
+          "title": "OpenStreetMap | Grijs",
+          "type": "reference",
+          "layerInfo": {
+            "id": "openstreetmapgray",
+            "type": "raster",
+            "metadata": {
+              "legendurl": "https://mapserver.edugis.nl/legends/wereld/osm_logo.png",
+              "title": "OpenStreetMap | Grijs",
+              "reference": true
+            },
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "tiles": [
+                "https://tiles.edugis.nl/mapproxy/osm/tiles/osmgrayscale_EPSG900913/{z}/{x}/{y}.png?origin=nw"
+              ],
+              "attribution": "&copy; <a href=\"https://www.openstreetmap.org/about\" target=\"copyright\">OpenStreetMap contributors</a>"
+            }
+          },
+          "id": "OpenStreetMap_| Grijs_reference_id",
+          "checked": false
+        },
+        {
+          "type": "reference",
+          "title": "OpenStreetMap | Helder",
+          "checked": false,
+          "layerInfo": {
+            "id": "OsmBright",
+            "type": "style",
+            "source": "styles/openmaptiles/osmbright.json",
+            "metadata": {
+              "reference": true,
+              "title": "OpenStreetMap | Helder",
+              "styleid": "OsmBright",
+              "styletitle": "OpenStreetMap | Helder"
+            }
+          },
+          "id": "OpenStreetMap_| Helder_reference_id"
+        },
+        {
+          "type": "reference",
+          "title": "Mapbox | Satelliet",
+          "layerInfo": {
+            "id": "satellite",
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tileSize": 256,
+              "url": "mapbox://mapbox.satellite"
+            },
+            "metadata": {
+              "title": "Satelliet",
+              "reference": true,
+              "userlayer": true
+            }
+          },
+          "id": "Mapbox_satellite_wmts_id",
+          "checked": false
+        },
+        {
+          "type": "reference",
+          "title": "ESRI | Satelliet",
+          "layerInfo": {
+            "id": "esriworldimagery",
+            "metadata": {
+              "reference": true,
+              "title": "ESRI | Satelliet",
+              "userlayer": true
+            },
+            "type": "raster",
+            "source": {
+              "type": "raster",
+              "tiles": [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              ],
+              "tileSize": 256,
+              "maxzoom": 22,
+              "attribution": "ESRI World Imagery"
+            }
+          },
+          "id": "Luchtfoto_(ESRI World Imagery)_reference_id",
+          "checked": false
+        }
+      ],
+      "checked": false
+    }
+  ],
+  "tools": {
+    "toolbar": {
+      "visible": true,
+      "position": "opened",
+      "order": 0
+    },
+    "search": {
+      "visible": 1,
+      "position": "",
+      "order": 1
+    },
+    "datacatalog": {
+      "visible": 1,
+      "position": "",
+      "order": 2
+    },
+    "measure": {
+      "visible": 1,
+      "position": "",
+      "order": 3
+    },
+    "info": {
+      "visible": 1,
+      "position": "",
+      "order": 4
+    },
+    "maplanguage": {
+      "visible": false,
+      "position": "",
+      "order": 5
+    },
+    "pitch": {
+      "visible": 1,
+      "position": "",
+      "order": 6
+    },
+    "geolocate": {
+      "visible": true,
+      "position": "",
+      "order": 7
+    },
+    "draw": {
+      "visible": 1,
+      "position": "",
+      "order": 8
+    },
+    "importexport": {
+      "visible": false,
+      "position": "",
+      "order": 100
+    },
+    "datatoolbox": {
+      "visible": 0,
+      "position": "",
+      "order": 10
+    },
+    "sheetimport": {
+      "visible": 0,
+      "position": "",
+      "order": 11
+    },
+    "projchooser": {
+      "visible": false,
+      "position": "",
+      "order": 120
+    },
+    "zoomlevel": {
+      "visible": 1,
+      "position": "bottom-left",
+      "order": 0
+    },
+    "navigation": {
+      "visible": 1,
+      "position": "bottom-left",
+      "order": 1
+    },
+    "coordinates": {
+      "visible": 1,
+      "position": "bottom-center",
+      "order": 202
+    },
+    "scalebar": {
+      "visible": 1,
+      "position": "bottom-right",
+      "order": 203
+    },
+    "legend": {
+      "opened": 1,
+      "visible": 1,
+      "position": "top-right",
+      "order": 204
+    }
+  },
+  "keys": {}
+}
