@@ -2340,7 +2340,7 @@ class WebMap extends LitElement {
     if (featureInfoUrl.toLowerCase().indexOf('srs=epsg:900913') > -1) {
       srs = 'EPSG:900913';
     }
-    const params = `&width=3&height=3&x=1&y=1&crs=${srs}&srs=${srs}&info_format=${featureInfoFormat}&bbox=`;
+    const params = `&fi_point_tolerance=3&fi_line_tolerance=3&width=3&height=3&x=1&y=1&srs=${srs}&info_format=${featureInfoFormat}&bbox=`;
     let url=featureInfoUrl+params+(leftbottom.x)+","+(leftbottom.y)+","+(righttop.x)+","+(righttop.y);
     if (metadata.featureinfoproxy) {
       url = metadata.featureinfoproxy + encodeURIComponent(url);
