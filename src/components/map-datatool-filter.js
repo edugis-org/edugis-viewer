@@ -62,6 +62,10 @@ class MapDatatoolFilter extends LitElement {
         return true;
     }
     render() {
+        const layers = this.map.getStyle().layers.filter(layer=>layer.metadata && !layer.metadata.reference && !layer.metadata.isToolLayer && ['fill','line','circle','symbol'].includes(layer.type));
+        if (layers.length < 1) {
+            return html`${layers.length} kaartlagen aanwezig (minimmaal 1 nodig)`;
+        }
         return html`
         <div id="form">
             ${this._renderLayerList()}

@@ -57,7 +57,6 @@ class MapDatatoolRoute extends LitElement {
     }
     connectedCallback() {
         super.connectedCallback()
-        //addEventListener('keydown', this._handleKeydown);
     }
     disconnectedCallback() {
         super.disconnectedCallback()
@@ -115,7 +114,9 @@ class MapDatatoolRoute extends LitElement {
     _handleMapClick(e) {
         if (!this.mouseMoveMode) {
             this.mouseMoveMode = true;
-            this.routeLayer.source.data.geometry.coordinates = [[e.lngLat.lng, e.lngLat.lat],[e.lngLat.lng, e.lngLat.lat]];
+            this._addRouteLayers();
+            //this.routeLayer.source.data.geometry.coordinates = [[e.lngLat.lng, e.lngLat.lat],[e.lngLat.lng, e.lngLat.lat]];
+            this.map.getSource('map-datatool-route').setData({type: "FeatureCollection", features: []});
             this.routeStartEndLayer.source.data.features[0] = {
                 type: "Feature",
                 geometry: {
@@ -124,7 +125,7 @@ class MapDatatoolRoute extends LitElement {
                 }
             };
             this.routeStartEndLayer.source.data.features[1] = this.routeStartEndLayer.source.data.features[0];
-            this.map.getSource('map-datatool-route').setData(this.routeLayer.source.data);
+            //this.map.getSource('map-datatool-route').setData(this.routeLayer.source.data);
             this.map.getSource('map-datatool-route-startend').setData(this.routeStartEndLayer.source.data);
         } else {
             this.mouseMoveMode = false;
@@ -162,11 +163,17 @@ class MapDatatoolRoute extends LitElement {
         const response = await fetch(url);
         if (response.ok) {
             const json = await response.json();
-            this.routeLayer.source.data.geometry.coordinates = json.routes[0].legs[0].points.map((point)=>{return [point.longitude, point.latitude]});
-            this.routeLayer.source.data.properties = json.routes[0].summary;
+            const feature = {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: json.routes[0].legs[0].points.map((point)=>{return [point.longitude, point.latitude]})
+                },
+                properties: json.routes[0].summary
+            }
             if (this.travelMode==='truck') {
-                // add the truck properties to the routeLayer
-                this.routeLayer.source.data.properties = {...this.routeLayer.source.data.properties, 
+                // add the truck properties to the feature
+                feature.properties = {...feature.properties, 
                     vehicleWeight: this.vehicleWeight,
                     vehicleAxleWeight: this.vehicleAxleWeight,
                     vehicleLength: this.vehicleLength,
@@ -175,7 +182,8 @@ class MapDatatoolRoute extends LitElement {
                 };
             }
             this.distance = json.routes[0].summary.lengthInMeters;
-            this.map.getSource('map-datatool-route').setData(this.routeLayer.source.data);
+            this.map.getSource('map-datatool-route').setData({"type":"FeatureCollection","features":[feature]});
+
             this.start = start;
             this.end = end;
             this.busyMessage = '';
@@ -191,9 +199,7 @@ class MapDatatoolRoute extends LitElement {
         this.timeout = null;
         if (!this.waitingForRoute) {
             this.waitingForRoute = true;
-            this.routeLayer.source.data.geometry.coordinates[1] = [e.lngLat.lng, e.lngLat.lat];
             await this._getTomTomRoute();  
-            this.map.getSource('map-datatool-route').setData(this.routeLayer.source.data);
             this.waitingForRoute = false;
         }
     }
@@ -206,6 +212,76 @@ class MapDatatoolRoute extends LitElement {
             this.timeout = setTimeout(()=>{this._updateRoute(e)}, 500);
         }
     }
+    _addRouteLayers() {
+       const layers = this.map.getStyle().layers;
+       const routeLayer = layers.find((layer)=>{return layer.id==='map-datatool-route'});
+       const routeStartEndLayer = layers.find((layer)=>{return layer.id==='map-datatool-route-startend'});
+       if (!routeLayer) {
+            // add empty routeLayer
+            this.routeLayer = {
+                id: 'map-datatool-route',
+                type: 'line',
+                metadata: {
+                    title: 'Route'
+                },
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: []
+                    },
+                    attribution: 'TomTom'
+                },
+                paint: {
+                    'line-color': '#888',
+                    'line-width': 8
+                },
+                layout: {
+                    'line-join': 'round',
+                }
+            }
+            this.dispatchEvent(new CustomEvent('addlayer', {
+                detail: this.routeLayer,
+                bubbles: true,
+                composed: true
+            }))
+        }
+        if (!routeStartEndLayer) {
+            this.routeStartEndLayer = {
+                id: 'map-datatool-route-startend',
+                metadata: {
+                    title: 'Route begin/eind',
+                    userlayer: true // show in legend
+                },
+                type: 'circle',
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            properties: {},
+                            geometry: {
+                                type: 'Point',
+                                coordinates: []
+                            }
+                        }],
+                    }
+                },
+                paint: {
+                    'circle-radius': 8,
+                    'circle-color': '#fff',
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#000'
+                }
+            }
+            this.dispatchEvent(new CustomEvent('addlayer', {
+                detail: this.routeStartEndLayer,
+                bubbles: true,
+                composed: true
+            }))
+        }
+    }
     _registerWithMap() {
         if (!this.registered && this.map) {
             this.boundMapClickHandler = this._handleMapClick.bind(this);
@@ -213,96 +289,7 @@ class MapDatatoolRoute extends LitElement {
             this.registeredMap = this.map;
             this.registeredMap.on('click', this.boundMapClickHandler);
             this.registeredMap.on('mousemove', this.boundMapMouseMoveHandler);
-            this.routeLayer = this.map.getStyle().layers.find((layer)=>{return layer.id==='map-datatool-route'});
-            if (!this.routeLayer) {
-                this.routeLayer = {
-                    id: 'map-datatool-route',
-                    type: 'line',
-                    metadata: {
-                        title: 'Route'
-                    },
-                    source: {
-                        type: 'geojson',
-                        data: {
-                            type: 'Feature',
-                            properties: {},
-                            geometry: {
-                                type: 'LineString',
-                                coordinates: []
-                            }
-                        }
-                    },
-                    paint: {
-                        'line-color': '#888',
-                        'line-width': 8
-                    },
-                    layout: {
-                        'line-join': 'round',
-                    }
-                }
-                /*this.dispatchEvent(new CustomEvent('addlayer', {
-                    detail: this.routeLayer,
-                    bubbles: true,
-                    composed: true
-                }))*/
-            } else {
-                this.routeLayer.source = this.map.getSource(this.routeLayer.source).serialize();
-            }
-            this.routeStartEndLayer = this.map.getStyle().layers.find((layer)=>{return layer.id==='map-datatool-route-startend'});
-            if (!this.routeStartEndLayer) {
-                this.routeStartEndLayer = {
-                    id: 'map-datatool-route-startend',
-                    metadata: {
-                        title: 'Route begin/eind',
-                        userlayer: true
-                    },
-                    type: 'circle',
-                    source: {
-                        type: 'geojson',
-                        data: {
-                            type: 'FeatureCollection',
-                            features: [{
-                                type: 'Feature',
-                                properties: {},
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: []
-                                }
-                            }]
-                        }
-                    },
-                    paint: {
-                        'circle-radius': 8,
-                        'circle-color': '#fff',
-                        'circle-stroke-width': 2,
-                        'circle-stroke-color': '#000'
-                    }
-                }
-                const styleLayer = {
-                    type: 'style',
-                    id: 'map-datatool-route-style',
-                    metadata: {
-                        title: 'Route',
-                        userlayer: true
-                    },
-                    source: {
-                        version: 8,
-                        sources: {
-                        },
-                        layers: [
-                            this.routeLayer,
-                            this.routeStartEndLayer
-                        ]
-                    }
-                }
-                this.dispatchEvent(new CustomEvent('addlayer', {
-                    detail: styleLayer,
-                    bubbles: true,
-                    composed: true
-                }))
-            } else {
-                this.routeStartEndLayer.source = this.map.getSource(this.routeStartEndLayer.source).serialize();
-            }
+            this._addRouteLayers();
             this.registered = true;
         }
     }
@@ -310,19 +297,6 @@ class MapDatatoolRoute extends LitElement {
         if (this.registered && this.registeredMap) {
             this.registeredMap.off('click', this.boundMapClickHandler);
             this.registeredMap.off('mousemove', this.boundMapMouseMoveHandler);
-            /*
-            // remove the layers
-            this.map.removeLayer(this.routeLayer.id);
-            this.map.removeLayer(this.routeStartEndLayer.id);
-            let source = this.map.getSource(this.routeLayer.id);
-            if (source) {
-                this.map.removeSource(this.routeLayer.id);
-            }
-            source = this.map.getSource(this.routeStartEndLayer.id);
-            if (source) {
-                this.map.removeSource(this.routeStartEndLayer.id);
-            }
-            */
             this.registered = false;
         }
     }

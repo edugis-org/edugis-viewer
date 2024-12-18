@@ -1882,9 +1882,13 @@ class WebMap extends LitElement {
         this.applyConfig(droppedFile.data);
         this.initMap();
       })
-    } else if (droppedFile.data.type && (droppedFile.data.type === "Feature" || droppedFile.data.type === "FeatureCollection")) {
+    } else if (droppedFile.data.type && (droppedFile.data.type === "Feature" || droppedFile.data.type === "FeatureCollection" || droppedFile.data.type === "Topology")) {
       const filename = droppedFile.filename.replace(/\.[^/.]+$/,"");
       let geojson = droppedFile.data;
+      if (geojson.type === "Topology") {
+        // convert topojson to geojson
+        geojson = topojson.feature(geojson,geojson.objects[Object.keys(geojson.objects)[0]])
+      }
       if (geojson.crs) {
         geojson = geoJSONProject(geojson);
       }

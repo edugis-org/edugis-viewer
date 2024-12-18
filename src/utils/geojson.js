@@ -129,6 +129,10 @@ export class GeoJSON {
         .then(data=>data.json())
         .then(json=>{
           layerInfo.metadata.originaldata = layerInfo.source.data;
+          if (json.type === "Topology") {
+            // convert to geojson
+            json = topojson.feature(json, json.objects[Object.keys(json.objects)[0]]);
+          }
           layerInfo.source.data = json;
           return layerInfo;
         });     
