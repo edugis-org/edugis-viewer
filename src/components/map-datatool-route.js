@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {mapgl} from '../map-gl.js';
 
 class MapDatatoolRoute extends LitElement {
     static get styles() {
@@ -54,6 +55,8 @@ class MapDatatoolRoute extends LitElement {
         this.emptyReturn = false;
         // laadvermogen
         this.vehicleLoad = 30000;
+        this.startMarker = null;
+        this.endMarker = null;
     }
     connectedCallback() {
         super.connectedCallback()
@@ -89,7 +92,7 @@ class MapDatatoolRoute extends LitElement {
                 <label>Aslast:</label><input type="number" value="${this.vehicleAxleWeight}" @change="${e=>this.vehicleAxleWeight = e.target.value}" min="500" max="12000" step="100"> kg<br>
                 <label>Leeg retour:</label><input type="checkbox" value="${this.emptyReturn}" @change="${e=>this.emptyReturn = e.target.checked}"><br>
                 ${this.emptyReturn ? html`<label>Laadvermogen:</label><input type="number" value="${this.vehicleLoad}" @change="${e=>this.vehicleLoad = e.target.value}" min="500" max="30000" step="100"> kg<br>` : html``}
-                <button @click="${(_e)=>this._recalculateRoute()}">Opnieuw berekenen</button><br>
+                <button @click="${(_e)=>this._calculateRoute()}">Opnieuw berekenen</button><br>
             ` : html``}
             ${this.distance ? html`<label>Afstand:</label> ${this._distanceText(this.distance)}` : html``}<br>
             <b>${this.busyMessage}</b>
@@ -99,47 +102,38 @@ class MapDatatoolRoute extends LitElement {
     firstUpdated() {
         this._registerWithMap();
     }
-    updated() {
-
-    }
-    _recalculateRoute() {
-        if (!this.mouseMoveMode && this.start[0]!==0 && this.end[0]!==0) {
+    _calculateRoute() {
+        if (this.startMarker) {
+            this.start = this.startMarker.getLngLat().toArray();
+        }
+        if (this.endMarker) {
+            this.end = this.endMarker.getLngLat().toArray();
+        }
+        if (this.startMarker && this.endMarker) {
+            this._addRouteLayer();
             this._getTomTomRoute();
         }
     }
     _travelModeChanged(e) {
         this.travelMode = e.target.value;
-        this._recalculateRoute();
+        this._calculateRoute();
+    }
+    _createMarker(e, type) {
+        const marker = new mapgl.Marker({color: type === 'start' ? 'green' : 'red', draggable: true})
+            .setLngLat(e.lngLat)
+            .addTo(this.map);
+        marker.on('dragend', (e)=>{this._calculateRoute()});
+        return marker;
     }
     _handleMapClick(e) {
-        if (!this.mouseMoveMode) {
-            this.mouseMoveMode = true;
-            this._addRouteLayers();
-            //this.routeLayer.source.data.geometry.coordinates = [[e.lngLat.lng, e.lngLat.lat],[e.lngLat.lng, e.lngLat.lat]];
-            this.map.getSource('map-datatool-route').setData({type: "FeatureCollection", features: []});
-            this.routeStartEndLayer.source.data.features[0] = {
-                type: "Feature",
-                geometry: {
-                    type: "Point",
-                    coordinates: [e.lngLat.lng, e.lngLat.lat]
-                }
-            };
-            this.routeStartEndLayer.source.data.features[1] = this.routeStartEndLayer.source.data.features[0];
-            //this.map.getSource('map-datatool-route').setData(this.routeLayer.source.data);
-            this.map.getSource('map-datatool-route-startend').setData(this.routeStartEndLayer.source.data);
+        if (!this.startMarker) {
+            this.startMarker = this._createMarker(e, 'start');
         } else {
-            this.mouseMoveMode = false;
-        }
-    }
-    _updateStartEnd(e) {
-        this.routeStartEndLayer.source.data.features[1] = {
-            type: "Feature",
-            geometry: {
-                type: "Point",
-                coordinates: [e.lngLat.lng, e.lngLat.lat]
+            if (!this.endMarker) {
+                this.endMarker = this._createMarker(e, 'end');
+                this._calculateRoute();
             }
-        };
-        this.map.getSource('map-datatool-route-startend').setData(this.routeStartEndLayer.source.data);
+        }
     }
     _round(number, precision) {
         const factor = Math.pow(10, precision);
@@ -154,8 +148,8 @@ class MapDatatoolRoute extends LitElement {
     }
     async _getTomTomRoute() {
         this.busyMessage = 'Route wordt berekend...';
-        const start = this.routeStartEndLayer.source.data.features[0].geometry.coordinates;
-        const end = this.routeStartEndLayer.source.data.features[1].geometry.coordinates;
+        const start = this.start;
+        const end = this.end;
         let url = `https://api.tomtom.com/routing/1/calculateRoute/${start[1]},${start[0]}:${end[1]},${end[0]}/json?travelMode=${this.travelMode}&key=${APIkeys.tomtom}`;
         if (this.travelMode==='truck') {
             url += `&vehicleWeight=${this.vehicleWeight}&vehicleAxleWeight=${this.vehicleAxleWeight}&vehicleLength=${this.vehicleLength}&vehicleWidth=${this.vehicleWidth}&vehicleHeight=${this.vehicleHeight}`;
@@ -195,24 +189,7 @@ class MapDatatoolRoute extends LitElement {
             setTimeout(()=>{this.busyMessage = ''}, 5000);
         }
     }
-    async _updateRoute(e) {
-        this.timeout = null;
-        if (!this.waitingForRoute) {
-            this.waitingForRoute = true;
-            await this._getTomTomRoute();  
-            this.waitingForRoute = false;
-        }
-    }
-    _handleMapMouseMove(e) {
-        if (this.mouseMoveMode) {
-            this._updateStartEnd(e);
-            if (this.timeout) { 
-                clearTimeout(this.timeout);
-            }
-            this.timeout = setTimeout(()=>{this._updateRoute(e)}, 500);
-        }
-    }
-    _addRouteLayers() {
+    _addRouteLayer() {
        const layers = this.map.getStyle().layers;
        const routeLayer = layers.find((layer)=>{return layer.id==='map-datatool-route'});
        const routeStartEndLayer = layers.find((layer)=>{return layer.id==='map-datatool-route-startend'});
@@ -246,58 +223,23 @@ class MapDatatoolRoute extends LitElement {
                 composed: true
             }))
         }
-        if (!routeStartEndLayer) {
-            this.routeStartEndLayer = {
-                id: 'map-datatool-route-startend',
-                metadata: {
-                    title: 'Route begin/eind',
-                    userlayer: true // show in legend
-                },
-                type: 'circle',
-                source: {
-                    type: 'geojson',
-                    data: {
-                        type: 'FeatureCollection',
-                        features: [{
-                            type: 'Feature',
-                            properties: {},
-                            geometry: {
-                                type: 'Point',
-                                coordinates: []
-                            }
-                        }],
-                    }
-                },
-                paint: {
-                    'circle-radius': 8,
-                    'circle-color': '#fff',
-                    'circle-stroke-width': 2,
-                    'circle-stroke-color': '#000'
-                }
-            }
-            this.dispatchEvent(new CustomEvent('addlayer', {
-                detail: this.routeStartEndLayer,
-                bubbles: true,
-                composed: true
-            }))
-        }
     }
     _registerWithMap() {
         if (!this.registered && this.map) {
             this.boundMapClickHandler = this._handleMapClick.bind(this);
-            this.boundMapMouseMoveHandler = this._handleMapMouseMove.bind(this);
             this.registeredMap = this.map;
             this.registeredMap.on('click', this.boundMapClickHandler);
-            this.registeredMap.on('mousemove', this.boundMapMouseMoveHandler);
-            this._addRouteLayers();
             this.registered = true;
         }
     }
     _unregisterFromMap() {
         if (this.registered && this.registeredMap) {
             this.registeredMap.off('click', this.boundMapClickHandler);
-            this.registeredMap.off('mousemove', this.boundMapMouseMoveHandler);
             this.registered = false;
+            this.startMarker?.remove();
+            this.startMarker = null;
+            this.endMarker?.remove();
+            this.endMarker = null;
         }
     }
 }
