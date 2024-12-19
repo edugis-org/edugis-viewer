@@ -200,11 +200,11 @@ class WebMap extends LitElement {
     this.mapstyle = rootUrl + "styles/openmaptiles/osmbright.json";
     this.mapstyleid = "OsmBright";
     this.mapstyletitle = "OSM bright (stijl)";
-    this.lon = 4.5458;
-    this.lat = 51.9397;
+    this.lon = 5.327;
+    this.lat = 52.191;
     this.displaylat = this.lat;
     this.displaylng = this.lon;
-    this.zoom = 13;
+    this.zoom = 7;
     this.resolution = 0;
     this.navigation = "false";
     this.zoomlevel = "false";

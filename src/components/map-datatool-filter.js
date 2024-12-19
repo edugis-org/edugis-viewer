@@ -64,7 +64,7 @@ class MapDatatoolFilter extends LitElement {
     render() {
         const layers = this.map.getStyle().layers.filter(layer=>layer.metadata && !layer.metadata.reference && !layer.metadata.isToolLayer && ['fill','line','circle','symbol'].includes(layer.type));
         if (layers.length < 1) {
-            return html`${layers.length} kaartlagen aanwezig (minimmaal 1 nodig)`;
+            return html`${layers.length} kaartlagen aanwezig (minimaal 1 nodig)`;
         }
         return html`
         <div id="form">
@@ -212,7 +212,7 @@ class MapDatatoolFilter extends LitElement {
     _renderLayerList() {
         const layers = this.map.getStyle().layers.filter(layer=>layer.metadata && !layer.metadata.reference && !layer.metadata.isToolLayer && ['fill','line','circle','symbol'].includes(layer.type));
         if (layers.length < 1) {
-          return html`${layers.length} kaartlagen aanwezig (minimmaal 1 nodig)`;
+          return html`${layers.length} kaartlagen aanwezig (minimaal 1 nodig)`;
         }
         return html`<label for="layerselect">Invoerlaag</label><div class="styled-select"><select id="layerselect" @change="${e=>this._layerSelected(e)}">
         <option value="" disabled selected>Selecteer kaartlaag</option>

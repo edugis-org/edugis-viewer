@@ -210,7 +210,7 @@ class MapDatatoolRoute extends LitElement {
                     attribution: 'TomTom'
                 },
                 paint: {
-                    'line-color': '#888',
+                    'line-color': '#0f53ff',
                     'line-width': 8
                 },
                 layout: {

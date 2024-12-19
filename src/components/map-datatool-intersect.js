@@ -97,7 +97,7 @@ class MapDatatoolIntersect extends LitElement {
     _renderLayerList() {
       const layers = this.map.getStyle().layers.filter(layer=>layer.metadata && !layer.metadata.reference && !layer.metadata.isToolLayer && ['fill','line','circle','symbol'].includes(layer.type));
       if (layers.length < 2) {
-        return html`${layers.length} kaartlagen aanwezig (minimmaal 2 nodig)`;
+        return html`${layers.length} kaartlagen aanwezig (minimaal 2 nodig)`;
       }
       return html`<div class="styled-select"><select @change="${e=>this._layerSelected(e)}">
       <option value="" disabled selected>Selecteer kaartlaag</option>
