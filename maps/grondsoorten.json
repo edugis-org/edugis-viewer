@@ -4120,7 +4120,7 @@
                         "id": "MI_WINDTURBINES",
                         "type": "raster",
                         "metadata": {
-                            "proxy": "https://t2.edugis.nl/cgi-bin/proxy.cgi?url=",
+                            "proxy": "https://map.edugis.nl/cgi-bin/proxy.cgi?url=",
                             "getFeatureInfoFormat":"application/json"
                         },
                         "source": {
@@ -4137,7 +4137,7 @@
                         "id": "MI_LDEN_CONTOUREN",
                         "type": "raster",
                         "metadata": {
-                            "proxy": "https://t2.edugis.nl/cgi-bin/proxy.cgi?url=",
+                            "proxy": "https://map.edugis.nl/cgi-bin/proxy.cgi?url=",
                             "getFeatureInfoFormat":"application/json"
                         },
                         "source": {
@@ -4154,7 +4154,7 @@
                         "id": "Bodemdaling_OFL-2011-2030",
                         "type": "raster",
                         "metadata": {
-                            "proxy": "https://t2.edugis.nl/cgi-bin/proxy.cgi?url=",
+                            "proxy": "https://map.edugis.nl/cgi-bin/proxy.cgi?url=",
                             "getFeatureInfoFormat":"application/json"
                         },
                         "source": {
@@ -4171,7 +4171,7 @@
                         "id": "ijg_diep_2012",
                         "type": "raster",
                         "metadata": {
-                            "proxy": "https://t2.edugis.nl/cgi-bin/proxy.cgi?url=",
+                            "proxy": "https://map.edugis.nl/cgi-bin/proxy.cgi?url=",
                             "getFeatureInfoFormat":"application/vnd.ogc.gml"
                         },
                         "source": {
