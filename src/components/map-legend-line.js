@@ -13,6 +13,7 @@ class MapLegendLine extends LitElement {
         }
         .label {
             padding-left: 2px;
+            cursor: pointer;
         }`
     }
     static get properties() { 
@@ -109,12 +110,7 @@ class MapLegendLine extends LitElement {
         }
         return result;
     }
-    firstUpdated() {
-
-    }
-    updated() {
-
-    }
+    
     _editActive(event) {
         if (event.detail.editActive) {
             this.activeEdits = this.activeEdits.concat(event.detail.itemIndex);
