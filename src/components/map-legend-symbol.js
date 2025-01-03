@@ -12,6 +12,7 @@ class MapLegendSymbol extends LitElement {
         }
         .label {
             padding-left: 2px;
+            cursor: pointer;
         }
         .icon {
             vertical-align: middle;

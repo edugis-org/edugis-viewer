@@ -18,6 +18,7 @@ class MapLegendFill extends LitElement {
         }
         .label {
             padding-left: 2px;
+            cursor: pointer;
         }`
     }
     static get properties() { 

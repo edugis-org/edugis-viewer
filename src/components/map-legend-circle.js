@@ -13,6 +13,7 @@ class MapLegendCircle extends LitElement {
     }
     .label {
         padding-left: 2px;
+        cursor: pointer;
     }
     .bubblecontainer {
       display: block;
