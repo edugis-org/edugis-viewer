@@ -621,22 +621,23 @@ class MapDraw extends LitElement {
   _keyDown(event) {
     if (!((event.srcElement || event.target).classList.contains('mapboxgl-canvas') || 
       (event.srcElement || event.target).classList.contains('maplibregl-canvas'))) return; // we only handle events on the map
-    if ((event.keyCode === 8 || event.keyCode === 46)) {
+    if ((event.key === 'Backspace' || event.key === 'Delete')) {
       this.mbDraw.trash();
       event.preventDefault();
-    } else if (event.keyCode === 49) {
+    } else if (event.key === '1') {
       this._changeMode('draw_point');
-    } else if (event.keyCode === 50) {
+    } else if (event.key === '2') {
       this._changeMode('draw_line_string');
-    } else if (event.keyCode === 51) {
+    } else if (event.key === '3') {
       this._changeMode('draw_polygon');
-    } else if (event.keyCode === 27) {
+    } else if (event.key === 'Escape') {
       this._setMode('simple_select');
     } else if (event.key === 'z' && event.ctrlKey) {
       this._undo();
     } else if (event.key === 'y' && event.ctrlKey) {
       this._redo();
     }
+    console.log(event.key)
   }
   _isEmptyNewLayer(layer) {
     return layer.isnewlayer;

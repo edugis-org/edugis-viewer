@@ -46,19 +46,19 @@ class BaseArrow extends LitElement {
     }
     _click(event) {
         if (event instanceof KeyboardEvent) {
-            if (event.keyCode === 38) {
+            if (event.key === 'ArrowUp') {
                 /* up arrow key */
                 this.open = false;
                 event.stopPropagation();
                 return;
             }
-            if (event.keyCode === 40) {
+            if (event.key === 'ArrowDown') {
                 /* down arrow key */
                 this.open = true;
                 event.stopPropagation();
                 return;
             }
-            if (event.keyCode !== 32 && event.keyCode !== 13) {
+            if (event.code !== 'Space' && event.key !== 'Enter') {
                 return;
             }
         }

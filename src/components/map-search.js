@@ -148,7 +148,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
   }
 
   keyup(e) {
-    if (e.keyCode == 13) {
+    if (e.key == 'Enter') {
       this.search(e);
     } else {
       this.resultList = null;
