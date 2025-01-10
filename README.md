@@ -1,6 +1,4 @@
 
-> ## 🛠 Status: In Development
-
 # EduGIS-Viewer
 
 EduGIS, http://www.edugis.nl, and http://kaart.edugis.nl is an application to introduce Geographical Information Systems (GIS) to students, without the need to first install software or data.
