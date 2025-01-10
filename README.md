@@ -1,7 +1,7 @@
 
 > ## 🛠 Status: In Development
 
-# EduGIS-lithtml
+# EduGIS-Viewer
 
 EduGIS, http://www.edugis.nl, and http://kaart.edugis.nl is an application to introduce Geographical Information Systems (GIS) to students, without the need to first install software or data.
 
@@ -12,7 +12,7 @@ EduGIS, http://www.edugis.nl, and http://kaart.edugis.nl is an application to in
 * file src/keys.js (see [below](#Add-API-keys))
 
 ## Get source and dependencies
-```
+```bash
 # get source from github
 git clone [this_repository]
 cd this_repository
@@ -41,4 +41,4 @@ The resulting static web files are generated under `build/`
 
 ## TODOs
 
-Many...
+see [issues](https://github.com/edugis-repo/edugis-viewer/issues)
