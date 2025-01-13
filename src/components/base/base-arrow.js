@@ -19,16 +19,16 @@ class BaseArrow extends LitElement {
                 width: 8px;
                 height: 8px;
                 margin: 3px;
-                border-top: 1px solid #424242;
-                border-right: 1px solid #424242;
+                border-top: 1px solid var(--theme-text-color-primary, #424242);
+                border-right: 1px solid var(--theme-text-color-primary, #424242);
                 transform: rotate(45deg);
-                transition: transform .8s ease-in-out;
+                transition: transform .2s ease-in-out;
                 cursor: pointer;
                 outline: none;
             }
             div:focus {
-                border-top: 2px solid #424242;
-                border-right: 2px solid #424242;
+                border-top: 2px solid var(--theme-text-color-primary, #424242);
+                border-right: 2px solid var(--theme-text-color-primary, #424242);
             }
             .open {
                 transform: rotate(135deg);

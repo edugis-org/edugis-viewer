@@ -33,7 +33,9 @@ class MapLayerSet extends LitElement {
                 position: relative;
                 height: 58px;
                 line-height: 58px;
+                font-weight: bold;
                 cursor: pointer;
+                color: #007BC7;
             }
             base-arrow {
                 position: absolute;
@@ -187,6 +189,7 @@ class MapLayerSet extends LitElement {
         })
     }
     _renderLayerList() {
+        console.log(this.layerSet);
         if (this.layerSet.length == 0) {
             return html`<map-layer .nolayer="${this.nolayer}"></map-layer>`;
         }
