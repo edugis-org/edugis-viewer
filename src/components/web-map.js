@@ -413,14 +413,14 @@ class WebMap extends LitElement {
     }
   }
   updateLayerPaintProperty(e, wait = 100) {
-    // If no timeout is set, execute immediately and set timeout
+    // If no timeout is set, execute immediately and set timeout to execute at least every wait ms
     if (!this.timeout) {
       this.executeLayerPaintUpdate(e);
       this.timeout = setTimeout(() => {
         this.timeout = null;
       }, wait);
     } else {
-      // Store latest event for deferred execution
+      // Store latest event for deferred execution and skip execution if another event is received within wait ms
       clearTimeout(this.deferredTimeout);
       this.deferredTimeout = setTimeout(() => {
         this.executeLayerPaintUpdate(e);
