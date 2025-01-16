@@ -11,6 +11,7 @@ class MapLegendFill extends LitElement {
         .container {
             display: flex;
             align-items: flex-start;
+            cursor: pointer;
         }
         .stretch {
             display: flex;
@@ -33,19 +34,6 @@ class MapLegendFill extends LitElement {
         this.title = "untitled";
         this.items = [];
         this.activeEdits = [];
-    }
-    connectedCallback() {
-        super.connectedCallback()
-        //addEventListener('keydown', this._handleKeydown);
-    }
-    disconnectedCallback() {
-        super.disconnectedCallback()
-        //window.removeEventListener('keydown', this._handleKeydown);
-    }
-    shouldUpdate(changedProp) {
-        //if (changedProp.has('items')) {
-        //}
-        return true;
     }
     _fillItem(color, strokeColor, label) {
         return svg`
@@ -112,8 +100,8 @@ class MapLegendFill extends LitElement {
         }
         if (typeof items.colorItems[0]?.attrExpression === 'string' && items.colorItems[0].attrExpression.startsWith('interpolate-')) {
             let gradients = [];
-            for (let i = 0; i < items.colorItems.length; i++) {
-                gradients.push({label: items.colorItems[i].attrValue, color: items.colorItems[i].paintValue});
+            for (const item of items.colorItems) {
+                gradients.push({label:item.attrValue, color: item.paintValue});
             }
             const label = items.colorItems[0].attrName;
             const base = items.colorItems[0].attrExpression.split(',')[2];
@@ -205,12 +193,6 @@ class MapLegendFill extends LitElement {
             }
         }));
         this.requestUpdate();
-    }
-    firstUpdated() {
-
-    }
-    updated() {
-
     }
 }
 
