@@ -557,6 +557,116 @@ export default
               }
             },
             {
+              "title": "Punten in Nederland",
+              "layerInfo": {
+                "id": "punten",
+                "type": "circle",
+                "source": {
+                  "type": "geojson",
+                  "data": {
+                    "type": "FeatureCollection",
+                    "features": [
+                      {
+                        "type": "Feature",
+                        "properties": {
+                          "name": "Utrecht",
+                          "value": 1
+                        },
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [5.1214, 52.0907]
+                        }
+                      },{
+                        "type": "Feature",
+                        "properties": {
+                          "name": "Den Haag",
+                          "value": 2
+                        },
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [4.3007, 52.0705]
+                        }
+                      },
+                      {
+                        "type": "Feature",
+                        "properties": {
+                          "name": "Arnhem",
+                          "value": 3
+                        },
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [5.9119, 51.9851]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "paint": {
+                  "circle-radius": 5,
+                  "circle-color": "#f00"
+                }
+              }
+            },
+            {
+              "title": "Punten geklassificeerd",
+              "layerInfo": {
+                "id": "puntengeklasseerd",
+                "type": "circle",
+                "source": {
+                  "type": "geojson",
+                  "data": {
+                    "type": "FeatureCollection",
+                    "features": [
+                      {
+                        "type": "Feature",
+                        "properties": {
+                          "name": "Utrecht",
+                          "value": 1
+                        },
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [5.1214, 52.0907]
+                        }
+                      },{
+                        "type": "Feature",
+                        "properties": {
+                          "name": "Den Haag",
+                          "value": 2
+                        },
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [4.3007, 52.0705]
+                        }
+                      },
+                      {
+                        "type": "Feature",
+                        "properties": {
+                          "name": "Arnhem",
+                          "value": 3
+                        },
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [5.9119, 51.9851]
+                        }
+                      }
+                    ]
+                  }
+                },
+                paint: {
+                  "circle-radius": 5,
+                  "circle-color": [
+                    "match",
+                    ["get", "value"],
+                    1, "#f00",
+                    2, "#f80",
+                    3, "#ff0",
+                    "#000"
+                    ], 
+                  "circle-stroke-width": 1
+                }
+              }
+            },
+            {
               "type":"geojson",
               "title":"Merwedekanaalzone Utrecht",
               "layerInfo":{
@@ -1183,6 +1293,19 @@ export default
               "title": "Stedin kabels",
               "layerInfo": {
                 "id": "stedinkabels",
+                "metadata": {
+                  "attributes": {
+                    "translations": [
+                      {
+                        "name": "ktype","translation": "kabeltype", "valuemap" : [
+                          ["laag", "laagspanning"],
+                          ["midden", "middenspanning"],
+                          ["hoog", "hoogspanning"]
+                        ]
+                      }
+                    ]
+                  },
+                },
                 "type": "line",
                 "minzoom": 12,
                 "source": {

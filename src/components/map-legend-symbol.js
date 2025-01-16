@@ -1,4 +1,4 @@
-import {LitElement, html, css, svg} from 'lit';
+import {LitElement, html, css} from 'lit';
 import "./map-legend-item-edit";
 class MapLegendSymbol extends LitElement {
     static get styles() {
@@ -6,13 +6,15 @@ class MapLegendSymbol extends LitElement {
         :host {
             display: block;
         }
-        .container {
+        .container, editcontainer {
             display: flex;
             align-items: center;
         }
+        .editcontainer {
+            cursor: pointer;
+        }
         .label {
             padding-left: 2px;
-            cursor: pointer;
         }
         .icon {
             vertical-align: middle;
@@ -36,8 +38,8 @@ class MapLegendSymbol extends LitElement {
         this.activeEdits = [];
     }
     render() {
-        if (this.symbols && this.symbols.length) {
-            const result = [];
+        const result = [];
+        if (this.symbols?.length) {
             if (this.symbols.length > 1) {
                 result.push(html`<div>${this.title}</div>`)
             }
@@ -49,23 +51,17 @@ class MapLegendSymbol extends LitElement {
                     @change="${this._symbolChange}" 
                     legendItemType="symbol" 
                     itemIndex=${index} 
-                    fontStyle=${this.fontStyle}><div><img class="icon" src="${symbol.data}"><span style=${this.fontStyle}>${label}</span></div></map-legend-item-edit>`)
+                    fontStyle=${this.fontStyle}><div class="editcontainer"><img class="icon" src="${symbol.data}"><span style=${this.fontStyle}>${label}</span></div></map-legend-item-edit>`)
             }
-            return result;
         } else {
-            return(html`<map-legend-item-edit 
+            result.push(html`<map-legend-item-edit 
                     .visible=${this.activeEdits.includes(0)} 
                     @editActive="${this._editActive}"
                     @change="${this._symbolChange}"
                     legendItemType="symbol" 
-                    fontStyle=${this.fontStyle}><div><span style=${this.fontStyle}>${this.title}</span></div></map-legend-item-edit>`)
+                    fontStyle=${this.fontStyle}><div class="editcontainer"><span style=${this.fontStyle}>${this.title}</span></div></map-legend-item-edit>`)
         }
-    }
-    firstUpdated() {
-
-    }
-    updated() {
-
+        return result;
     }
     _editActive(event) {
         if (event.detail.editActive) {

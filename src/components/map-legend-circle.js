@@ -7,13 +7,15 @@ class MapLegendCircle extends LitElement {
     :host {
         display: block;
     }
-    .container {
+    .container, .editcontainer {
         display: flex;
         align-items: center;
     }
+    .editcontainer {
+        cursor: pointer;
+    }
     .label {
         padding-left: 2px;
-        cursor: pointer;
     }
     .bubblecontainer {
       display: block;
@@ -91,38 +93,42 @@ class MapLegendCircle extends LitElement {
     }
     _eqSet(as, bs) {
       if (as.size !== bs.size) return false;
-      for (var a of as) if (!bs.has(a)) return false;
+      for (const a of as) if (!bs.has(a)) return false;
       return true;
     }
+    renderCircleLegendEditor(label, index, color, strokeColor, strokeWidth, radius) {
+        return html`
+        <map-legend-item-edit 
+            .itemIndex=${index}
+            .visible=${this.activeEdits.includes(index)}
+            @editActive="${this._editActive}"
+            @change="${this._colorChanged}"
+            @changeLineWidth="${this._outlineWidthChanged}"
+            @changeLineColor="${this._outlineColorChanged}"
+            @changeRadius="${this._radiusChanged}"
+            legendItemType="circle" 
+            .color=${color} 
+            .lineWidth=${strokeWidth}
+            lineColor=${strokeColor}
+            radius=${radius}>
+            <div class="editcontainer">${this._circleItem(color, strokeColor, strokeWidth, radius, label)}</div>
+        </map-legend-item-edit>
+        `;
+    }
     render() {
+        let result = [];
         const items = this.items;
         if (items.colorItems.length <= 1 && items.radiusItems.length <= 1) {
+            const label = items.colorItems.length ? items.colorItems[0].attrName: this.title;
             const color = items.colorItems.length ? items.colorItems[0].paintValue : 'rgba(0,0,0,0)';
             const strokeColor = items.strokeColorItems.length ? items.strokeColorItems[0].paintValue : color;
             const strokeWidth = items.strokeWidthItems.length ? items.strokeWidthItems[0].paintValue : 0;
             const radius = items.radiusItems.length ? items.radiusItems[0].paintValue : 3;
-            const label = items.colorItems.length ? items.colorItems[0].attrName: this.title;
-            return html`
-            <map-legend-item-edit 
-                .visible=${this.activeEdits.includes(0)}
-                @editActive="${this._editActive}"
-                @change="${this._colorChanged}"
-                @changeLineWidth="${this._outlineWidthChanged}"
-                @changeLineColor="${this._outlineColorChanged}"
-                @changeRadius="${this._radiusChanged}"
-                legendItemType="circle" 
-                .color=${color} 
-                .lineWidth=${strokeWidth}
-                lineColor=${strokeColor}
-                radius=${radius}>
-                <div class="container">${this._circleItem(color, strokeColor, strokeWidth, radius, label)}</div>
-            </map-legend-item-edit>
-            `
+            result.push(this.renderCircleLegendEditor(label, 0, color, strokeColor, strokeWidth, radius));
+            return result;
         }
-        let result = [];
         let usedRadiusValues = new Set();
         if (items.colorItems.length > 1) {
-            result.push(html`${items.colorItems[0].attrName}`);
             const coloredCircles = items.colorItems.map(({paintValue,attrValue}, itemIndex)=>{
                 if (attrValue === undefined) {
                     return html``;
@@ -136,29 +142,31 @@ class MapLegendCircle extends LitElement {
                     case 1:
                         strokeColor = items.strokeColorItems[0].paintValue;
                         break;
-                    default:
+                    default: {
                         const strokeColors = items.strokeColorItems.filter(({attrValue})=>attrValue===colorAttrValue);
                         if (strokeColors.length === 1) {
                             strokeColor = strokeColors[0].paintValue;
                         } else {
                             strokeColor = paintValue;
                         }
+                    }
                 }
                 let strokeWidth;
                 switch (items.strokeWidthItems.length) {
                     case 0:
-                        strokeWidth = 1;
+                        strokeWidth = 0;
                         break;
                     case 1:
                         strokeWidth = items.strokeWidthItems[0].paintValue;
                         break;
-                    default:
+                    default: {
                         const strokeWidths = items.strokeWidthItems.filter(({attrValue})=>attrValue===colorAttrValue);
                         if (strokeWidths.length === 1) {
                             strokeWidth = strokeWidths[0].paintValue;
                         } else {
-                            strokeWidth = 1;
+                            strokeWidth = 0;
                         }
+                    }
                 }
                 let radius;
                 switch (items.radiusItems.length) {
@@ -168,7 +176,7 @@ class MapLegendCircle extends LitElement {
                     case 1:
                         radius = items.radiusItems[0].paintValue;
                         break;
-                    default:
+                    default: {
                         const radiusWidths = items.radiusItems.filter(({attrValue})=>attrValue===colorAttrValue);
                         if (radiusWidths.length === 1) {
                             radius = radiusWidths[0].paintValue;
@@ -176,24 +184,9 @@ class MapLegendCircle extends LitElement {
                         } else {
                             radius = 3;
                         }
+                    }
                 }
-                //const label = attrExpression ? attrExpression === '==' ? attrValue : `${attrExpression} ${attrValue}` : attrValue;
-                return html`<map-legend-item-edit 
-                    .visible=${this.activeEdits.includes[itemIndex]}
-                    @editActive="${this._editActive}"
-                    @change="${this._colorChanged}"
-                    @changeLineColor="${this._outlineColorChanged}"
-                    @changeLineWidth="${this._outlineWidthChanged}"
-                    @changeRadius="${this._radiusChanged}"
-                    .itemIndex=${itemIndex} 
-                    legendItemType="circle" 
-                    .color=${paintValue}
-                    .lineColor=${strokeColor}
-                    .lineWidth=${strokeWidth}
-                    .radius=${radius}>
-                    <div class="container">${this._circleItem(paintValue, strokeColor, strokeWidth, radius, attrValue)}</div>
-                </map-legend-item-edit>
-                `
+                result.push(this.renderCircleLegendEditor(attrValue, itemIndex, paintValue, strokeColor, strokeWidth, radius));
             });
             result.push(coloredCircles);
         }
@@ -212,15 +205,11 @@ class MapLegendCircle extends LitElement {
         }
         return result;
     }
-    firstUpdated() {
-
-    }
-    updated() {
-
-    }
     _editActive(event) {
-        if (event.detail.editActive) {
-            this.activeEdits = this.activeEdits.concat(event.detail.itemIndex);
+        if (event.detail.editActive ) {
+            if (!this.activeEdits.includes(event.detail.itemIndex)) {
+                this.activeEdits = this.activeEdits.concat(event.detail.itemIndex);
+            }
         } else {
             this.activeEdits = this.activeEdits.filter(index=>index !== event.detail.itemIndex);
         }
@@ -234,7 +223,15 @@ class MapLegendCircle extends LitElement {
     _colorChanged(event) {
         const itemIndex = event.detail.itemIndex;
         const color = event.detail.color;
-        this.items.colorItems[itemIndex].paintValue = color;
+        if (this.items.colorItems.length > itemIndex) {
+            this.items.colorItems[itemIndex].paintValue = color;
+        } else if (this.items.colorItems.length) {
+            // circle set has shared color
+            this.items.colorItems[0].paintValue = color;
+        } else {
+            // circle color not set yet
+            this.items.colorItems.push({paintValue: color});
+        }
         this.dispatchEvent(new CustomEvent('change', {
             detail: {
                 layerid: this.layerid,
@@ -247,9 +244,13 @@ class MapLegendCircle extends LitElement {
     _outlineColorChanged(event) {
         const itemIndex = event.detail.itemIndex;
         const color = event.detail.color;
-        if (this.items.strokeColorItems.length) {
+        if (this.items.strokeColorItems.length > itemIndex) {
             this.items.strokeColorItems[itemIndex].paintValue = color;
+        } else if (this.items.strokeColorItems.length) {
+            // circle set has shared stroke color
+            this.items.strokeColorItems[0].paintValue = color;
         } else {
+            // circle stroke color not set yet
             this.items.strokeColorItems.push({paintvalue: color});
         }
         this.dispatchEvent(new CustomEvent('change', {
@@ -264,9 +265,13 @@ class MapLegendCircle extends LitElement {
     _outlineWidthChanged(event) {
         const itemIndex = event.detail.itemIndex;
         const width = event.detail.width;
-        if (this.items.strokeWidthItems.length) {
+        if (this.items.strokeWidthItems.length > itemIndex) {
             this.items.strokeWidthItems[itemIndex].paintValue = width;
+        } else if (this.items.strokeWidthItems.length) {
+            // circle set has shared stroke width
+            this.items.strokeWidthItems[0].paintValue = width;
         } else {
+            // circle stroke with not set yet
             this.items.strokeWidthItems.push({paintValue: width});
         }
         this.dispatchEvent(new CustomEvent('change', {
@@ -281,7 +286,15 @@ class MapLegendCircle extends LitElement {
     _radiusChanged(event) {
         const itemIndex = event.detail.itemIndex;
         const radius = event.detail.radius;
-        this.items.radiusItems[itemIndex].paintValue = radius;
+        if (this.items.radiusItems?.length > itemIndex) {
+            this.items.radiusItems[itemIndex].paintValue = radius;
+        } else if (this.items.radiusItems?.length) {
+            // circle set has shared radius
+            this.items.radiusItems[0].paintValue = radius;
+        } else {
+            // circle radius not set yet
+            this.items.radiusItems.push({paintValue: radius});
+        }
         this.dispatchEvent(new CustomEvent('change', {
             detail: {
                 layerid: this.layerid,

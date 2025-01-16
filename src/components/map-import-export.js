@@ -1,4 +1,5 @@
 import {LitElement, html} from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import './map-iconbutton';
 import {openfileIcon, downloadIcon} from './my-icons';
 import {toGeoJSON} from '../lib//togeojson';
@@ -8,7 +9,7 @@ import {translate as t, registerLanguageChangedListener, unregisterLanguageChang
 * @polymer
 * @extends HTMLElement
 */
-export default class MapImportExport extends LitElement {
+export class MapImportExport extends LitElement {
   static get properties() { 
     return {
       active: {type: Boolean},
@@ -60,7 +61,7 @@ export default class MapImportExport extends LitElement {
       <div class="rowcontainer">
         <input type="file" id="fileElem" accept=".json" style="display:none" @change="${e=>this._openFiles(e)}">
         ${window.saveAs ? html`<div class="dropzone" @dragover="${e=>e.target.classList.add('dragover')}" @dragleave="${e=>e.target.classList.remove('dragover')}">drop config json here</map-iconbutton></div>`: ''}
-        ${window.saveAs ? html`<div class="buttoncontainer right" @click="${(e)=>this.shadowRoot.querySelector('#fileElem').click()}"><map-iconbutton info="${t('open file')}" .icon="${openfileIcon}"></map-iconbutton></div>`: ''}
+        ${window.saveAs ? html`<div class="buttoncontainer right" @click="${(e)=>this.shadowRoot.querySelector('#fileElem').click()}"><map-iconbutton info="${ifDefined(t('open file')??undefined)}" .icon="${openfileIcon}"></map-iconbutton></div>`: ''}
       </div>
       <hr>
       <div>${t('Save')}</div>
@@ -70,7 +71,7 @@ export default class MapImportExport extends LitElement {
       <div class="spacer">
       ${this.toollist.map(tool=>html`<input type="checkbox" name="${tool.name}" ?checked="${tool.visible}" @click="${e=>tool.visible=!tool.visible}">${tool.name}<br>`)}
       </div>
-      ${window.saveAs ? html`<div class="buttoncontainer right" @click="${(e)=>this._saveFile()}"><map-iconbutton info="${t('save')}" .icon="${downloadIcon}"></map-iconbutton></div>`: ''}
+      ${window.saveAs ? html`<div class="buttoncontainer right" @click="${(e)=>this._saveFile()}"><map-iconbutton info="${ifDefined(t('save')??undefined)}" .icon="${downloadIcon}"></map-iconbutton></div>`: ''}
       </div>
       </div>
     `
@@ -331,4 +332,7 @@ export default class MapImportExport extends LitElement {
     })
   }
 }
+
+export default MapImportExport;
+
 customElements.define('map-import-export', MapImportExport);

@@ -1,18 +1,7 @@
 
-/* 
-//see  https://stackoverflow.com/questions/51670987/how-to-import-non-module-javascript-into-polymer-3-0
-//import * as mapboxgl from './node_modules/mapbox-gl/dist/mapbox-gl.js';
-// load external mapbox-gl.js script
-const mapboxgljs = document.createElement('script');
-mapboxgljs.setAttribute('src', 'node_modules/mapbox-gl/dist/mapbox-gl.js');
-document.head.appendChild(mapboxgljs);
-// load external mapbox-gl.css 
-const mapboxcss = document.createElement('link');
-mapboxcss.setAttribute('href', 'node_modules/mapbox-gl/dist/mapbox-gl.css');
-mapboxcss.setAttribute('rel', 'stylesheet');
-document.head.appendChild(mapboxcss);
-*/
-
+import {LitElement, html} from 'lit';
+import {ifDefined} from 'lit/directives/if-defined.js';
+import {MapImportExport} from './map-import-export.js';
 import '../../lib/openmaptiles-language.js';
 import './map-data-catalog.js';
 import './map-spinner.js';
@@ -29,7 +18,6 @@ import './map-pitch';
 import './map/layer/map-layer-container.js';
 import './map/layer/map-layer-set.js';
 import './map-draw';
-import './map-import-export';
 import './map-data-toolbox';
 import './map-sheet-tool';
 import './map-modal-dialog';
@@ -149,13 +137,6 @@ function projectLngLat(lngLat, srs)
     return lngLat;
 }
 
-import {LitElement, html, svg} from 'lit';
-import {ifDefined} from 'lit/directives/if-defined.js';
-import MapImportExport from './map-import-export';
-/**
-* @polymer
-* @extends HTMLElement
-*/
 class WebMap extends LitElement {
   static get properties() { 
     return { 
@@ -431,17 +412,31 @@ class WebMap extends LitElement {
       }
     }
   }
-  updateLayerPaintProperty(e) {
+  updateLayerPaintProperty(e, wait = 100) {
+    // If no timeout is set, execute immediately and set timeout
+    if (!this.timeout) {
+      this.executeLayerPaintUpdate(e);
+      this.timeout = setTimeout(() => {
+        this.timeout = null;
+      }, wait);
+    } else {
+      // Store latest event for deferred execution
+      clearTimeout(this.deferredTimeout);
+      this.deferredTimeout = setTimeout(() => {
+        this.executeLayerPaintUpdate(e);
+      }, wait);
+    }
+  }
+  executeLayerPaintUpdate(e) {
     if (this.map.version) {
       if (Array.isArray(e.detail.layerid)) {
-        e.detail.layerid.forEach(id=>{
+        e.detail.layerid.forEach(id => {
           this.updateSingleLayerPaintProperty(id, e.detail);
-        })
+        });
       } else {
         this.updateSingleLayerPaintProperty(e.detail.layerid, e.detail);
       }
     }
-    //this.updatelegend++;
   }
   updateLayerFilter(e) {
     if (this.map.version){
@@ -2449,8 +2444,8 @@ class WebMap extends LitElement {
     }
     if (e.type === "mousemove" && !this.infoClicked) {
       this.featureInfo = this.map.queryRenderedFeatures(e.point);
-      const height = this.map.queryTerrainElevation(e.lngLat);
-      console.log(`height: ${height}`);
+      //const height = this.map.queryTerrainElevation(e.lngLat);
+      //console.log(`height: ${height}`);
       this._updateFeatureState();
       return;
     }
@@ -2489,8 +2484,8 @@ class WebMap extends LitElement {
           if (features.length) {
             featureInfo.push(...features.reverse());
           }
-          const height = this.map.queryTerrainElevation(e.lngLat);
-          console.log(`height: ${height}`);
+          //const height = this.map.queryTerrainElevation(e.lngLat);
+          //console.log(`height: ${height}`);
         }
       }
       if (this.streetViewOn) {

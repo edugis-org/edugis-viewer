@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {ifDefined} from 'lit/directives/if-defined.js';
 import './color-picker';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 
@@ -171,20 +172,46 @@ class MapLegendItemEdit extends LitElement {
         return html`<slot @click="${this._click}"></slot>
             ${this.visible?this._renderLegendEditor():""}`
     }
-    firstUpdated() {
-
-    }
-    updated() {
-
-    }
     _click(e) {
-        //this.visible = !this.visible;
         this.dispatchEvent(new CustomEvent('editActive', {
             detail: {
                 editActive: !this.visible,
                 itemIndex: this.itemIndex
             }
         }))
+    }
+    _renderOptionalFillOptions() {
+        if (this.lineColor) {
+        return html`
+            <div class="wrapper">
+                <div class="label">${t('Border color')}:</div>
+                <color-picker .color=${this.color} @change="${e=>this._lineColorChange(e)}">
+                    <div class="linepicker"><svg width="20" height="10">
+                        <title>lijnkleur</title>
+                        <line x1="0" y1="5" x2="20" y2="5" stroke="${this.lineColor?this.lineColor:this.color}" />
+                    </svg></div>
+                </color-picker>
+            </div>`;
+        }
+        return html``;
+    }
+    _renderOptionalCircleOptions() {
+        if (this.lineWidth) {
+            return html`
+            <div class="wrapper">
+                <div class="label">${t('border width')}: </div><input class="right" type="range" min="0.001" max="5" step="0.1" value="${this.lineWidth?this.lineWidth:0}" @input="${(e)=>this._lineWidthChange(e)}"/>
+            </div>
+            <div class="wrapper">
+                <div class="label">${t('border color')}: </div>
+                <color-picker .color=${this.color} @change="${e=>this._lineColorChange(e)}">
+                    <div class="linepicker"><svg width="20" height="10">
+                        <title>kleur</title>
+                        <line x1="0" y1="5" x2="20" y2="5" stroke="${this.lineColor}" stroke-width="${this.lineWidth}" />
+                    </svg></div>
+                </color-picker>
+            </div>`;
+        }
+        return html``;
     }
     _renderLegendEditor() {
         let color = this.color;
@@ -195,18 +222,10 @@ class MapLegendItemEdit extends LitElement {
                     <div class="wrapper">
                         <div class="label">${t('Fill color')}:</div>
                         <color-picker .color=${this.color} @change="${e=>this._colorChange(e)}">
-                            <div class="fillpicker" title="${t('color')}" style="background-color:${color}"></div>
+                            <div class="fillpicker" title="${ifDefined(t('color')??undefined)}" style="background-color:${color}"></div>
                         </color-picker>
                     </div>
-                    <div class="wrapper">
-                        <div class="label">${t('Border color')}:</div>
-                        <color-picker .color=${this.color} @change="${e=>this._lineColorChange(e)}">
-                            <div class="linepicker"><svg width="20" height="10">
-                                <title>lijnkleur</title>
-                                <line x1="0" y1="5" x2="20" y2="5" stroke="${this.lineColor?this.lineColor:this.color}" />
-                            </svg></div>
-                        </color-picker>
-                    </div>
+                    ${this._renderOptionalFillOptions()}
                 </div>`
             case 'line': 
                 return html`
@@ -231,23 +250,12 @@ class MapLegendItemEdit extends LitElement {
                     <div class="wrapper">
                         <div class="label">${t('color')}: </div>
                         <color-picker .color=${this.color} @change="${e=>this._colorChange(e)}">
-                            <div class="fillpicker" title="${t('color')}" style="background-color:${color}"></div>
+                            <div class="fillpicker" title="${ifDefined(t('color')??undefined)}" style="background-color:${color}"></div>
                         </color-picker>
                     </div>
-                    <div class="wrapper">
-                        <div class="label">${t('border width')}: </div><input class="right" type="range" min="0" max="5" step="0.1" value="${this.lineWidth?this.lineWidth:0}" @input="${(e)=>this._lineWidthChange(e)}"/>
-                    </div>
-                    <div class="wrapper">
-                        <div class="label">${t('border color')}: </div>
-                        <color-picker .color=${this.color} @change="${e=>this._lineColorChange(e)}">
-                            <div class="linepicker"><svg width="20" height="10">
-                                <title>kleur</title>
-                                <line x1="0" y1="5" x2="20" y2="5" stroke="${this.lineColor}" stroke-width="${this.lineWidth}" />
-                            </svg></div>
-                        </color-picker>
-                    </div>
+                    ${this._renderOptionalCircleOptions()}
                 </div>`
-            case 'symbol':
+            case 'symbol': {
                 const fontSizeMatch = this.fontStyle.match(/font-size\s*:\s*([^;]*)/);
                 const fontSize = fontSizeMatch ? parseFloat(fontSizeMatch[1]) : 12;
                 const fontColormatch = this.fontStyle.match(/color\s*:\s*([^;]*)/);
@@ -261,11 +269,13 @@ class MapLegendItemEdit extends LitElement {
                     <div class="wrapper">
                         <div class="label">${t('text color')}: </div>
                         <color-picker .color=${fontColor} @change="${e=>this._fontColorChange(e)}">
-                            <div class="fillpicker" title="${t('color')}" style="background-color:${fontColor}"></div>
+                            <div class="fillpicker" title="${ifDefined(t('color')??undefined)}" style="background-color:${fontColor}"></div>
                         </color-picker>
                     </div>
                 </div>
                 `
+            }
+            break;
             default:
                 return html`Legend item editor for '${this.legendItemType}' not implemented`;
         }
