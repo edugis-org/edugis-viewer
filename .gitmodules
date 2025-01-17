@@ -1,0 +1,3 @@
+[submodule "maps"]
+	path = maps
+	url = https://github.com/edugis-repo/edugis-configurations.git
