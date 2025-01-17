@@ -84,23 +84,26 @@ class MapLayerSet extends LitElement {
     shouldUpdate(changedProperties) {
         if (changedProperties.has('layerlist')) {
             this.layerSet = this.layerlist.reduce((result, layer)=>{
-                if (layer.metadata && layer.metadata.styleid) {
-                    if (result.previd !== layer.metadata.styleid) {
-                        // new style layer
-                        result.group.push({
-                            id: layer.metadata.styleid, 
-                            type: "style",
-                            metadata: {
-                                title: layer.metadata.styletitle,
-                                sublayers: [layer]
-                            }
-                        });
-                        result.previd = layer.metadata.styleid;
+                if (layer.metadata) {
+                    // only add layers with metadata
+                    if (layer.metadata.styleid) {
+                        if (result.previd !== layer.metadata.styleid) {
+                            // new style layer
+                            result.group.push({
+                                id: layer.metadata.styleid, 
+                                type: "style",
+                                metadata: {
+                                    title: layer.metadata.styletitle,
+                                    sublayers: [layer]
+                                }
+                            });
+                            result.previd = layer.metadata.styleid;
+                        } else {
+                            result.group[result.group.length - 1].metadata.sublayers.push(layer);
+                        }
                     } else {
-                        result.group[result.group.length - 1].metadata.sublayers.push(layer);
+                        result.group.push(layer);
                     }
-                } else {
-                    result.group.push(layer);
                 }
                 return result;
             }, {group: [], previd: ""}).group;
@@ -189,7 +192,6 @@ class MapLayerSet extends LitElement {
         })
     }
     _renderLayerList() {
-        console.log(this.layerSet);
         if (this.layerSet.length == 0) {
             return html`<map-layer .nolayer="${this.nolayer}"></map-layer>`;
         }
@@ -212,6 +214,8 @@ class MapLayerSet extends LitElement {
     _renderSaveLayerList() {
         if (this.layerSet.length > 1) {
             return html`<div class="iconbutton" @click="${()=>this._saveLayerList()}" title="${ifDefined(t('Save layer set')??undefined)}"><span class="icon">${downloadIcon}</span> ${t('Save layer set')}</div>`
+        } else {
+            return html``;
         }
     }
     _saveLayerList() {

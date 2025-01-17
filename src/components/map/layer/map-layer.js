@@ -53,9 +53,6 @@ class MapLayer extends GestureEventListeners(LitElement) {
               position: relative;
               top: 3px;
             }
-            .mltitle {
-              padding-right: 10px;
-            }
             .lightgray {
               color: #ccc;
               fill: #ccc;
@@ -69,6 +66,13 @@ class MapLayer extends GestureEventListeners(LitElement) {
               cursor: move;
               user-select: none;
               background-color: rgba(255,255,255,0.5);
+            }
+            .draghandle:active {
+              cursor: grabbing;
+            }
+            .mltitle {
+              padding-right: 10px;
+              cursor: pointer;
             }
             #layerinfo {
               position: relative;
@@ -401,12 +405,10 @@ class MapLayer extends GestureEventListeners(LitElement) {
                 }
                 this.curHovering = hovering[0];
               }
-            } else {
-              if (this.curHovering) {
-                this.curHovering.style['border-top'] = '';
-                this.curHovering.style['border-bottom'] = '';
-                this.curHovering = null;
-              }
+            } else if (this.curHovering) {
+              this.curHovering.style['border-top'] = '';
+              this.curHovering.style['border-bottom'] = '';
+              this.curHovering = null;
             }
             break;
           case 'end':

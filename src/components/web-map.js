@@ -365,6 +365,9 @@ class WebMap extends LitElement {
     }
   }
   updateSingleLayerOpacity(id, opacity) {
+    if (isNaN(opacity) || opacity < 0 || opacity > 1) {
+      return; // cannot parse opacity to valid single number
+    }
     const layer = this.map.getLayer(id);
     if (layer) {
       switch (layer.type) {
@@ -412,7 +415,7 @@ class WebMap extends LitElement {
       }
     }
   }
-  updateLayerPaintProperty(e, wait = 100) {
+  updateLayerPaintProperty(e, wait = 150) {
     // If no timeout is set, execute immediately and set timeout to execute at least every wait ms
     if (!this.timeout) {
       this.executeLayerPaintUpdate(e);
@@ -1201,8 +1204,8 @@ class WebMap extends LitElement {
         right: 10px;
         justify-content: flex-end;
         transition: right 0.5s ease;
-        pointer-events: none;
         box-sizing: border-box;
+        user-select: none;
       }
       </style>
     <div class="webmap"></div>
