@@ -12,10 +12,23 @@ EduGIS, http://www.edugis.nl, and http://kaart.edugis.nl is an application to in
 ## Get source and dependencies
 ```bash
 # get source from github
-git clone [this_repository]
+git clone --recurse-submodules [this_repository]
 cd this_repository
 # add dependencies
 npm install
+```
+
+If you didn't use the --recurse-submodules option while cloning:
+```bash
+cd this_repository
+git submodule update --init
+# add dependencies
+npm install
+```
+
+To update the submodule (maps configurations) to the latest commit of their default branch
+```bash
+git submodule update --remote
 ```
 
 ## Add API keys
