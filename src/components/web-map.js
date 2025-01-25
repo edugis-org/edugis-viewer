@@ -24,6 +24,8 @@ import './map-modal-dialog';
 import './map-proj-chooser';
 import "./map-save-layer";
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from "../i18n.js";
+import { WebMapInitializer } from './web-map-initializer.js';
+import { WebMapStyleLoader } from './web-map-style-loader.js';
 
 
 import {GeoJSON} from '../utils/geojson';
@@ -31,34 +33,13 @@ import {getCapabilitiesNodes, copyMetadataToCapsNodes} from '../utils/capabiliti
 import {wmsUrl} from '../utils/wmsurl';
 import mapgl from '../map-gl'
 
-import ZoomControl from '../../lib/zoomcontrol';
 import { importExportIcon, gpsIcon, languageIcon, arrowLeftIcon, outlineInfoIcon, combineToolIcon, threeDIcon, infoIcon, drawIcon, sheetIcon, world3Icon } from './my-icons';
 import { measureIcon, layermanagerIcon, searchIcon as gmSearchIcon } from '../gm/gm-iconset-svg';
-import rootUrl from '../utils/rooturl.js';
 import {geoJSONProject, coordProject} from '@edugis/proj-convert'
+
 
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function getResolution (map)
-{
-  // returns degrees / pixel-width
-  if (!map) {
-    return undefined;
-  }
-  const y = map._container.clientHeight / 2;
-  return getAngle(map.unproject([0, y]), map.unproject([1, y]));
-}
-
-function getAngle (latlng1, latlng2)
-{
-  const rad = Math.PI / 180,
-      lat1 = latlng1.lat * rad,
-      lat2 = latlng2.lat * rad,
-      a = Math.sin(lat1) * Math.sin(lat2) +
-        Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlng2.lng - latlng1.lng) * rad);
-  return Math.acos(Math.min(a, 1)) / rad;
 }
 
 let searchGeoJson = {
@@ -178,14 +159,14 @@ class WebMap extends LitElement {
     this.maxPitch = 60;
     this.viewbox = [];
     // default property values
-    this.mapstyle = rootUrl + "styles/openmaptiles/osmbright.json";
-    this.mapstyleid = "OsmBright";
-    this.mapstyletitle = "OSM bright (stijl)";
-    this.lon = 5.327;
-    this.lat = 52.191;
+    this.mapstyle = this.getEmtpyStyle();
+    this.mapstyleid = "EmptyStyle";
+    this.mapstyletitle = "Empty Style";
+    this.lon = 0;
+    this.lat = 0;
     this.displaylat = this.lat;
     this.displaylng = this.lon;
-    this.zoom = 7;
+    this.zoom = 1;
     this.resolution = 0;
     this.navigation = "false";
     this.zoomlevel = "false";
@@ -197,6 +178,7 @@ class WebMap extends LitElement {
     this.accesstoken = undefined;
     this.lastClickPoint = [];
     this.thematicLayers = [];
+    this.delayedLayers = [];
     this.layerlist = [];
     this.backgroundLayers = [];
     this.datagetter = {};
@@ -478,219 +460,8 @@ class WebMap extends LitElement {
       this.map._update(true); // TODO: how refresh map without calling private "_update()"?
     }
   }
-  restoreNoneReferenceLayers()
-  {
-    if (this.extraLayers) {
-      this.extraLayers.forEach(layer=>{
-        if (!this.map.getSource(layer.storedSource.id)) {
-          this.map.addSource(layer.storedSource.id, layer.storedSource.source);
-          if (layer.storedSource.source.tiles) {
-            const newSource = this.map.getSource(layer.storedSource.id);
-            if (!newSource.tiles) {
-              // mapbox-gl bug? explicitly set .tiles property if necessary
-              newSource.tiles = layer.storedSource.source.tiles;
-            }
-          }
-        }
-        layer.storedSource = null;
-        delete layer.storedSource;
-        this.addLayer({detail:layer});
-      });
-      this.extraLayers = null;
-    }
-  }
-  storeNoneReferenceLayers()
-  {
-    this.extraLayers = this.map.getStyle().layers.filter(layer=>{
-      if (!layer.metadata || !layer.metadata.reference) {
-        if (!layer.source) {
-          return false;
-        }
-        const layerSource = this.map.getSource(layer.source);
-        let typedSource = {};
-        switch (layerSource.type) {
-          case "raster":
-            if (layerSource.url) {
-              typedSource = {
-                type: "raster",
-                tileSize: layerSource.tileSize,
-                url: layerSource.url
-              }
-            } else {
-              typedSource = {
-                type: "raster",
-                tileSize: layerSource.tileSize,
-                attribution: layerSource.attribution,
-                tiles: layerSource.tiles,
-                minzoom: layerSource.minzoom,
-                maxzoom: layerSource.maxzoom
-              }
-            }
-            break;
-          case "geojson":
-            typedSource = {
-              type: "geojson",
-              attribution: layerSource.attribution,
-              data: layerSource._data
-            }
-            break;
-          case "vector":
-            if (layerSource.url) {
-              typedSource = {
-                  type: "vector",
-                  url: layerSource.url
-              }
-            } else {
-              typedSource = {
-                id: layer.source,
-                type: "vector",
-                attribution: layerSource.attribution,
-                tiles: layerSource.tiles,
-                url: layerSource.url,
-                minzoom: layerSource.minzoom,
-                maxzoom: layerSource.maxzoom
-              }
-            }
-            break;
-          case "raster-dem":
-            if (layerSource.url) {
-              typedSource = {
-                type: "raster-dem",
-                url: layerSource.url
-              }
-            } else {
-              typedSource = {
-                type: "raster-dem",
-                tileSize: layerSource.tileSize,
-                encoding: layerSource.encoding,
-                tiles: layerSource.tiles,
-                attribution: layerSource.attribution
-              }
-            }
-            break;
-        }
-        if (!typedSource.attribution) {
-          delete typedSource.attribution; // undefined attribution not allowed
-        }
-        if (!typedSource.url) {
-          delete typedSource.url;
-        }
-        if (!typedSource.tiles) {
-          delete typedSource.tiles;
-        }
-        layer.storedSource = {
-          id: layer.source,
-          source: typedSource
-        }
-        return true;
-      }
-      return false;
-    });
-  }
-  setReferenceLayers(styleId, styleTitle) {
-    this.map.getStyle().layers.forEach(layer=>{
-      let mapLayer = layer;
-      if (mapLayer.metadata) {
-        mapLayer.metadata.reference = true;
-      } else {
-        // get reference to original layer
-        mapLayer = this.map.getLayer(layer.id);
-        mapLayer.metadata = {reference: true};
-      }
-      if (styleId && !mapLayer.metadata.styleid) {
-        mapLayer.metadata.styleid = styleId;
-      }
-      if (styleTitle && !mapLayer.metadata.styletitle) {
-        mapLayer.metadata.styletitle = styleTitle;
-      }
-    });
-  }
-  applyStyle(style, styleId, styleTitle) {
-    for (let id in style.sources) {
-      if (!this.map.getSource(id)) {
-        this.map.addSource(id, style.sources[id]);
-      }
-    }
-    style.layers.forEach(layer=>{
-      if (!layer.metadata) {
-        layer.metadata = {};
-      }
-      layer.metadata.styletitle=styleTitle;
-      layer.metadata.styleid=styleId;
-      this.addLayer({detail:layer});
-    });
-  }
-  loadStyle(url, styleId, styleTitle) {
-    if (typeof url === 'object') {
-      // no need to dereference url
-      return this.applyStyle(url, styleId, styleTitle);
-    }
-    if (url.split('/')[0].indexOf(':') === -1) {
-      // relative url
-      url = rootUrl + url;
-    } 
-    if (url.indexOf('mapbox:') === 0) {
-      url = url.replace('mapbox://styles/mapbox/', 'https://api.mapbox.com/styles/v1/mapbox/') + `?access_token=${APIkeys.mapbox}`;
-    }
-    fetch(url).then(data=>data.json()).then(style=>{
-      this.applyStyle(style, styleId, styleTitle);
-    });
-  }
-  removeReferenceLayers()  {
-    const referenceLayers = this.map.getStyle().layers.filter(layer=>layer.metadata && layer.metadata.reference);
-    referenceLayers.forEach(layer=>{
-      this.map.removeLayer(layer.id)
-      if (this.map.getSource(layer.id)) {
-        this.map.removeSource(layer.id);
-      }
-    });
-  }
-  handleStyleLoaded(styleId, styleTitle) {
-    /* add reference metadata to new layers set by setStyle() */
-    this.setReferenceLayers(styleId, styleTitle);
-    /* restore old non-reference layers */
-    this.restoreNoneReferenceLayers();
-    /* allow new styles to be set */
-    setTimeout(()=>{
-        this.resetLayerList();
-        this.styleLoading = false;
-        this.map._update(true); // TODO: how refresh map wihtout calling private mapbox-gl function?
-    }, 1000);
-  }
-  addStyle(styleInfo) {
-    const styleId = styleInfo.id;
-    const styleTitle = styleInfo.metadata.title ? styleInfo.metadata.title : styleId ? styleId : "style title not defined";
-    if (styleInfo.metadata && styleInfo.metadata.reference) {
-      if (this.styleLoading) {
-        return;
-      }
-      this.styleLoading = true;
-      let timeOutHander = setTimeout(()=>{
-        if (this.styleLoading) {
-          console.log('timeout, fire artificial style.load event');
-          this.map.style.fire('style.load');
-        }
-      }, 3000)
-      /* replace reference style */
-      /* remove old reference layers */
-      this.removeReferenceLayers(); 
-      /* store non reference layers */
-      this.storeNoneReferenceLayers();
-      /* update layerlist */
-      this.layerlist = [...this.layerlist.filter(layer=>layer.reference==false || layer.background)];
-      /* set callback for map.setStyle() */
-      this.map.once('style.load', ()=>{
-        clearTimeout(timeOutHander);
-        if (this.styleLoading) {
-          this.handleStyleLoaded(styleId, styleTitle);
-        }
-      });
-      this.map.setStyle(styleInfo.source);
-    } else {
-      /* add style to existing layers */
-      this.loadStyle(styleInfo.source, styleId, styleTitle);
-    }
-  }
+  
+  
   insertServiceKey(layerInfo) {
     /* replace '{geodanmapskey}' by APIkeys.geodanmaps, '{freetilehostingkey}' by APIkeys.freetilehosting etc. */
     for (let key in APIkeys) {
@@ -724,10 +495,31 @@ class WebMap extends LitElement {
       }
     }
   }
+  removeReferenceLayers()  {
+    const referenceLayers = this.map.getStyle()?.layers.filter(layer=>layer.metadata?.reference);
+    referenceLayers?.forEach(layer=>{
+      this.map.removeLayer(layer.id)
+      if (this.map.getSource(layer.id)) {
+        this.map.removeSource(layer.id);
+      }
+    });
+  }
+
   async addLayer(e) {
+    if (this.styleLoading) {
+        this.delayedLayers.push(e);
+      return;
+    }
     const layerInfo = e.detail;
     if (layerInfo.type === 'style') {
-      this.addStyle(layerInfo);
+      this.styleLoading = true;
+      const styleLoader = new WebMapStyleLoader(this);
+      styleLoader.addStyle(layerInfo, () => {
+        this.styleLoading = false;
+        const delayedLayers = this.delayedLayers;
+        this.delayedLayers = [];
+        delayedLayers.forEach(e=>this.addLayer(e));
+      });
     } else {
       layerInfo.metadata = Object.assign(layerInfo.metadata || {}, {userlayer: true});
       this.insertServiceKey(layerInfo);
@@ -779,7 +571,7 @@ class WebMap extends LitElement {
       }
       if (layerInfo.metadata && layerInfo.metadata.reference) {
         this.removeReferenceLayers();
-        this.layerlist = [...this.layerlist.filter(layer=>layer.reference==false || layer.background)];        
+        this.layerlist = [...this.layerlist.filter(layer=>layer.metadata?.reference==false || layer.background)];        
         this.map.addLayer(layerInfo, this.map.getStyle().layers.length ? this.map.getStyle().layers[0].id : undefined);
       } else {
         if (layerInfo.type == "sheetlayer") {
@@ -822,8 +614,8 @@ class WebMap extends LitElement {
       if (layerInfo.type === 'hillshade' && layerInfo.metadata?.terrain) {
           this.setTerrainLayer(layerInfo.id, true);
       }
-      this.resetLayerList();
     }
+    this.resetLayerList();
   }
   moveLayer(e) {
     if (e.detail.beforeFirst) {
@@ -1085,7 +877,6 @@ class WebMap extends LitElement {
   render() {
     
     return html`<style>
-      /*@import "${rootUrl}node_modules/mapbox-gl/dist/mapbox-gl.css";*/
       ${mapgl.css}
       /* workaround bug mapbox-gl v.051, https://github.com/mapbox/mapbox-gl-js/issues/7589 */
       .mapboxgl-ctrl.mapboxgl-ctrl-attrib p {
@@ -1228,14 +1019,6 @@ class WebMap extends LitElement {
   _beforeSaveLayer(event) {
     this.saveCounter++;
   }
-  _positionString(prop) {
-    // convert prop to control position
-    let propl = prop.toLowerCase().trim();
-    if (propl === "true" || propl === "") {
-      return undefined;
-    }
-    return propl;
-  }
   checkMapIsLanguageSwitcherCapable(recheck)
   {
     if (recheck) {
@@ -1252,18 +1035,43 @@ class WebMap extends LitElement {
     }
     return this.isLanguageSwitcherCapable = this.map.getStyle().layers.find(layer=>layer.source === 'openmaptiles' && layer.metadata && layer.metadata.reference == true) !== undefined;
   }
-  disableRightMouseDragRotate()
+  _getAngle (latlng1, latlng2)
   {
-    const onMouseDown = this.map.dragRotate.onMouseDown;
-    this.map.dragRotate.onMouseDown = function (e) {
-      if (e.button === 2) {
-        // right mouse button clicked
-        event = new MouseEvent({button: 2, ctrlKey:true});
-        onMouseDown(event);
-      } else {
-        onMouseDown(e);
-      }
+    const rad = Math.PI / 180,
+        lat1 = latlng1.lat * rad,
+        lat2 = latlng2.lat * rad,
+        a = Math.sin(lat1) * Math.sin(lat2) +
+          Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlng2.lng - latlng1.lng) * rad);
+    return Math.acos(Math.min(a, 1)) / rad;
+  }
+  _getResolution (map)
+  {
+    // returns degrees / pixel-width
+    if (!map) {
+      return undefined;
     }
+    const y = map._container.clientHeight / 2;
+    return this._getAngle(map.unproject([0, y]), map.unproject([1, y]));
+  }
+  _mapMoveEnd() {
+    const bounds = this.map.getBounds();
+    this.viewbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
+    this.resolution = this._getResolution(this.map);
+    const center = this.map.getCenter();
+    this.displaylat = center.lat;
+    this.displaylng = center.lng;
+    this.zoom = this.map.getZoom();
+    this.dispatchEvent(new CustomEvent('moveend', 
+      {detail: {
+        center: center,
+        viewbox: this.viewbox, 
+        zoom: this.map.getZoom(),
+        bearing: this.map.getBearing(),
+        pitch: this.map.getPitch()}
+      }
+    ));
+    this.updateInBounds();
+    this.requestUpdate();
   }
   initMap()
   {
@@ -1321,7 +1129,7 @@ class WebMap extends LitElement {
     this.map.on('render', e=>this.mapHasRendered());
     this.map.on('zoomend', e=>this.mapHasZoomed());
     this.map.on('load', ()=>{
-        this.setReferenceLayers(this.mapstyleid, this.mapstyletitle);
+        this.setReferenceLayerMetadata(this.mapstyleid, this.mapstyletitle);
         this.resetLayerList();
         if (this.activeLayers) {
           this.addActiveLayers();
@@ -1337,6 +1145,21 @@ class WebMap extends LitElement {
             "star-intensity": 0.15
           });
         }
+    });
+    this.map.onLoad = (cb) => {
+      if  (this.map.loaded()) {
+          cb();
+      } else if (!this.map.areTilesLoaded()) {
+          this.map.once('data', cb);
+      } else if (!this.map.isStyleLoaded()) {
+          this.map.once('styledata', cb);
+      } else {
+          console.log("Map is not ready but is not not-ready either.");
+      }
+      return this.map;
+    };
+    this.map.onLoad(()=>{
+      console.log('map has loaded according to this.map.onLoad()');
     });
   }
   addCheckedLayersFromCapabilitiesNodes(layer) {
@@ -1402,73 +1225,9 @@ class WebMap extends LitElement {
       }
     }
   }
-  getCheckedLayerInfos(nodeList, layerInfos) {
-    // recursively lookup checked nodes and return array
-    if (!layerInfos) {
-      layerInfos = [];
-    }
-    nodeList.forEach(node=>{
-      if (node.sublayers) {
-        this.getCheckedLayerInfos(node.sublayers, layerInfos);
-      } else if (node.checked) {
-        layerInfos.push({order: node.checked, layerInfo: node.layerInfo});
-      }
-    });
-    return layerInfos;
-  }
-  prepareLayerInfos(nodeList) {
-    let activeReferenceLayer = undefined;
-    nodeList.forEach(node=>{
-      if (node.type !== 'layergroup') {
-        if (node.sublayers) {
-          this.prepareLayerInfos(node.sublayers);
-        } else {
-          if (!node.layerInfo.type) {
-            node.layerInfo.type = node.type;
-          }
-          if (!node.layerInfo.metadata) {
-            node.layerInfo.metadata = {};
-          }
-          if (!node.layerInfo.metadata.title) {
-            node.layerInfo.metadata.title = node.title;
-          }
-          if (node.type === 'wms') {
-            node.layerInfo.metadata.wms = true;        
-          }        
-          if (node.layerInfo.type === 'style') {
-            node.layerInfo.metadata.styleid = node.layerInfo.id;
-            node.layerInfo.metadata.styletitle = node.title;
-          }
-          if (node.type === 'reference') {
-            node.layerInfo.metadata.reference = true;
-            if (!activeReferenceLayer) {
-              activeReferenceLayer = node;
-            }
-            if (node.checked) {
-              activeReferenceLayer = node;
-            }
-          } else {
-            // checked non reference nodes should have a numbered checked property starting at 2
-            // checked property 1 is reserved for the reference layer
-            if (node.checked) {
-              if (isNaN(parseInt(node.checked))) {
-                node.checked = 2;
-              } else {
-                node.checked = parseInt(node.checked) + 1;
-              }
-            }
-          }
-        }
-      }
-    });
-    if (activeReferenceLayer) {
-      // set reference layer order to first
-      activeReferenceLayer.checked = 1;
-    }
-  }
   setHillShadeInfo(catalog) {
     if (catalog) {
-    this.hillshadeLayerId = this.getHillshadeLayerId(catalog);
+      this.hillshadeLayerId = this.getHillshadeLayerId(catalog);
       this.hasHillshadeLayer = this.hillshadeLayerId !== null;
       this.terrainActive = false;
     } else {
@@ -1619,19 +1378,190 @@ class WebMap extends LitElement {
       this.initMap();
     }
   }
+  initializeDataGetter() {
+    this.datagetter = {
+      querySourceFeatures: (source, options) => this.map.querySourceFeatures(source, options),
+      getSource: (sourcename) => this.map.getSource(sourcename),
+      getFilter: (layerid) => this.map.getFilter(layerid)
+    };
+  }
+  initializeMapState() {
+
+    //this.map.on('load', ()=>{
+      //this.setReferenceLayers(this.mapstyleid, this.mapstyletitle);
+      //this.resetLayerList();
+      if (this.activeLayers) {
+        this.addActiveLayers();
+      }
+      this.disableRightMouseDragRotate();
+    //});
+
+    if (this.map.setFog) {
+      this.map.setFog({
+        "range": [0.8, 8],
+        "color": "#ffffff",
+        "horizon-blend": 0.2,
+        "high-color": "#4faac6",
+        "space-color": "#000000",
+        "star-intensity": 0.15
+      });
+    }
+  }
+  initializeMap() {
+    // Clean up existing map if present
+    if (this.map?.version) {
+      this.map.remove();
+    }
+  
+    // Create new map instance
+    this.map = new mapgl.Map({
+      container: this.shadowRoot.querySelector('div'),
+      style: null, //this.getEmtpyStyle(),
+      center: [this.lon, this.lat],
+      zoom: this.zoom,
+      pitch: this.pitch,
+      bearing: this.bearing,
+      maxPitch: this.maxPitch
+    });
+  
+    // Set version for maplibregl compatibility
+    if (this.map.version === undefined) {
+      this.map.version = 'mapblibregl';
+    }
+  
+    // Initialize data getter
+    this.initializeDataGetter();
+  
+    // Set up map controls
+    this.setupMapControls();
+  
+    // Set up event handlers
+    this.setupEventHandlers();
+  
+    // Initialize map state
+   this.initializeMapState();
+  }
+  async handleConfiguration() {
+    // (re-)load the configuration
+    const initializer = new WebMapInitializer(this);
+  
+    if (this.configurl) {
+      try {
+        // Load and apply external configuration
+        const response = await fetch(this.configurl);
+        if (!response.ok) {
+          throw new Error(`Error loading config: ${response.statusText || response.status}`);
+        }
+        const config = await response.json();
+        
+        // Resolve any layer references in the config
+        await this.resolveLayerReferences(
+          this.configurl, 
+          config.datacatalog, 
+          config.fallbackBaseUrl ?? config.baseUrl
+        );
+        
+        // Apply the loaded configuration
+        await initializer.initializeMap(config);
+      } catch (error) {
+        console.error('Error loading configuration:', error);
+        alert(`Error loading config:\n${this.configurl}\n${error}`);
+        // Fall back to default configuration
+        await initializer.initializeMap({
+          datacatalog: this.defaultdatacatalog
+        });
+      }
+    } else {
+      // No external config, use default
+      await initializer.initializeMap({
+        datacatalog: this.defaultdatacatalog
+      });
+    }
+  }
+  
+  async applyConfiguration(config) {
+    // Apply API keys if present
+    if (config.keys) {
+      Object.assign(APIkeys, config.keys);
+      if (APIkeys.mapboxaccesstoken) {
+        this.accesstoken = APIkeys.mapboxaccesstoken;
+      }
+    }
+  
+    // Apply map settings
+    if (config.map) {
+      this.applyMapSettings(config.map);
+    }
+  
+    // Process datacatalog
+    if (config.datacatalog) {
+      this.prepareLayerInfos(config.datacatalog);
+      this.activeLayers = this.getCheckedLayerInfos(config.datacatalog)
+        .sort((a, b) => a.order - b.order)
+        .map(layer => layer.layerInfo);
+      this.datacatalog = config.datacatalog;
+      this.setHillShadeInfo(this.datacatalog);
+    }
+  
+    // Apply tool configurations
+    if (config.tools) {
+      this.applyToolSettings(config.tools);
+    }
+  }
+  
+  applyMapSettings(mapConfig) {
+    // Set center if provided
+    if (mapConfig.center) {
+      [this.lon, this.lat] = mapConfig.center;
+    }
+  
+    // Apply numeric properties if present
+    ['zoom', 'pitch', 'bearing', 'maxPitch'].forEach(prop => {
+      if (mapConfig.hasOwnProperty(prop)) {
+        this[prop] = mapConfig[prop];
+      }
+    });
+  
+    // Handle style configuration
+    this.mapstyle = mapConfig.style || this.getEmtpyStyle();
+    this.mapstyleid = mapConfig.style?.id;
+    this.mapstyletitle = mapConfig.style?.name;
+  }
+  
+  getEmtpyStyle() {
+    return {
+      version: 8,
+      name: "EmptyStyle",
+      id: "emptystyle",
+      sources: {},
+      layers: [],
+      glyphs: "https://tiles.edugis.nl/glyphs/{fontstack}/{range}.pbf"
+    };
+  }
+  
+  applyToolSettings(tools) {
+    // Reset tool visibility except toolbar
+    this.toolList.forEach(tool => tool.visible = (tool.name === 'toolbar'));
+  
+    // Apply tool configurations
+    Object.entries(tools).forEach(([toolName, toolConfig]) => {
+      const mapTool = this.toolList.find(tool => tool.name === toolName);
+      if (mapTool) {
+        Object.assign(mapTool, toolConfig);
+        
+        // Special handling for toolbar and legend positions
+        if (toolName === 'toolbar' || toolName === 'legend') {
+          mapTool.position = toolConfig.position || "opened";
+        }
+      }
+    });
+  }
   firstUpdated() {
     const mapcontainer = this.shadowRoot.querySelector('div');
     mapcontainer.addEventListener('dragover', (e)=>{
       e.preventDefault()
     });
-    mapcontainer.addEventListener('drop', (ev)=> this.handleDrop(ev));
-    if (this.configurl) {
-      this.loadConfig(this.configurl);
-    } else {
-      this.datacatalog = this.defaultdatacatalog;
-      this.setHillShadeInfo(this.datacatalog);
-      this.initMap();
-    }
+    mapcontainer.addEventListener('drop', (ev)=> this.handleDrop(ev));   
     this.addEventListener('openedfile', (ev)=> this.handleOpenedFile(ev));
     this.addEventListener('showmodaldialog', event=> {
       let modalDialog = this.shadowRoot.querySelector('map-modal-dialog');
@@ -1639,6 +1569,8 @@ class WebMap extends LitElement {
         modalDialog.markdown = event.detail.markdown;
       }
     });
+
+    this.handleConfiguration();
   }
   _loadCSVLatLon(droppedFile) {
     const longitude = droppedFile.data.meta.fields.find(field=>field.trim().toLowerCase() === "longitude");
@@ -1988,7 +1920,7 @@ class WebMap extends LitElement {
 
     if (changedProperties.has("configurl")) {
       if (this.map.version) {
-        this.loadConfig(this.configurl);
+        this.handleConfiguration();
       }
     }
 
@@ -2052,26 +1984,6 @@ class WebMap extends LitElement {
     if (changed) {
       this.layerlist = [...this.layerlist];
     }
-  }
-  _mapMoveEnd() {
-    const bounds = this.map.getBounds();
-    this.viewbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
-    this.resolution = getResolution(this.map);
-    const center = this.map.getCenter();
-    this.displaylat = center.lat;
-    this.displaylng = center.lng;
-    this.zoom = this.map.getZoom();
-    this.dispatchEvent(new CustomEvent('moveend', 
-      {detail: {
-        center: center,
-        viewbox: this.viewbox, 
-        zoom: this.map.getZoom(),
-        bearing: this.map.getBearing(),
-        pitch: this.map.getPitch()}
-      }
-    ));
-    this.updateInBounds();
-    this.requestUpdate();
   }
   setLanguage(e) {
     this.storeNoneReferenceLayers();
@@ -2440,7 +2352,7 @@ class WebMap extends LitElement {
   handleInfo(e) {
     if (this.currentTool !== 'info') {
       this.infoClicked = false;
-      if (this.featureInfo.length) {
+      if (this.featureInfo?.length) {
         this.featureInfo = [];
       }
       return;
