@@ -5,3 +5,4 @@ src/keys.js
 cypress/downloads
 cypress/fixtures
 cypress/videos
+cypress/snapshots/actual

@@ -1,11 +1,17 @@
-const { defineConfig } = require("cypress");
-const { initPlugin } = require ("@frsource/cypress-plugin-visual-regression-diff/plugins");
+const { defineConfig } = require('cypress')
+const { configureVisualRegression } = require('cypress-visual-regression')
+
 module.exports = defineConfig({
   e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
-      initPlugin(on, config)
+    env: {
+      // base: generate baseline images
+      // regression: compare against baseline images
+      visualRegressionType: 'base'
+      //visualRegressionType: 'regression'
     },
-    scrollBehavior: false
-  },
-});
+    screenshotsFolder: './cypress/snapshots/actual',
+    setupNodeEvents(on, config) {
+      configureVisualRegression(on)
+    }
+  }
+})
