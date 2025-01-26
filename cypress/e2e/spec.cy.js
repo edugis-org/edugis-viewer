@@ -1,7 +1,8 @@
 
-describe('empty spec', () => {
+describe('EduGIS viewer', () => {
   
   beforeEach(() => {
+    cy.viewport(1000, 600)
     cy.visit('http://localhost:8000#configurl=maps/layers.json')    
   })
 
@@ -109,8 +110,11 @@ describe('empty spec', () => {
       .find("div.wrapper > div.layertree > ul > li:nth-child(1) > ul > li:nth-child(3)")
       .click()
       //document.querySelector("#app-container > map-app").shadowRoot.querySelector("web-map").shadowRoot.querySelector("#panel-container > map-panel:nth-child(2) > map-data-catalog").shadowRoot.querySelector("map-layer-tree").shadowRoot.querySelector("div.wrapper > div.layertree > ul > li:nth-child(1) > ul > li:nth-child(3)")
-    cy.wait(3000)
-    cy.compareSnapshot('layer-bright')
+    cy.wait(3500)
+    cy.compareSnapshot('layer-bright').then(comparisonResults => {
+      cy.log("Number of mismatched pixels: " + comparisonResults.mismatchedPixels)
+      cy.log("Percentage difference: " + comparisonResults.percentage)
+    })
     cy.get('#app-container')
       .find('map-app')
       .shadow()
@@ -121,7 +125,10 @@ describe('empty spec', () => {
       .find("#title")
       .click()
     cy.wait(1000)
-    cy.compareSnapshot('layer-bright-legend')
+    cy.compareSnapshot('layer-bright-legend').then(comparisonResults => {
+      cy.log(comparisonResults.mismatchedPixels)
+      cy.log(comparisonResults.percentage)
+    })
      //document.querySelector("#app-container > map-app").shadowRoot.querySelector("web-map").shadowRoot.querySelector("#layersbackground").shadowRoot.querySelector("#title")
     cy.pause()
   })
