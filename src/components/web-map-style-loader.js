@@ -136,7 +136,7 @@ export class WebMapStyleLoader {
       this.storedThematicLayers = null;
     }
   }
-  
+
   _setReferenceLayerMetadata(styleInfo, styleId, styleTitle) {
     for (const mapLayer of styleInfo.source.layers) { 
       mapLayer.metadata = mapLayer.metadata || {};     
@@ -208,6 +208,18 @@ export class WebMapStyleLoader {
     }
   }
 
+  setMapFog() {
+    if (this.webMap.map.setFog) {
+      this.webMap.map.setFog({
+        "range": [0.8, 8],
+        "color": "#ffffff",
+        "horizon-blend": 0.2,
+        "high-color": "#4faac6",
+        "space-color": "#000000",
+        "star-intensity": 0.15
+      });
+    }
+  }
 
   _addStyleObject(styleInfo, readyCallback) {
       const styleId = styleInfo.id;
@@ -219,11 +231,12 @@ export class WebMapStyleLoader {
         
         /* store thematic layers */
         this._storeThematicLayers();
-        
+
         /* set handler for style.load event */
         this.map.once("style.load", ()=>{
-          console.log(`_addStyleObject(): map.once("style.load"), styleId: ${styleId}, styleTitle: ${styleTitle}`);        
+          console.log(`_addStyleObject(): map.once("style.load"), styleId: ${styleId}, styleTitle: ${styleTitle}`);
           this._restoreThematicLayers();
+          this.setMapFog();
           readyCallback();
         });
 

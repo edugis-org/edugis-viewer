@@ -829,6 +829,9 @@ class WebMap extends LitElement {
       </div>
     </div>`
   }
+  handleCopiedCoordinate(e) {
+    console.log(e.detail);
+  }
   renderCoordinates(){
     const tool = this.toolList.find(tool=>tool.name==='coordinates');
     if (tool && tool.visible) {
@@ -1073,6 +1076,7 @@ class WebMap extends LitElement {
     this.updateInBounds();
     this.requestUpdate();
   }
+  /*
   initMap()
   {
     if (this.accesstoken) {
@@ -1146,22 +1150,8 @@ class WebMap extends LitElement {
           });
         }
     });
-    this.map.onLoad = (cb) => {
-      if  (this.map.loaded()) {
-          cb();
-      } else if (!this.map.areTilesLoaded()) {
-          this.map.once('data', cb);
-      } else if (!this.map.isStyleLoaded()) {
-          this.map.once('styledata', cb);
-      } else {
-          console.log("Map is not ready but is not not-ready either.");
-      }
-      return this.map;
-    };
-    this.map.onLoad(()=>{
-      console.log('map has loaded according to this.map.onLoad()');
-    });
-  }
+  }*/
+
   addCheckedLayersFromCapabilitiesNodes(layer) {
     if (!Array.isArray(layer)) {
       layer = [layer];
@@ -1357,6 +1347,7 @@ class WebMap extends LitElement {
       }
     }
   }
+  /*
   loadConfig(configurl) {
     if (configurl && configurl !== '') {
       fetch(configurl).then(response=>{
@@ -1377,14 +1368,8 @@ class WebMap extends LitElement {
       this.applyConfig(this.datacatalog);
       this.initMap();
     }
-  }
-  initializeDataGetter() {
-    this.datagetter = {
-      querySourceFeatures: (source, options) => this.map.querySourceFeatures(source, options),
-      getSource: (sourcename) => this.map.getSource(sourcename),
-      getFilter: (layerid) => this.map.getFilter(layerid)
-    };
-  }
+  }*/
+  /*
   initializeMapState() {
 
     //this.map.on('load', ()=>{
@@ -1407,6 +1392,7 @@ class WebMap extends LitElement {
       });
     }
   }
+  
   initializeMap() {
     // Clean up existing map if present
     if (this.map?.version) {
@@ -1441,22 +1427,30 @@ class WebMap extends LitElement {
     // Initialize map state
    this.initializeMapState();
   }
+   */
   async handleConfiguration() {
     // (re-)load the configuration
     const initializer = new WebMapInitializer(this);
   
     if (this.configurl) {
       try {
-        // Load and apply external configuration
-        const response = await fetch(this.configurl);
-        if (!response.ok) {
-          throw new Error(`Error loading config: ${response.statusText || response.status}`);
+        let config;
+        if (typeof this.configurl === 'string') {
+          // Load and apply external configuration
+          const response = await fetch(this.configurl);
+          if (!response.ok) {
+            throw new Error(`Error loading config: ${response.statusText || response.status}`);
+          }
+          config = await response.json();
+        } else {
+          // Use provided configuration object (such as a dropped config file)
+          config = this.configurl;
         }
-        const config = await response.json();
         
         // Resolve any layer references in the config
+        const baseUrl = typeof this.configurl === 'string' ? this.configurl : "";
         await this.resolveLayerReferences(
-          this.configurl, 
+          baseUrl, 
           config.datacatalog, 
           config.fallbackBaseUrl ?? config.baseUrl
         );
@@ -1809,8 +1803,11 @@ class WebMap extends LitElement {
       alert('Json error: ' + droppedFile.error);
     } else if (droppedFile.data.map && droppedFile.data.tools) {
       this.resolveLayerReferences(droppedFile.filename, droppedFile.data.datacatalog, droppedFile.data.baseUrl).then(()=>{
-        this.applyConfig(droppedFile.data);
-        this.initMap();
+        this.configurl = droppedFile.data;
+        this.handleConfiguration();
+        //this.loadConfig(droppedFile.data);
+        //this.applyConfig(droppedFile.data);
+        //this.initMap();
       })
     } else if (droppedFile.data.type && (droppedFile.data.type === "Feature" || droppedFile.data.type === "FeatureCollection" || droppedFile.data.type === "Topology")) {
       const filename = droppedFile.filename.replace(/\.[^/.]+$/,"");
@@ -1873,7 +1870,6 @@ class WebMap extends LitElement {
         console.log("layerlist empty")
         return;
       }
-      this._updateLayerIconImages();
       const newLayerList = this.map.getStyle().layers
       this.layerlist = [...newLayerList];
       this.checkMapIsLanguageSwitcherCapable(true);
@@ -1986,13 +1982,13 @@ class WebMap extends LitElement {
     }
   }
   setLanguage(e) {
-    this.storeNoneReferenceLayers();
+    //this.storeNoneReferenceLayers();
     if (e.detail.language === "autodetect") {
       this.map.autodetectLanguage();
     } else {
       this.map.setLanguage(e.detail.language, (e.detail.language !== "native"));
     }
-    setTimeout(()=>this.restoreNoneReferenceLayers(), 1000); // how else?    
+    //setTimeout(()=>this.restoreNoneReferenceLayers(), 1000); // how else?    
     // maybe: this.once('styledata', () => this.restoreNoneReferenceLayers()); ?
   }
   mapClick(e) {
@@ -2440,6 +2436,16 @@ class WebMap extends LitElement {
           //ctx.putImageData(imageData, offsetX, offsetY);
           ctx.putImageData(imageData, 0, 0);
           this._iconDataCache.push({name: name, data: canvas.toDataURL()});
+        } else if (images[name].spriteData) {
+          const spriteData = images[name].spriteData;
+          const canvas = spriteData.context.canvas;
+
+          const croppedCanvas = document.createElement('canvas');
+          croppedCanvas.width = spriteData.width;
+          croppedCanvas.height = spriteData.height;
+          const croppedCtx = croppedCanvas.getContext('2d');
+          croppedCtx.drawImage(canvas, spriteData.x, spriteData.y, spriteData.width, spriteData.height, 0, 0, spriteData.width, spriteData.height);
+          this._iconDataCache.push({name: name, data: croppedCanvas.toDataURL()});
         } else {
           // empty data
           this._iconDataCache.push({name: name, data: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="});
@@ -2506,8 +2512,16 @@ class WebMap extends LitElement {
       }
     }
   }
+  mapHasData(e) {
+    // handler for map 'data' event
+    if (e.dataType === 'style' && e.style?.imageManager?.isLoaded()) {
+      this._updateLayerIconImages();
+      this.resetLayerList();
+    }
+  }
   _updateLayerIconImages() {
-    this.iconCache = undefined;
+    // copy icon images from style sprite to layer metadata
+    this._iconDataCache = undefined;
     const layers = this.map.getStyle().layers;
     for (const layer of layers) {
       if ((

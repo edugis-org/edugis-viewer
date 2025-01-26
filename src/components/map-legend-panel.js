@@ -207,7 +207,7 @@ class MapLegendPanel extends LitElement {
       case 'fill':
         //legendContent = this.fillLegend(maplayer, items);
         if (maplayer.paint && maplayer.paint["fill-pattern"]) {
-          legendContent = legendContent = html`<map-legend-symbol 
+          legendContent = html`<map-legend-symbol 
             title="${layerTitle}" 
             .symbols="${maplayer.metadata.imageData}"></map-legend-symbol>`
         } else {

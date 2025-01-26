@@ -29,10 +29,14 @@ export class WebMapInitializer {
 
   async initializeMap(config) {
     // Apply API keys if present
+    
     if (config.keys) {
-      this.applyApiKeys(config.keys);
+      APIkeys = { ...APIkeys, ...config.keys };
     }
-
+    if (this.webMap.accesstoken && mapgl.libName === 'mapboxgl') {
+        mapgl.accessToken = config.keys?.mapbox || this.webMap.accesstoken;
+    }
+    
     // Apply tool configurations
     if (config.tools) {
       this.applyToolSettings(config.tools);
@@ -42,13 +46,6 @@ export class WebMapInitializer {
     this.createMap(config);
     
     // post initialization: see this.mapCreated()
-  }
-
-  applyApiKeys(keys) {
-    APIkeys = { ...APIkeys, ...keys };
-    if (APIkeys.mapboxaccesstoken) {
-      this.webMap.accesstoken = APIkeys.mapboxaccesstoken;
-    }
   }
 
   getCheckedLayers(nodeList, layerInfos = []) {
@@ -153,6 +150,14 @@ export class WebMapInitializer {
     }
     return propl;
   }
+
+  initializeDataGetter() {
+    this.webMap.datagetter = {
+      querySourceFeatures: (source, options) => this.webMap.map.querySourceFeatures(source, options),
+      getSource: (sourcename) => this.webMap.map.getSource(sourcename),
+      getFilter: (layerid) => this.webMap.map.getFilter(layerid)
+    };
+  }
   
   setupMapControls() {
     const controlTools = this.webMap.toolList.filter(tool=>tool.position !== "").sort((a,b)=>a.order-b.order);
@@ -178,14 +183,15 @@ export class WebMapInitializer {
 
   disableRightMouseDragRotate()
   {
-    const onMouseDown = this.webMap.map.dragRotate.onMouseDown;
-    this.webMap.map.dragRotate.onMouseDown = function (e) {
+    const originalDragRotate = this.webMap.map.dragRotate;
+    this.webMap.map.dragRotate = function (e) {
+      console.log("dragRotate.onMouseDown");
       if (e.button === 2) {
         // right mouse button clicked
         const event = new MouseEvent({button: 2, ctrlKey:true});
-        onMouseDown(event);
+        originalDragRotate(event);
       } else {
-        onMouseDown(e);
+        originalDragRotate(e);
       }
     }
   }
@@ -200,6 +206,7 @@ export class WebMapInitializer {
     this.webMap.map.on('click', (e)=>this.webMap.mapClick(e));
     this.webMap.map.on('render', e=>this.webMap.mapHasRendered());
     this.webMap.map.on('zoomend', e=>this.webMap.mapHasZoomed());
+    this.webMap.map.on('data', e=>this.webMap.mapHasData(e));
 
     this.disableRightMouseDragRotate();
   }
@@ -223,6 +230,7 @@ export class WebMapInitializer {
     // map is created
     console.log("new map created");
     // Setup map controls and event handlers
+    this.initializeDataGetter();
     this.setupMapControls();
     this.setupEventHandlers();
     this.setupDatacatalog(config);
@@ -249,7 +257,7 @@ export class WebMapInitializer {
     // Create new map instance
     this.webMap.map = new mapgl.Map({
       container: this.webMap.shadowRoot.querySelector('div'),
-      style: this.webMap.mapstyle,
+      style: this.getEmptyStyle(),
       center: [this.webMap.lon, this.webMap.lat],
       zoom: this.webMap.zoom,
       pitch: this.webMap.pitch,
