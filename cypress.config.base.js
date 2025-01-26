@@ -5,8 +5,8 @@ module.exports = defineConfig({
   e2e: {
     env: {
       // base: generate baseline images
-      // regression: compare against baseline images      
-      visualRegressionType: 'regression'
+      // regression: compare against baseline images
+      visualRegressionType: 'base'
     },
     screenshotsFolder: './cypress/snapshots/actual',
     setupNodeEvents(on, config) {
