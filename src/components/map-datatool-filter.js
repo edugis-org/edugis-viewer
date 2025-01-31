@@ -1,9 +1,9 @@
-// skeleton for a lit-element component
+// skeleton for a lit component
 // Path: src\components\test.js
 // Compare this snippet from src\components\map-datatool-intersect.js:
 import {LitElement, html, css} from 'lit';
 import getVisibleFeatures from '../utils/mbox-features';
-import {until} from 'lit-html/directives/until.js';
+import {until} from 'lit/directives/until.js';
 import './wc-button';
 
 let outputLayerCounter = 0;

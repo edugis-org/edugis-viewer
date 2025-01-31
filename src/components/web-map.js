@@ -1,4 +1,3 @@
-
 import {LitElement, html} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import {MapImportExport} from './map-import-export.js';
@@ -29,7 +28,6 @@ import { WebMapStyleLoader } from './web-map-style-loader.js';
 
 
 import {GeoJSON} from '../utils/geojson';
-import {getCapabilitiesNodes, copyMetadataToCapsNodes} from '../utils/capabilities';
 import {wmsUrl} from '../utils/wmsurl';
 import mapgl from '../map-gl'
 
@@ -159,7 +157,7 @@ class WebMap extends LitElement {
     this.maxPitch = 60;
     this.viewbox = [];
     // default property values
-    this.mapstyle = this.getEmtpyStyle();
+    this.mapstyle = this.getEmptyStyle();
     this.mapstyleid = "EmptyStyle";
     this.mapstyletitle = "Empty Style";
     this.lon = 0;
@@ -1012,13 +1010,6 @@ class WebMap extends LitElement {
     <map-save-layer .webmap=${this.map} .container=${this} @beforesave="${(e)=>this._beforeSaveLayer(e)}"></map-save-layer>
     `
   }
-  getData()
-  {
-    if (!this.map.version) {
-      return {};
-    }
-    return {querySourceFeatures: this.map.querySourceFeatures.bind(this.map)};
-  }
   _beforeSaveLayer(event) {
     this.saveCounter++;
   }
@@ -1076,88 +1067,7 @@ class WebMap extends LitElement {
     this.updateInBounds();
     this.requestUpdate();
   }
-  /*
-  initMap()
-  {
-    if (this.accesstoken) {
-      mapgl.accessToken = this.accesstoken;
-    }
-    if (this.map.version) {
-      this.map.remove();
-    }
-    this.map = new mapgl.Map({
-        container: this.shadowRoot.querySelector('div'), 
-        style: this.mapstyle,
-        center: [this.lon,this.lat],
-        zoom: this.zoom,
-        pitch: this.pitch,
-        bearing: this.bearing,
-        maxPitch: this.maxPitch
-    });
-    //this.map.showTileBoundaries = true; // debug
-    if (this.map.version === undefined) {
-      this.map.version = 'mapblibregl';
-    }
-    this.datagetter = {
-      querySourceFeatures: (source, options) => this.map.querySourceFeatures(source, options),
-      getSource: (sourcename) => this.map.getSource(sourcename),
-      getFilter: (layerid) => this.map.getFilter(layerid)
-    };
-    const controlTools = this.toolList.filter(tool=>tool.position !== "").sort((a,b)=>a.order-b.order);
-    controlTools.forEach(tool=>{
-      if (tool.visible) {
-        switch (tool.name) {
-          case "zoomlevel":
-              this.map.addControl(new ZoomControl(), this._positionString(tool.position));
-            break;
-          case "navigation":
-            this.map.addControl(new mapgl.NavigationControl({visualizePitch: true, showCompass: true, showZoom: true}), this._positionString(tool.position));
-            break;
-          case "coordinates":
-            this.map.on('mousemove', e=>{this.displaylat = e.lngLat.lat; this.displaylng = e.lngLat.lng;});
-            break;
-          case "scalebar":
-            this.map.addControl(new mapgl.ScaleControl(), this._positionString(tool.position));
-            break;
-        }
-      }
-    });
-    this.featureInfo = [];
-    this.map.on('mousemove', e=>this.handleInfo(e));
-    
-    this.map.autodetectLanguage(); // set openmaptiles language to browser language
-
-    this._mapMoveEnd();
-    this.map.on('moveend', ()=>{this._mapMoveEnd()});
-    this.map.on('click', (e)=>this.mapClick(e));
-    this.map.on('render', e=>this.mapHasRendered());
-    this.map.on('zoomend', e=>this.mapHasZoomed());
-    this.map.on('load', ()=>{
-        this.setReferenceLayerMetadata(this.mapstyleid, this.mapstyletitle);
-        this.resetLayerList();
-        if (this.activeLayers) {
-          this.addActiveLayers();
-        }
-        this.disableRightMouseDragRotate();
-        if (this.map.setFog) {
-          this.map.setFog({
-            "range": [0.8, 8],
-            "color": "#ffffff",
-            "horizon-blend": 0.2,
-            "high-color": "#4faac6",
-            "space-color": "#000000",
-            "star-intensity": 0.15
-          });
-        }
-    });
-  }*/
-
-  addCheckedLayersFromCapabilitiesNodes(layer) {
-    if (!Array.isArray(layer)) {
-      layer = [layer];
-    }
-    
-  }
+  
   findLayer(id, layers) {
     if (!Array.isArray(layers)) {
       layers = [layers];
@@ -1176,45 +1086,6 @@ class WebMap extends LitElement {
     }
     return undefined;
   }
-  async addActiveLayers() {
-    for (let i = 0; this.activeLayers && i < this.activeLayers.length; i++) {
-      const layerInfo = this.activeLayers[i];
-      if (layerInfo.metadata && layerInfo.metadata.reference) {
-        this.mapstyleid = layerInfo.id;
-      }
-      if (layerInfo.type === 'getcapabilities') {
-        if (layerInfo.hasOwnProperty('checkedlayers')) {
-          if (!Array.isArray(layerInfo.checkedlayers)) {
-            layerInfo.checkedlayers = layerInfo.checkedlayers.split(',');
-          }
-          let nodes = await getCapabilitiesNodes(layerInfo);
-          copyMetadataToCapsNodes(layerInfo, nodes);
-          const activeLayers = this.activeLayers;
-          // find and add checkedLayers in capabilities by order of checkedLayers
-          for (let j = 0; this.activeLayers === activeLayers && j < layerInfo.checkedlayers.length; j++) {
-            const node = this.findLayer(layerInfo.checkedlayers[j], nodes);
-            if (node) {
-              await this.addLayer({detail: node.layerInfo});
-              while (!this.map.loaded()) {
-                await timeout(50);  
-              }
-              while (this.styleLoading) {
-                await timeout(50);
-              }
-            }
-          }
-        }
-      } else {
-        await this.addLayer({detail: layerInfo});
-        while (!this.map.loaded()) {
-          await timeout(50);
-        }
-        while (this.styleLoading) {
-          await timeout(50);
-        }
-      }
-    }
-  }
   setHillShadeInfo(catalog) {
     if (catalog) {
       this.hillshadeLayerId = this.getHillshadeLayerId(catalog);
@@ -1224,84 +1095,6 @@ class WebMap extends LitElement {
       this.hillshadeLayerId = null;
       this.hasHillshadeLayer = false;
       this.terrainActive = false;
-    }
-  }
-  applyConfig(config) {
-    this.currentTool = '';
-    this.activeLayers = null;    
-    if (config.keys) {
-      for (let keyname in config.keys) {
-        APIkeys[keyname] = config.keys[keyname];
-      }
-      if (APIkeys.mapboxaccesstoken) {
-        this.accesstoken = APIkeys.mapboxaccesstoken;
-      }
-    }
-    if (config.map) {
-      if (config.map.center) {
-        this.lon = config.map.center[0];
-        this.lat = config.map.center[1];
-      }
-      if (config.map.hasOwnProperty('zoom')) {
-        this.zoom = config.map.zoom;
-      }
-      if (config.map.hasOwnProperty('pitch')) {
-        this.pitch = config.map.pitch;
-      }
-      if (config.map.hasOwnProperty('bearing')) {
-        this.bearing = config.map.bearing;
-      }
-      if (config.map.hasOwnProperty('maxPitch')) {
-        this.maxPitch = config.map.maxPitch;
-      }
-      if (!config.map.style) {
-        config.map.style = {
-          "version": 8,
-          "name": "EmptyStyle",
-          "id": "emptystyle",
-          "sources": {
-          },
-          "layers": [
-          ]
-        } 
-      }
-      if (!config.map.style.glyphs) {
-        config.map.style.glyphs = `https://tiles.edugis.nl/glyphs/{fontstack}/{range}.pbf`;
-        /*
-        config.map.style.glyphs = https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${APIkeys.freetilehosting};
-        config.map.style.glyphs = https://tiles.edugis.nl/fonts/{fontstack}/{range}.pbf?key=${APIkeys.freetilehosting};
-        */
-      }
-      this.mapstyle = config.map.style;
-      this.mapstyleid = config.map.style.id;
-      this.mapstyletitle = config.map.style.name;
-    }
-    if (config.datacatalog) {
-      this.prepareLayerInfos(config.datacatalog);
-      this.activeLayers = this.getCheckedLayerInfos(config.datacatalog).sort((a,b)=>a.order-b.order).map(layer=>layer.layerInfo);
-      this.datacatalog = config.datacatalog;
-      this.setHillShadeInfo(this.datacatalog);
-    }
-    if (config.tools) {
-      this.toolList.forEach(tool=>tool.visible=(tool.name==='toolbar'));
-      for (let toolName in config.tools) {
-        const confTool = config.tools[toolName];
-        const mapTool = this.toolList.find(tool=>tool.name === toolName);
-        if (mapTool) {
-          for (let prop in mapTool) {
-            if (confTool.hasOwnProperty(prop)) {
-              mapTool[prop] = confTool[prop];
-            }
-          }
-          if (toolName === 'toolbar' || toolName === 'legend') {
-            if (confTool.position) { // 'collapsed' or 'opened'
-              mapTool.position = confTool.position;
-            } else {
-              mapTool.position = "opened";
-            }
-          }
-        }
-      }
     }
   }
   async resolveLayerReferences(parentUrl, layerArray, baseUrl) {
@@ -1347,87 +1140,7 @@ class WebMap extends LitElement {
       }
     }
   }
-  /*
-  loadConfig(configurl) {
-    if (configurl && configurl !== '') {
-      fetch(configurl).then(response=>{
-        if (response.status >= 200 && response.status < 300) {
-            return response.json()
-        }
-        throw (new Error(`Error loading config from ${this.configurl}, status: ${response.statusText || response.status}`));
-      }).then(config=>{
-        this.resolveLayerReferences(configurl, config.datacatalog, config.fallbackBaseUrl ?? config.baseUrl).then(()=>
-          {
-            this.applyConfig(config);
-            this.initMap();
-        })
-      }).catch(error=>{
-        alert(`Error loading config:\n${configurl}\n${error}`);
-      });
-    } else {
-      this.applyConfig(this.datacatalog);
-      this.initMap();
-    }
-  }*/
-  /*
-  initializeMapState() {
-
-    //this.map.on('load', ()=>{
-      //this.setReferenceLayers(this.mapstyleid, this.mapstyletitle);
-      //this.resetLayerList();
-      if (this.activeLayers) {
-        this.addActiveLayers();
-      }
-      this.disableRightMouseDragRotate();
-    //});
-
-    if (this.map.setFog) {
-      this.map.setFog({
-        "range": [0.8, 8],
-        "color": "#ffffff",
-        "horizon-blend": 0.2,
-        "high-color": "#4faac6",
-        "space-color": "#000000",
-        "star-intensity": 0.15
-      });
-    }
-  }
   
-  initializeMap() {
-    // Clean up existing map if present
-    if (this.map?.version) {
-      this.map.remove();
-    }
-  
-    // Create new map instance
-    this.map = new mapgl.Map({
-      container: this.shadowRoot.querySelector('div'),
-      style: null, //this.getEmtpyStyle(),
-      center: [this.lon, this.lat],
-      zoom: this.zoom,
-      pitch: this.pitch,
-      bearing: this.bearing,
-      maxPitch: this.maxPitch
-    });
-  
-    // Set version for maplibregl compatibility
-    if (this.map.version === undefined) {
-      this.map.version = 'mapblibregl';
-    }
-  
-    // Initialize data getter
-    this.initializeDataGetter();
-  
-    // Set up map controls
-    this.setupMapControls();
-  
-    // Set up event handlers
-    this.setupEventHandlers();
-  
-    // Initialize map state
-   this.initializeMapState();
-  }
-   */
   async handleConfiguration() {
     // (re-)load the configuration
     const initializer = new WebMapInitializer(this);
@@ -1473,35 +1186,6 @@ class WebMap extends LitElement {
     }
   }
   
-  async applyConfiguration(config) {
-    // Apply API keys if present
-    if (config.keys) {
-      Object.assign(APIkeys, config.keys);
-      if (APIkeys.mapboxaccesstoken) {
-        this.accesstoken = APIkeys.mapboxaccesstoken;
-      }
-    }
-  
-    // Apply map settings
-    if (config.map) {
-      this.applyMapSettings(config.map);
-    }
-  
-    // Process datacatalog
-    if (config.datacatalog) {
-      this.prepareLayerInfos(config.datacatalog);
-      this.activeLayers = this.getCheckedLayerInfos(config.datacatalog)
-        .sort((a, b) => a.order - b.order)
-        .map(layer => layer.layerInfo);
-      this.datacatalog = config.datacatalog;
-      this.setHillShadeInfo(this.datacatalog);
-    }
-  
-    // Apply tool configurations
-    if (config.tools) {
-      this.applyToolSettings(config.tools);
-    }
-  }
   
   applyMapSettings(mapConfig) {
     // Set center if provided
@@ -1517,12 +1201,12 @@ class WebMap extends LitElement {
     });
   
     // Handle style configuration
-    this.mapstyle = mapConfig.style || this.getEmtpyStyle();
+    this.mapstyle = mapConfig.style || this.getEmptyStyle();
     this.mapstyleid = mapConfig.style?.id;
     this.mapstyletitle = mapConfig.style?.name;
   }
   
-  getEmtpyStyle() {
+  getEmptyStyle() {
     return {
       version: 8,
       name: "EmptyStyle",
@@ -1533,23 +1217,6 @@ class WebMap extends LitElement {
     };
   }
   
-  applyToolSettings(tools) {
-    // Reset tool visibility except toolbar
-    this.toolList.forEach(tool => tool.visible = (tool.name === 'toolbar'));
-  
-    // Apply tool configurations
-    Object.entries(tools).forEach(([toolName, toolConfig]) => {
-      const mapTool = this.toolList.find(tool => tool.name === toolName);
-      if (mapTool) {
-        Object.assign(mapTool, toolConfig);
-        
-        // Special handling for toolbar and legend positions
-        if (toolName === 'toolbar' || toolName === 'legend') {
-          mapTool.position = toolConfig.position || "opened";
-        }
-      }
-    });
-  }
   firstUpdated() {
     const mapcontainer = this.shadowRoot.querySelector('div');
     mapcontainer.addEventListener('dragover', (e)=>{
@@ -1805,9 +1472,6 @@ class WebMap extends LitElement {
       this.resolveLayerReferences(droppedFile.filename, droppedFile.data.datacatalog, droppedFile.data.baseUrl).then(()=>{
         this.configurl = droppedFile.data;
         this.handleConfiguration();
-        //this.loadConfig(droppedFile.data);
-        //this.applyConfig(droppedFile.data);
-        //this.initMap();
       })
     } else if (droppedFile.data.type && (droppedFile.data.type === "Feature" || droppedFile.data.type === "FeatureCollection" || droppedFile.data.type === "Topology")) {
       const filename = droppedFile.filename.replace(/\.[^/.]+$/,"");

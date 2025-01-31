@@ -165,6 +165,9 @@ class MapLayerInfo extends LitElement {
                 if (layer && layer.paint) {
                     let opacityname = layer.type==='hillshade'?'hillshade-exaggeration':`${layer.type}-opacity`;
                     if (layer.paint.hasOwnProperty(opacityname)) {
+                        if (isNaN(layer.paint[opacityname])) {
+                            return 0; // opacity is likely an expression, return 0
+                        }
                         return Math.round(100*(1 - layer.paint[opacityname]));
                     }
                     return 0;

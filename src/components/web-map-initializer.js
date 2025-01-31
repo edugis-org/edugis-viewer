@@ -39,7 +39,7 @@ export class WebMapInitializer {
     
     // Apply tool configurations
     if (config.tools) {
-      this.applyToolSettings(config.tools);
+      await this.applyToolSettings(config.tools);
     }
 
     // Initialize the map
@@ -60,17 +60,6 @@ export class WebMapInitializer {
     return layerInfos;
   }
   
-  getEmptyStyle() {
-    return {
-      version: 8,
-      name: "EmptyStyle",
-      id: "emptystyle",
-      sources: {},
-      layers: [],
-      glyphs: "https://tiles.edugis.nl/glyphs/{fontstack}/{range}.pbf"
-    };
-  }
-
   prepareLayers(nodeList) {
     // set up layer metadata and checked (visible) layers and visible layer order
     let activeReferenceLayer = undefined;
@@ -123,7 +112,12 @@ export class WebMapInitializer {
     }
   }
 
-  applyToolSettings(tools) {
+  async applyToolSettings(tools) {
+    // Reset current tool
+    if (this.webMap.currentTool) {
+      this.webMap.currentTool = '';
+      await new Promise(resolve => setTimeout(resolve, 100)); // let tool cleanup
+    }
     // Reset tool visibility except toolbar
     this.webMap.toolList.forEach(tool => {
       tool.visible = (tool.name === 'toolbar');
@@ -184,16 +178,7 @@ export class WebMapInitializer {
   disableRightMouseDragRotate()
   {
     const originalDragRotate = this.webMap.map.dragRotate;
-    this.webMap.map.dragRotate = function (e) {
-      console.log("dragRotate.onMouseDown");
-      if (e.button === 2) {
-        // right mouse button clicked
-        const event = new MouseEvent({button: 2, ctrlKey:true});
-        originalDragRotate(event);
-      } else {
-        originalDragRotate(e);
-      }
-    }
+    //originalDragRotate.disable();
   }
     
   setupEventHandlers() {
@@ -257,7 +242,7 @@ export class WebMapInitializer {
     // Create new map instance
     this.webMap.map = new mapgl.Map({
       container: this.webMap.shadowRoot.querySelector('div'),
-      style: this.getEmptyStyle(),
+      style: this.webMap.getEmptyStyle(),
       center: [this.webMap.lon, this.webMap.lat],
       zoom: this.webMap.zoom,
       pitch: this.webMap.pitch,
