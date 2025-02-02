@@ -1,11 +1,14 @@
 {
-  "name": "edugis",
-  "version": "0.8.1",
+  "name": "edugis-viewer",
+  "version": "2.1.0",
   "contributors": [
-    "Anne Blankert"
+    "Anne Blankert",
+    "Kamiel Verhelst",
+    "tjn-gis",
+    "Tom van Tilburg"
   ],
   "license": "BSD-3-Clause",
-  "repository": "Polymer/pwa-starter-kit",
+  "repository": "https://github.com/edugis-org/edugis-viewer",
   "scripts": {
     "start": "web-dev-server --node-resolve --open --watch",
     "build": "rollup -c",
