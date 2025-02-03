@@ -18,7 +18,7 @@ export default {
     }),
     // Resolve bare module specifiers to relative paths
     resolve({
-      exportConditions: ['development']
+      exportConditions: ['production']
     }),
     // Minify HTML template literals
     minifyTemplateLiterals(),
