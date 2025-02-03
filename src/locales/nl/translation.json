@@ -146,6 +146,7 @@
     "referpoint": "dat",
     "referpolygon": "dat",
     "Remove": "Verwijderen",
+    "Reset bearing to north": "Kaart naar het noorden draaien",
     "S": "Z",
     "save": "opslaan",
     "Save": "Opslaan",
@@ -174,6 +175,7 @@
     "Southern Parallel Lat": "Zuidelijke parallel (breedtegraad)",
     "string": "tekst",
     "text color": "tekstkleur",
+    "Toggle attribution": "Toon/verberg bronvermelding",
     "toggle layer visibility": "laag zichtbaar/onzichtbaar",
     "Toolbox": "Gereedschapskist",
     "Tools": "Gereedschappen",
@@ -191,6 +193,8 @@
     "Zoom level": "Zoom-niveau",
     "Zoom to my location": "Zoom naar mijn locatie",
     "Zoom, rotate": "Zoom, Roteer",
+    "Zoom in": "Zoom in",
     "Zoom in further": "Zoom verder in",
+    "Zoom out": "Zoom uit",
     "Zoom out further": "Zoom verder uit"
 }

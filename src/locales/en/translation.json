@@ -145,6 +145,7 @@
     "referpoint": "it",
     "referpolygon": "it",
     "Remove": "Remove",
+    "Reset bearing to north": "Point map to North",
     "S": "S",
     "save": "save",
     "Save": "Save",
@@ -173,6 +174,7 @@
     "Southern Parallel Lat": "Southern Parallel Lat",
     "string": "string",
     "text color": "text color",
+    "Toggle attribution": "Toggle attribution",
     "toggle layer visibility": "toggle layer visibility",
     "Toolbox": "Toolbox",
     "Tools": "Tools",
@@ -190,6 +192,8 @@
     "Zoom level": "Zoom level",
     "Zoom to my location": "Zoom to my location",
     "Zoom, rotate": "Zoom, rotate",
+    "Zoom in": "Zoom in",
     "Zoom in further": "Zoom in further",
+    "Zoom out": "Zoom out",
     "Zoom out further": "Zoom out further"
 }

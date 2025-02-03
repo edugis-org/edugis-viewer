@@ -211,7 +211,7 @@ class WebMap extends LitElement {
   }
   connectedCallback() {
     super.connectedCallback();
-    this.listener = this.langChanged.bind(this);
+    this.listener = this.languageChanged.bind(this);
     registerLanguageChangedListener(this.listener);
   }
   disconnectedCallback() {
@@ -245,8 +245,19 @@ class WebMap extends LitElement {
       }
     });
   }
-  langChanged() {
+  setControlTooltips() {
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-compass`)?.setAttribute('title', t('Reset bearing to north'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-zoom-in`)?.setAttribute('title', t('Zoom in'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-zoom-out`)?.setAttribute('title', t('Zoom out'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-attrib-button`)?.setAttribute('title', t('Toggle attribution'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-compass`)?.setAttribute('aria-label', t('Reset bearing to north'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-zoom-in`)?.setAttribute('aria-label', t('Zoom in'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-zoom-out`)?.setAttribute('aria-label', t('Zoom out'));
+    this.map.getContainer().querySelector(`.${mapgl.libName}-ctrl-attrib-button`)?.setAttribute('aria-label', t('Toggle attribution'));
+  }
+  languageChanged() {
     this.setToolListInfo();
+    this.setControlTooltips();
     this.requestUpdate();
   }
   setTerrainLayer(id, active) {
@@ -880,11 +891,7 @@ class WebMap extends LitElement {
     return html`<style>
       ${mapgl.css}
       /* workaround bug mapbox-gl v.051, https://github.com/mapbox/mapbox-gl-js/issues/7589 */
-      .mapboxgl-ctrl.mapboxgl-ctrl-attrib p {
-        display: inline-block;
-        margin: 2px;
-      }
-      .maplibregl-ctrl.maplibregl-ctrl-attrib p {
+      .${mapgl.libName}-ctrl.${mapgl.libName}-ctrl-attrib p {
         display: inline-block;
         margin: 2px;
       }
@@ -895,10 +902,7 @@ class WebMap extends LitElement {
         overflow: hidden;
       }
       .webmap {width: 100%; height: 100%}
-      .mapboxgl-ctrl.mapboxgl-ctrl-group.mapboxgl-ctrl-zoom {
-        background: rgba(255, 255, 255, 0.75);
-      }
-      .maplibregl-ctrl.maplibregl-ctrl-group.maplibregl-ctrl-zoom {
+      .${mapgl.libName}-ctrl.${mapgl.libName}-ctrl-group.${mapgl.libName}-ctrl-zoom {
         background: rgba(255, 255, 255, 0.75);
       }
       #tool-menu-container {

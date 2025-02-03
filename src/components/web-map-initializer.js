@@ -173,6 +173,7 @@ export class WebMapInitializer {
         }
       }
     });
+    this.webMap.setControlTooltips();
   };
 
   disableRightMouseDragRotate()
@@ -213,7 +214,6 @@ export class WebMapInitializer {
 
   mapCreated(config) {
     // map is created
-    console.log("new map created");
     // Setup map controls and event handlers
     this.initializeDataGetter();
     this.setupMapControls();
@@ -253,6 +253,8 @@ export class WebMapInitializer {
     if (this.webMap.map.version === undefined) {
       this.webMap.map.version = 'mapblibregl';
     }
+
+    this.webMap.map.libName = mapgl.libName;
 
     this.webMap.map.once('load', () => {
       this.mapCreated(config);

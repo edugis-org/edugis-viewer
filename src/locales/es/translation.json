@@ -145,6 +145,7 @@
     "referpoint": "el",
     "referpolygon": "el",
     "Remove": "Eliminar",
+    "Reset bearing to north": "Alinear el mapa hacia el Norte",
     "S": "S",
     "save": "guardar",
     "Save": "Guardar",
@@ -173,6 +174,7 @@
     "Southern Parallel Lat": "Latitud del Paralelo Sur",
     "string": "cadena",
     "text color": "color del texto",
+    "Toggle attribution": "Afficher/Masquer les crédits",
     "toggle layer visibility": "alternar visibilidad de capa",
     "Toolbox": "Caja de herramientas",
     "Tools": "Herramientas",
@@ -190,6 +192,8 @@
     "Zoom level": "Nivel de zoom",
     "Zoom to my location": "Acercar a mi ubicación",
     "Zoom, rotate": "Zoom, rotar",
+    "Zoom in": "Acercar",
     "Zoom in further": "Acercar más",
+    "Zoom out" : "Alejar",
     "Zoom out further": "Alejar más"
 }

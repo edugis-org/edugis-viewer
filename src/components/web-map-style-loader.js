@@ -112,7 +112,6 @@ export class WebMapStyleLoader {
     if (this.storedThematicLayers === undefined) {
       this.storedThematicLayers = [];
     }
-    console.log(`storeThematicLayers(): ${this.storedThematicLayers.length} layers stored`);
   }
 
   _restoreThematicLayers()
@@ -234,7 +233,6 @@ export class WebMapStyleLoader {
 
         /* set handler for style.load event */
         this.map.once("style.load", ()=>{
-          console.log(`_addStyleObject(): map.once("style.load"), styleId: ${styleId}, styleTitle: ${styleTitle}`);
           this._restoreThematicLayers();
           this.setMapFog();
           readyCallback();

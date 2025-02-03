@@ -145,6 +145,7 @@
     "referpoint": "cela",
     "referpolygon": "cela",
     "Remove": "Supprimer",
+    "Reset bearing to north": "Orienter la carte vers le Nord",
     "S": "S",
     "save": "enregistrer",
     "Save": "Enregistrer",
@@ -173,6 +174,7 @@
     "Southern Parallel Lat": "Latitude parallèle sud",
     "string": "texte",
     "text color": "couleur du texte",
+    "Toggle attribution": "Afficher/masquer les crédits",
     "toggle layer visibility": "afficher/masquer la couche",
     "Toolbox": "Boîte à outils",
     "Tools": "Outils",
@@ -190,6 +192,8 @@
     "Zoom level": "Niveau de zoom",
     "Zoom to my location": "Zoom sur ma position",
     "Zoom, rotate": "Zoom, rotation",
+    "Zoom in": "Zoomer",
     "Zoom in further": "Zoom davantage",
+    "Zoom out": "Dézoomer",
     "Zoom out further": "Dézoomer davantage"
 }
