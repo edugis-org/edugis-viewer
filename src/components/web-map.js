@@ -25,6 +25,7 @@ import "./map-save-layer";
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from "../i18n.js";
 import { WebMapInitializer } from './web-map-initializer.js';
 import { WebMapStyleLoader } from './web-map-style-loader.js';
+import { WebMapSearchResultManager } from './web-map-search-result-manager.js';
 
 
 import {GeoJSON} from '../utils/geojson';
@@ -39,68 +40,6 @@ import {geoJSONProject, coordProject} from '@edugis/proj-convert'
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-let searchGeoJson = {
-  "type": "FeatureCollection",
-  "features": []
-}
-const searchSource = { 
-  "type" : "geojson",
-  "data" : searchGeoJson
-};
-const searchLines = {        
-  "id": "map-search-line",
-  "type": "line",
-  "metadata": {"isToolLayer": true},
-  "source": "map-search-geojson",
-  "layout": {
-      "line-join": "round",
-      "line-cap": "round"
-  },
-  "paint": {
-      "line-color": "#c30",
-      "line-width": 3
-  },
-  "filter": ['in', '$type', 'LineString']
-};
-const searchPoints ={
-  "id": "map-search-points",
-  "type": "symbol",
-  "metadata": {"isToolLayer": true},
-  "source": "map-search-geojson",            
-  "layout": {                        
-    "icon-image": "{icon}",
-    "text-field": "{name}",
-    "text-font": ["Noto Sans Regular"],
-    "text-offset": [0, 0.6],
-    "text-anchor": "top",
-    "text-size": 14,
-    "text-rotation-alignment": "map",
-    "text-ignore-placement": true,
-    "text-allow-overlap": true,
-    "icon-allow-overlap": true
-  },
-  "paint": {
-    "text-color": "#000",
-    "text-halo-color": "#fff",
-    "text-halo-width": 1
-  },
-  "filter": ['==', '$type', 'Point']
-};
-const searchSurface = {
-  "id": "map-search-surface",
-  "type": "fill",
-  "metadata": {"isToolLayer": true},
-  "source": "map-search-geojson",
-  "layout": {
-    "visibility": "visible"
-  },
-  "paint": {
-    "fill-color": "#c30",
-    "fill-opacity": 0.4
-  },
-  "filter": ['==', '$type', "Polygon"],
-};
 
 // srs optional, defaults to 'EPSG:3857'
 // adds projected .x and .y properties to lngLat
@@ -207,6 +146,7 @@ class WebMap extends LitElement {
       {name:"legend", visible: true, position: "opened", opened: 1, order: 204, info: ""},
     ];
     this.setToolListInfo();
+    this.webMapSearchResultManager = new WebMapSearchResultManager(this);
     this.exporttool = false;
   }
   connectedCallback() {
@@ -776,7 +716,7 @@ class WebMap extends LitElement {
       </div>
       <div id="panel-container" class="${this.currentTool !==''?"active":""}">
         <map-panel .active="${this.currentTool==="search"}">
-          <map-search .active="${this.currentTool==="search"}" .viewbox="${this.viewbox}" @searchclick="${e=>this.fitBounds(e)}" @searchresult="${e=>this.searchResult(e)}"></map-search>
+          <map-search .active="${this.currentTool==="search"}" .viewbox="${this.viewbox}" @searchclick="${e=>this.fitBounds(e)}" @searchresult="${e=>this.webMapSearchResultManager.searchResult(e)}"></map-search>
         </map-panel>
         <map-panel .active="${this.currentTool==="datacatalog"}">
           <map-data-catalog .active="${this.currentTool==="datacatalog"}" .datacatalog="${this.datacatalog}" .maplayers="${this.layerlist}" .search=${layerSearch} @addlayer="${(e) => this.addLayer(e)}" @removelayer="${e=>this.removeLayer(e)}"></map-data-catalog>
@@ -1217,7 +1157,8 @@ class WebMap extends LitElement {
       id: "emptystyle",
       sources: {},
       layers: [],
-      glyphs: "https://tiles.edugis.nl/glyphs/{fontstack}/{range}.pbf"
+      glyphs: "https://tiles.edugis.nl/glyphs/{fontstack}/{range}.pbf",
+      sprite: "https://openmaptiles.github.io/osm-bright-gl-style/sprite"
     };
   }
   
@@ -1662,63 +1603,6 @@ class WebMap extends LitElement {
   mapClick(e) {
     this.lastClickPoint = [e.lngLat.lng,e.lngLat.lat];
     this.handleInfo(e);
-  }
-  getIcon(iconUrl) {
-    const name = iconUrl.split('/').pop().split('.').shift();
-    if (this.map.hasImage(name)) {
-      return name;
-    }
-    const baseUrl = 'https://nominatim.openstreetmap.org/';
-    if (iconUrl.startsWith(baseUrl)) {
-      // route through edugis to workaround openstreetmap CORS error
-      iconUrl = 'https://tiles.edugis.nl/nominatim/' + iconUrl.slice(baseUrl.length);
-    }
-    if (!this.loadedNames) {
-      this.loadedNames = [];
-    }
-    if (this.loadedNames.indexOf(name) == -1) {
-      this.loadedNames.push(name);
-      this.map.loadImage(iconUrl, (error, image) => {
-        if (error) {
-          // todo
-        } else {
-          this.map.addImage(name, image);
-        }
-      })
-    }
-    return name;
-  }
-  searchResult(e) {
-    // add list of found elements to temporary map layer
-    if (this.map.version) {
-      const mapSearchSource = this.map.getSource('map-search-geojson');
-      if (!mapSearchSource) {
-        this.map.addSource('map-search-geojson', searchSource);
-        this.map.addLayer(searchSurface);
-        this.map.addLayer(searchLines);
-        this.map.addLayer(searchPoints);
-      }
-      if (e.detail != null) {        
-        searchGeoJson.features = e.detail.map(item=>{
-          return {
-              "type":"Feature",
-              "geometry": item.geojson,
-              "properties": {
-                "icon": (item.icon?this.getIcon(item.icon): 'star_11'),
-                "name": item.display_name.split(",").shift()
-              }
-          };
-        });
-        this.map.getSource('map-search-geojson').setData(searchGeoJson);
-      } else {
-        searchGeoJson.features = [];
-        this.map.removeLayer(searchPoints.id);
-        this.map.removeLayer(searchLines.id);
-        this.map.removeLayer(searchSurface.id);
-        this.map.removeSource('map-search-geojson');
-      }
-      
-    }
   }
   XMLtoGeoJSON(xmlString)
   {

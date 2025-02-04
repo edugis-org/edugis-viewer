@@ -243,6 +243,13 @@ export class WebMapStyleLoader {
 
         /* set API keys for style if necessary */
         this._setApiStyleKeys(styleInfo);
+
+        if (!styleInfo.source.glyphs) {
+          styleInfo.source.glyphs = 'https://tiles.edugis.nl/glyphs/{fontstack}/{range}.pbf';
+        }
+        if (!styleInfo.source.sprite) {
+          styleInfo.source.sprite = 'https://openmaptiles.github.io/osm-bright-gl-style/sprite';
+        }
       
         // add {diff: false} to force new style.load event
         this.map.setStyle(styleInfo.source, {diff: false});
