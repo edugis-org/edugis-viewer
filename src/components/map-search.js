@@ -19,50 +19,57 @@ import { ifDefined } from "lit/directives/if-defined.js";
         height: 30px;
         padding: 5px;
         border-bottom: 1px solid lightblue;
+        margin-bottom: 12px;
         box-sizing: border-box;
       }
       .searchbox {
-        position: relative;
-        width: 100%;
-        background: white;
-        padding: 6px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        margin: 10px 0;
-        box-sizing: border-box;
-      }
-      .searchbox input {
-        width: 100%;
-        padding: 12px 15px 12px 5px;
-        border: 2px solid #0066cc;
+        display: flex;
+        align-items: stretch;
+        border: 2px solid var(--theme-background-color, #f9e11e);
         border-radius: 6px;
-        font-size: 14px;
-        background: #f8f9fa;
-        box-sizing: border-box;
+        overflow: hidden;
+        margin-bottom: 12px;
       }
+
+      .searchbox input {
+        flex: 1;
+        padding-left: 10px;
+        padding-right: 0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border: none;
+      }
+
       .searchbox input:focus {
-        border-color: #1976D2;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(33,150,243,0.2);
+        box-shadow: none;
+        border: none;
       }
+
       .searchbutton {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        fill: white;
+        display: flex;
+        align-items: center;
+        position: static;
+        padding-left: 2px;
         background-color: var(--theme-background-color, #f9e11e);
-        padding-top: 8px;
-        transform: translateY(-50%);
+        fill: white;
         cursor: pointer;
       }
-      .searchbutton:hover, .erasebutton:hover {
+      .searchbutton:hover {
         fill: lightgray;
       }
       .erasebutton {
-        position: absolute;
-        right: 30px;
-        fill: gray;
-        padding-top: 6px;
+        display: flex;
+        align-items: center;
+        padding: 2px;
+        background: transparent;
+        border-right: 1px solid #ddd;
+        transition: opacity 0.2s;
+        fill: #555;
+        cursor: pointer;
+      }
+      .erasebutton:hover {
+          fill: #000;
       }
       .resultlistcontainer {
         width: 100%;
@@ -325,7 +332,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
   renderExplanation() {
     if (!this.lastSearchText && !this.resultList?.length) {
       return html`
-        <div><p>- Vul hierboven minstens 1 compleet woord in. Bijvoorbeeld 'Alphen' voor 'Alphen aan den Rijn'.</p>
+        <div>- Vul hierboven minstens 1 compleet woord in. Bijvoorbeeld 'Alphen' voor 'Alphen aan den Rijn'.
         <p>- De zoekfunctie geeft voorkeur aan locaties die binnen het kaartbeeld liggen. Als daar (bijna) niets gevonden wordt, dan wordt verderop gezocht.</p></div>`;
     } else {
       return html``;
@@ -342,7 +349,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         <div class="title">Zoek plaatsen en adressen</div>
         <div class="searchbox${this.active ? '' : ' hidden'}">
           <input type="text" placeholder="${this.info}" @keyup="${e => this.keyup(e)}">
-          ${this.active && this.resultList && this.resultList.length ? html`<i class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</i>` : ''}
+          ${this.active && this.resultList && this.resultList.length ? html`<span title="erase" class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</span>` : ''}
           <span title="${ifDefined(t('search')??undefined)}" class="searchbutton" @click="${e => this.search(e)}">${searchIcon}</span>
         </div>
         ${this.renderExplanation()}
