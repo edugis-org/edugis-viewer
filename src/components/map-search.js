@@ -7,30 +7,56 @@ import { LitElement, html, css} from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
   class MapSearch extends LitElement {
     static styles = css`
-      .searchbox {
+      .searchtool {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+      }
+      .title {
+        font-weight: bold;
+        font-size: 16px;
         width: 100%;
         height: 30px;
-        display: flex;
-        align-items: center;
+        padding: 5px;
+        border-bottom: 1px solid lightblue;
+        box-sizing: border-box;
+      }
+      .searchbox {
+        position: relative;
+        width: 100%;
+        background: white;
+        padding: 6px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        margin: 10px 0;
         box-sizing: border-box;
       }
       .searchbox input {
-        border: none;
-        left: 1em;
-        width: calc(100% - 50px);
+        width: 100%;
+        padding: 12px 15px 12px 5px;
+        border: 2px solid #0066cc;
+        border-radius: 6px;
+        font-size: 14px;
+        background: #f8f9fa;
+        box-sizing: border-box;
       }
       .searchbox input:focus {
+        border-color: #1976D2;
         outline: none;
-        border-bottom: 1px solid lightblue;
+        box-shadow: 0 0 0 3px rgba(33,150,243,0.2);
       }
       .searchbutton {
         position: absolute;
-        right: 5px;
-        fill: gray;
-        padding-top: 6px;
+        right: 8px;
+        top: 50%;
+        fill: white;
+        background-color: var(--theme-background-color, #f9e11e);
+        padding-top: 8px;
+        transform: translateY(-50%);
+        cursor: pointer;
       }
       .searchbutton:hover, .erasebutton:hover {
-        fill: darkcyan;
+        fill: lightgray;
       }
       .erasebutton {
         position: absolute;
@@ -47,7 +73,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         width: 100%;
         overflow: auto;
       }
-
+      
       .resultlist ul {
         list-style: none;
         padding: 0;
@@ -116,6 +142,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
     this.resultList = null;
     this.viewbox = [];
     this.active = true;
+    this.lastSearchText = '';
   }
   connectedCallback() {
     super.connectedCallback()
@@ -151,10 +178,10 @@ import { ifDefined } from "lit/directives/if-defined.js";
 
   async search(e) {
     let searchText = this.shadowRoot.querySelector('input').value.trim();
+    this.lastSearchText = searchText;
 
     if (searchText.length > 1) {
       searchText = this.normalizeWhenCoordinateString(searchText);
-      
       let url;
       if (this.viewbox.length) {
         url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=json&viewbox=${this.viewbox.join(',')}&bounded=0&polygon_geojson=1&addressdetails=1&limit=15`;
@@ -175,6 +202,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
       this.search(e);
     } else {
       this.resultList = null;
+      this.lastSearchText = '';
       this.triggerResult();
     }
   }
@@ -195,10 +223,12 @@ import { ifDefined } from "lit/directives/if-defined.js";
     }));
   }
 
+  
   searchErase(_e) {
     if (this.resultList !== null) {
       this.shadowRoot.querySelector('input').value = "";
       this.resultList = null;
+      this.lastSearchText = '';
       this.triggerResult();
     }
   }
@@ -243,50 +273,82 @@ import { ifDefined } from "lit/directives/if-defined.js";
     console.log(persist);
   }
 
+  renderResultListItems() {
+    return this.resultList.map(item => html`
+      <li class="result-item">
+        <div class="persist-control">
+          <base-checkbox 
+            small 
+            ?checked="${item.persistOnMap}" 
+            @change="${(e)=>this.persistFeature(e.target.checked)}"
+          ></base-checkbox>
+        </div>
+        <div class="feature-content" @click="${(e) => this.zoomTo([item.lon, item.lat], item.boundingbox)}">
+          <div class="feature-icon">
+            ${this.getIcon(item)}
+          </div>
+          <div class="feature-name">
+            ${item.display_name}
+          </div>
+        </div>
+      </li>
+    `);
+  }
+
+  renderResultList() {
+    if (!this.lastSearchText) {
+      return html``;
+    }
+    if (!this.resultList?.length) {      
+      return html`
+        <div class="resultheader">Zoekresultaat '${this.lastSearchText}'</div>
+        <div class="resultlistcontainer">
+          <div class="resultlist">
+            <ul>
+              <li>${t('nothing found')}</li>
+            </ul>
+          </div>
+        </div>`;
+    }
+    return html`
+    <div class="resultheader">Zoekresultaat '${this.lastSearchText}'</div>
+    <div class="resultlistcontainer">
+      <div class="resultlist">
+        <ul>
+          ${this.renderResultListItems()}
+        </ul>
+      </div>
+    </div>
+    <div class="resultfooter">- Klik om op een resultaat in te zoomen<br>- Selecteer om toe te voegen aan de kaart</div>`;
+  }
+
+  renderExplanation() {
+    if (!this.lastSearchText && !this.resultList?.length) {
+      return html`
+        <div><p>- Vul hierboven minstens 1 compleet woord in. Bijvoorbeeld 'Alphen' voor 'Alphen aan den Rijn'.</p>
+        <p>- De zoekfunctie geeft voorkeur aan locaties die binnen het kaartbeeld liggen. Als daar (bijna) niets gevonden wordt, dan wordt verderop gezocht.</p></div>`;
+    } else {
+      return html``;
+    }
+  }
+
   render() {
     if (!this.active) {
       this.searchErase();
       return html``;
     }
-
     return html`
-    <div class="searchbox${this.active ? '' : ' hidden'}">
-      <input type="text" placeholder="${this.info}" @paste="${e=>this.pastedToSearch(e)}" @keyup="${e => this.keyup(e)}">
-      ${this.active && this.resultList && this.resultList.length ? html`<i class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</i>` : ''}
-      <span title="${ifDefined(t('search')??undefined)}" class="searchbutton" @click="${e => this.search(e)}">${searchIcon}</span>
-    </div>
-    <div class="resultlistcontainer">
-    ${this.active && this.resultList && this.resultList.length ? html`
-      <div class="resultlist">
-        <ul>
-          ${this.resultList.map(item => html`
-            <li class="result-item">
-              <div class="persist-control">
-                <base-checkbox 
-                  small 
-                  ?checked="${item.persistOnMap}" 
-                  @change="${e=>this.persistFeature(e.target.checked)}"
-                ></base-checkbox>
-              </div>
-              <div class="feature-content" @click="${e => this.zoomTo([item.lon, item.lat], item.boundingbox)}">
-                <div class="feature-icon">
-                  ${this.getIcon(item)}
-                </div>
-                <div class="feature-name">
-                  ${item.display_name}
-                </div>
-              </div>
-            </li>
-          `)}
-        </ul>
-      </div>` : this.active && Array.isArray(this.resultList) && this.resultList.length === 0 ? html`
-      <div class="resultlist">
-        <ul>
-          <li>${t('nothing found')}</li>
-        </ul>
-      </div>` : ''}
-    </div>`;
-    ;
+      <div class="searchtool">
+        <div class="title">Zoek plaatsen en adressen</div>
+        <div class="searchbox${this.active ? '' : ' hidden'}">
+          <input type="text" placeholder="${this.info}" @keyup="${e => this.keyup(e)}">
+          ${this.active && this.resultList && this.resultList.length ? html`<i class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</i>` : ''}
+          <span title="${ifDefined(t('search')??undefined)}" class="searchbutton" @click="${e => this.search(e)}">${searchIcon}</span>
+        </div>
+        ${this.renderExplanation()}
+        ${this.renderResultList()}
+      </div>
+    `;
   }
   normalizeWhenCoordinateString(coordinateString){
     // coordinate can be either lat,lon or lon,lat
