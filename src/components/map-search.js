@@ -327,7 +327,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
     }
     if (!this.resultList?.features?.length) {      
       return html`
-        <div class="resultheader">Zoekresultaat '${this.lastSearchText}':</div>
+        <div class="resultheader">${t('Search result for')} '${this.lastSearchText}':</div>
         <div class="resultlist">
           <ul>
             <li><b>${t('nothing found')}</b></li>
@@ -335,7 +335,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         </div>`;
     }
     return html`
-    <div class="resultheader">Zoekresultaat '${this.lastSearchText}':</div>
+    <div class="resultheader">${t('Search result for')} '${this.lastSearchText}':</div>
     <div class="resultlistcontainer">
       <div class="resultlist">
         <ul>
@@ -343,14 +343,14 @@ import { ifDefined } from "lit/directives/if-defined.js";
         </ul>
       </div>
     </div>
-    <div class="resultfooter">- Klik om op een resultaat in te zoomen<br>- Selecteer om toe te voegen aan de kaart</div>`;
+    <div class="resultfooter">- ${t('Click on a result to zoom')}<br>- ${t('Select to add to the map')}</div>`;
   }
 
   renderExplanation() {
     if (!this.lastSearchText && !this.resultList?.features?.length) {
       return html`
-        <div>- Vul hierboven minstens 1 compleet woord in. Bijvoorbeeld 'Alphen' voor 'Alphen aan den Rijn'.
-        <p>- De zoekfunctie geeft voorkeur aan locaties die binnen het kaartbeeld liggen. Als daar (bijna) niets gevonden wordt, dan wordt verderop gezocht.</p></div>`;
+        <div>- ${t("Enter at least 1 complete word above.")}
+        <p>- ${t("The search function prioritizes locations that are within the map view.")}</p></div>`;
     } else {
       return html``;
     }
@@ -358,7 +358,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 
   renderSearchInfo() {
     if (this.searching) {
-      return html`<div class="searching">Zoeken...</div>`;
+      return html`<div class="searching">${t("searching...")}</div>`;
     }
     if (!this.lastSearchText && !this.resultList?.features?.length) {
       return this.renderExplanation();
@@ -373,10 +373,10 @@ import { ifDefined } from "lit/directives/if-defined.js";
     }
     return html`
       <div class="searchtool">
-        <div class="title">Zoek plaatsen en adressen</div>
+        <div class="title">${t('Search places and addresses')}</div>
         <div class="searchbox${this.active ? '' : ' hidden'}">
           <input type="text" placeholder="${this.info}" @keyup="${e => this.keyup(e)}">
-          ${this.lastSearchText ? html`<span title="erase" class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</span>` : ''}
+          ${this.lastSearchText ? html`<span title="${ifDefined(t('erase')??undefined)}" class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</span>` : ''}
           <span title="${ifDefined(t('search')??undefined)}" class="searchbutton" @click="${e => this.search(e)}">${searchIcon}</span>
         </div>
         ${this.renderSearchInfo()}  
