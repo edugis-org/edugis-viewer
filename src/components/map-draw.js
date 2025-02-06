@@ -229,7 +229,17 @@ class MapDraw extends LitElement {
       <style>
       ${drawCss}
       .drawcontainer {font-size:14px;display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;max-height:100%}
-      .header {font-weight: bold; padding-bottom:10px; padding-top: 10px; border-bottom: 1px solid lightgray;flex-shrink: 0}
+      .header {
+        font-weight: bold;
+        position: relative;
+        font-size: 16px;
+        width: 100%;
+        height: 30px;
+        padding: 5px;
+        border-bottom: 1px solid lightblue;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+        flex-shrink: 0}
       .right {float: right; margin-left: 4px;}
       .dropzone {display: inline-block; height: 24px; width: 210px; border: 1px dashed gray; border-radius: 2px;}
       .dragover {background-color: lightgray;} 

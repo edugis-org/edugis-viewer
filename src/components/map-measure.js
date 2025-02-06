@@ -106,11 +106,15 @@ class MapMeasure extends LitElement {
       max-height: 100%;
     }
     .header {
-      width: 100%;
       font-weight: bold;
-      padding-bottom: 10px;
-      padding-top: 10px;
-      border-bottom: 1px solid lightgray;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
       flex-shrink: 0;
     }
     .scrollcontainer {

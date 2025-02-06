@@ -1,6 +1,6 @@
 import '@material/mwc-button';
 
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import './base/base-checkbox.js'
@@ -24,6 +24,32 @@ class MapPitch extends LitElement {
       this.terrainActive = false;
       this.terrainButton = false;
   }
+  static styles = css`
+    .edugisblue {
+        --mdc-theme-on-primary: var(--theme-color, white);
+        --mdc-theme-primary: var(--theme-background-color, #2E7DBA);
+        --mdc-theme-on-secondary: var(--theme-color, white);
+        --mdc-theme-secondary: var(--theme-background-color, #2E7DBA);
+    }
+    .padded {
+        padding: 10px;
+    }
+    .heading {
+        font-weight: bold;
+        position: relative;
+        font-size: 16px;
+        width: 100%;
+        height: 30px;
+        padding: 5px;
+        border-bottom: 1px solid lightblue;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+    }
+    .toolpanel {
+        font-size: 14px;
+        padding-top: 8px;
+    }
+    `;
   connectedCallback() {
     super.connectedCallback()
     this.languageChanged = this.languageChanged.bind(this);
@@ -60,29 +86,8 @@ class MapPitch extends LitElement {
   }
   render() {
     return html`
-      <style>
-        .edugisblue {
-        --mdc-theme-on-primary: var(--theme-color, white);
-        --mdc-theme-primary: var(--theme-background-color, #2E7DBA);
-        --mdc-theme-on-secondary: var(--theme-color, white);
-        --mdc-theme-secondary: var(--theme-background-color, #2E7DBA);
-      }
-      .padded {
-        padding: 10px;
-      }
-      .heading {
-        font-weight: bold;
-        border-bottom: 1px solid lightgray;
-        padding-bottom: 10px;
-        margin-bottom: 10px;
-      }
-      .toolpanel {
-        font-size: 14px;
-        padding-top: 8px;
-      }
-      </style>
-      <div class="padded" style="user-select:none">
-        <div class="heading">${t('Current view angle')}</div>
+      <div class="heading">${t('Current view angle')}</div>
+      <div class="padded" style="user-select:none">  
         <mwc-button class="edugisblue" ?outlined="${this.pitch!==0}" ?unelevated="${this.pitch===0}" @click="${e=>this.updatePitch(0)}">0&deg;</mwc-button>
         <mwc-button class="edugisblue" ?outlined="${this.pitch===0 || this.pitch===60}" ?unelevated="${this.pitch!==0 && this.pitch!==60}" @click="${e=>this.updatePitch(this.pitch===0||this.pitch===60?30:this.pitch)}">${this.pitch!==0 && this.pitch!==60?Math.round(this.pitch):30}&deg;</mwc-button>
         <mwc-button class="edugisblue" ?outlined="${this.pitch!==60}" ?unelevated="${this.pitch===60}" @click="${e=>this.updatePitch(60)}">60&deg;</mwc-button>
