@@ -11,6 +11,8 @@ import { ifDefined } from "lit/directives/if-defined.js";
         display: flex;
         flex-direction: column;
         font-size: 12px;
+        height: 100%;
+        min-height: 0; /* fix for Firefox */
       }
       .title {
         font-weight: bold;
@@ -21,6 +23,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         border-bottom: 1px solid lightblue;
         margin-bottom: 12px;
         box-sizing: border-box;
+        flex-shrink: 0;
       }
       .searchbox {
         display: flex;
@@ -29,6 +32,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         border-radius: 6px;
         overflow: hidden;
         margin-bottom: 12px;
+        flex-shrink: 0;
       }
 
       .searchbox input {
@@ -72,13 +76,16 @@ import { ifDefined } from "lit/directives/if-defined.js";
           fill: #000;
       }
       .resultlistcontainer {
-        width: 100%;
+        flex-shrink: 1;
+        min-height: 0; /* fix for Firefox */
+        margin-bottom: 12px;
+        border-bottom: 1px solid lightgray;
+        border-top: 1px solid lightgray;
         overflow: auto;
-        max-height: calc( 100% - 25px );
       }
       .resultlist {
-        width: 100%;
-        overflow: auto;
+        
+        
       }
       
       .resultlist ul {
@@ -191,9 +198,9 @@ import { ifDefined } from "lit/directives/if-defined.js";
       searchText = this.normalizeWhenCoordinateString(searchText);
       let url;
       if (this.viewbox.length) {
-        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=json&viewbox=${this.viewbox.join(',')}&bounded=0&polygon_geojson=1&addressdetails=1&limit=15`;
+        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&viewbox=${this.viewbox.join(',')}&bounded=0&polygon_geojson=1&addressdetails=1&limit=15`;
       } else {
-        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=json&polygon_geojson=1&addressdetails=1&limit=15`;
+        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=15`;
       }
 
       let response = await fetch(url);
@@ -219,11 +226,10 @@ import { ifDefined } from "lit/directives/if-defined.js";
     this.triggerResult();
   }
 
-  zoomTo(point, bbox) {
+  zoomTo(bbox) {
     this.dispatchEvent(new CustomEvent('searchclick', {
       detail: {
-        point: point,
-        bbox: [bbox[2], bbox[0], bbox[3], bbox[1]]
+        bbox: bbox
       },
       bubbles: true,
       composed: true
@@ -233,34 +239,38 @@ import { ifDefined } from "lit/directives/if-defined.js";
   
   searchErase(_e) {
     if (this.resultList !== null) {
-      this.shadowRoot.querySelector('input').value = "";
+      const searchInput = this.shadowRoot.querySelector('input');
+      searchInput.value = "";
+      searchInput.focus();
+      
       this.resultList = null;
       this.lastSearchText = '';
       this.triggerResult();
     }
   }
 
-  getIconUrl(item) {
-    if (item.geojson.type === 'Point' || item.geojson.type === 'MultiPoint') {
-      if (item.class && item.type && this.lookupTable[item.class] && this.lookupTable[item.class][item.type]) {
-        return `https://raw.githubusercontent.com/gravitystorm/openstreetmap-carto/refs/heads/master/symbols/${this.lookupTable[item.class][item.type]}`;
-      } else if (item.class && this.lookupTable[item.class] && typeof this.lookupTable[item.class] === 'string') {
-        return `https://raw.githubusercontent.com/gravitystorm/openstreetmap-carto/refs/heads/master/symbols/${this.lookupTable[item.class]}`;
+  getIconUrl(feature) {
+    if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+      const category = feature.properties.category;
+      const type = feature.properties.type;
+      if (category && type && this.lookupTable[category] && this.lookupTable[category][type]) {
+        return `https://raw.githubusercontent.com/gravitystorm/openstreetmap-carto/refs/heads/master/symbols/${this.lookupTable[category][type]}`;
+      } else if (category && this.lookupTable[category] && typeof this.lookupTable[category] === 'string') {
+        return `https://raw.githubusercontent.com/gravitystorm/openstreetmap-carto/refs/heads/master/symbols/${this.lookupTable[category]}`;
       }
     }
     return null;
   }
 
-  getIcon(item) {
-    console.log(item.geojson.type);
-    switch (item.geojson.type) {
+  getIcon(feature) {
+    switch (feature.geometry.type) {
       case 'Polygon':
       case 'MultiPolygon':
         return areaIcon;
   
       case 'Point':
       case 'MultiPoint': {
-          const url = this.getIconUrl(item);
+          const url = this.getIconUrl(feature);
           if (url) {
             return html`<img src="${url}" />`;
           }
@@ -281,21 +291,21 @@ import { ifDefined } from "lit/directives/if-defined.js";
   }
 
   renderResultListItems() {
-    return this.resultList.map(item => html`
+    return this.resultList.features.map(feature => html`
       <li class="result-item">
         <div class="persist-control">
           <base-checkbox 
             small 
-            ?checked="${item.persistOnMap}" 
+            ?checked="${feature.persistOnMap}" 
             @change="${(e)=>this.persistFeature(e.target.checked)}"
           ></base-checkbox>
         </div>
-        <div class="feature-content" @click="${(e) => this.zoomTo([item.lon, item.lat], item.boundingbox)}">
+        <div class="feature-content" @click="${(e) => this.zoomTo(feature.bbox)}">
           <div class="feature-icon">
-            ${this.getIcon(item)}
+            ${this.getIcon(feature)}
           </div>
           <div class="feature-name">
-            ${item.display_name}
+            ${feature.properties.display_name}
           </div>
         </div>
       </li>
@@ -306,9 +316,9 @@ import { ifDefined } from "lit/directives/if-defined.js";
     if (!this.lastSearchText) {
       return html``;
     }
-    if (!this.resultList?.length) {      
+    if (!this.resultList?.features?.length) {      
       return html`
-        <div class="resultheader">Zoekresultaat '${this.lastSearchText}'</div>
+        <div class="resultheader">Zoekresultaat '${this.lastSearchText}':</div>
         <div class="resultlistcontainer">
           <div class="resultlist">
             <ul>
@@ -318,7 +328,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         </div>`;
     }
     return html`
-    <div class="resultheader">Zoekresultaat '${this.lastSearchText}'</div>
+    <div class="resultheader">Zoekresultaat '${this.lastSearchText}':</div>
     <div class="resultlistcontainer">
       <div class="resultlist">
         <ul>
@@ -330,7 +340,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
   }
 
   renderExplanation() {
-    if (!this.lastSearchText && !this.resultList?.length) {
+    if (!this.lastSearchText && !this.resultList?.features?.length) {
       return html`
         <div>- Vul hierboven minstens 1 compleet woord in. Bijvoorbeeld 'Alphen' voor 'Alphen aan den Rijn'.
         <p>- De zoekfunctie geeft voorkeur aan locaties die binnen het kaartbeeld liggen. Als daar (bijna) niets gevonden wordt, dan wordt verderop gezocht.</p></div>`;
@@ -349,7 +359,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
         <div class="title">Zoek plaatsen en adressen</div>
         <div class="searchbox${this.active ? '' : ' hidden'}">
           <input type="text" placeholder="${this.info}" @keyup="${e => this.keyup(e)}">
-          ${this.active && this.resultList && this.resultList.length ? html`<span title="erase" class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</span>` : ''}
+          ${this.lastSearchText ? html`<span title="erase" class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</span>` : ''}
           <span title="${ifDefined(t('search')??undefined)}" class="searchbutton" @click="${e => this.search(e)}">${searchIcon}</span>
         </div>
         ${this.renderExplanation()}

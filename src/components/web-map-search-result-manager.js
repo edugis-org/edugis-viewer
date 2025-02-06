@@ -124,16 +124,10 @@ export class WebMapSearchResultManager {
         this.webMap.map.addLayer(searchLines);
         this.webMap.map.addLayer(searchPoints);
       }
-      if (event.detail != null) {        
-        searchGeoJson.features = event.detail.map(item=>{
-          return {
-              "type":"Feature",
-              "geometry": item.geojson,
-              "properties": {
-                "icon": (item.icon?this.getIcon(item.icon): 'star_11'),
-                "name": item.display_name.split(",").shift()
-              }
-          };
+      if (event.detail?.features?.length) {        
+        searchGeoJson.features = event.detail.features.map(feature=>{
+          feature.properties.icon = feature.properties.icon || 'star_11';
+          return feature;
         });
         this.webMap.map.getSource('map-search-geojson').setData(searchGeoJson);
       } else {
