@@ -144,7 +144,120 @@ export class WebMapSearchResultManager {
         this.webMap.map.removeSource('map-search-geojson');
       }
     }
-  } 
+  }
+  fitBounds(e)
+  {
+    this.webMap.map.fitBounds(e.detail.bbox, {maxZoom: 19});
+  }
+  searchLayerId(feature) {
+    return `nominatim-${feature.properties.category}-${feature.properties.type ?? ''}-${feature.properties.osm_type}-${feature.properties.osm_id}`;
+  }
+  pointLayer(layerId, feature) {
+    if (feature.properties.icon) {
+      // convert URL to map icon
+      feature.properties.icon = this.addMapIcon(feature.properties.icon);
+    } else {
+      feature.properties.icon = 'star_11';
+    }
+    return {
+      "id": layerId,
+      "metadata": {
+        "title": feature.properties.name,
+      },
+      "type": "symbol",
+      "source": {
+        "type": "geojson",
+        "data": {type:"FeatureCollection", features: [feature]},
+        "attribution": "Nominatim"
+      },
+      "layout": {
+        "icon-image": "{icon}",
+        "text-field": "{name}",
+        "text-font": ["Noto Sans Regular"],
+        "text-offset": [0, 0.6],
+        "text-anchor": "top",
+        "text-size": 14,
+        "text-rotation-alignment": "map",
+        "text-ignore-placement": true,
+        "text-allow-overlap": true,
+        "icon-allow-overlap": true
+      },
+      "paint": {
+        "text-color": "#000",
+        "text-halo-color": "#fff",
+        "text-halo-width": 1
+      },
+      "filter": ['==', '$type', 'Point']
+    }
+  }
+  lineLayer(layerId, feature) {
+    return {
+      "id": layerId,
+      "metadata": {
+        "title": feature.properties.name,
+      },
+      "type": "line",
+      "source": {
+        "type": "geojson",
+        "data": {type:"FeatureCollection", features: [feature]},
+        "attribution": "Nominatim"
+      },
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#c30",
+        "line-width": 3
+      },
+      "filter": ['==', '$type', 'LineString']
+    };
+  }
+  polygonLayer(layerId, feature) {
+    return {
+      "id": layerId,
+      "metadata": {
+        "title": feature.properties.name,
+      },
+      "type": "fill",
+      "source": {
+        "type": "geojson",
+        "data": {type:"FeatureCollection", features: [feature]},
+        "attribution": "Nominatim"
+      },
+      "paint": {
+        "fill-color": "#c30",
+        "fill-opacity": 0.4
+      },
+      "filter": ['==', '$type', 'Polygon']
+    };
+  }
+  persistSearchFeature(event) {
+    // persist search feature as a map layer
+    const {persist, feature} = event.detail;
+    const layerId = this.searchLayerId(feature);
+    const layer = this.webMap.map.getLayer(this.searchLayerId);
+    if (layer && !persist) {
+      this.webMap.map.removeLayer(layerId);
+    } else if (!layer && persist) {
+      switch (feature.geometry.type) {
+        case 'Point':
+        case 'MultiPoint':
+          this.webMap.addLayer({detail:this.pointLayer(layerId, feature)});
+          break;
+        case 'LineString':
+        case 'MultiLineString':
+          this.webMap.addLayer({detail:this.lineLayer(layerId, feature)});
+          break;
+        case 'Polygon':
+        case 'MultiPolygon':
+          this.webMap.addLayer({detail:this.polygonLayer(layerId, feature)});
+          break;
+        default:
+          console.log('unsupported geometry type', feature.geometry.type);
+      }
+    }
+  }
 }
 
 export default WebMapSearchResultManager;

@@ -1,7 +1,7 @@
 import "./map-iconbutton.js";
 import { imageSearchIcon, searchIcon, polygonIcon as areaIcon, lineIcon, pointIcon, closeIcon } from "./my-icons.js";
 import './base/base-checkbox.js'
-import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
+import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener, i18next} from '../i18n.js';
 
 import { LitElement, html, css} from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
@@ -169,7 +169,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
     this.info = `${t('Countries, Places, Rivers, ...')}`;
   }
   dispatchResult() {
-    if (this.prevResultList === null && this.resultList == null) {
+    if (this.prevResultList == null && this.resultList == null) {
       return; // pass null resultList only once
     }
     this.prevResultList = this.resultList;
@@ -187,10 +187,11 @@ import { ifDefined } from "lit/directives/if-defined.js";
     if (searchText.length > 1) {
       searchText = this.normalizeWhenCoordinateString(searchText);
       let url;
+      const language = i18next.resolvedLanguage || 'en';
       if (this.viewbox.length) {
-        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&viewbox=${this.viewbox.join(',')}&bounded=0&polygon_geojson=1&addressdetails=1&limit=15`;
+        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&viewbox=${this.viewbox.join(',')}&bounded=0&polygon_geojson=1&addressdetails=1&limit=15&accept-language=${language}&email=info@edugis.nl`;
       } else {
-        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=15`;
+        url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=15&accept-language=${language}&email=info@edugis.nl`;
       }
       this.searching = true;
       try {
@@ -276,7 +277,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
       case 'MultiPoint': {
           const url = feature.properties.icon;
           if (url) {
-            return html`<img src="${url}" />`;
+            return html`<img src="${url}" title=""/>`;
           }
           return pointIcon;
         }
@@ -289,9 +290,13 @@ import { ifDefined } from "lit/directives/if-defined.js";
     }
   }
   
-
-  persistFeature(persist) {
-    console.log(persist);
+  persistSearchFeature(persist, feature) {
+    this.dispatchEvent(new CustomEvent('persistSearchFeature', {
+      detail: {
+        persist: persist,
+        feature: JSON.parse(JSON.stringify(feature))
+      }
+    }));
   }
 
   renderResultListItems() {
@@ -301,11 +306,11 @@ import { ifDefined } from "lit/directives/if-defined.js";
           <base-checkbox 
             small 
             ?checked="${feature.persistOnMap}" 
-            @change="${(e)=>this.persistFeature(e.target.checked)}"
+            @change="${(e)=>this.persistSearchFeature(e.target.checked, feature)}"
           ></base-checkbox>
         </div>
-        <div class="feature-content" @click="${(e) => this.zoomTo(feature.bbox)}">
-          <div class="feature-icon">
+        <div class="feature-content" @click="${(e) => this.zoomTo(feature.bbox)}" title="${feature.properties.category}/${feature.properties.type}">
+          <div class="feature-icon" title="${feature.properties.category}/${feature.properties.type}">
             ${this.getIcon(feature)}
           </div>
           <div class="feature-name">

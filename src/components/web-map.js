@@ -622,10 +622,6 @@ class WebMap extends LitElement {
     }
     return null;
   }
-  fitBounds(e)
-  {
-    this.map.fitBounds(e.detail.bbox, {maxZoom: 19});
-  }
   toggleToolMenu(opened) {
     const collapsed = this.shadowRoot.querySelector('#tool-menu-container').classList.contains('collapsed');
     if (collapsed && (opened === undefined || opened)) {
@@ -709,23 +705,39 @@ class WebMap extends LitElement {
         <ul>
           ${tools.sort((a,b)=>a.order-b.order).map(tool=>{
             return html`<li>
-              <map-iconbutton .icon="${tool.icon}" info="${ifDefined(tool.info)}" @click="${e=>this.toggleTool(tool.name)}" .active="${this.currentTool===tool.name}"></map-iconbutton>
+              <map-iconbutton .icon="${tool.icon}" info="${ifDefined(tool.info)}" 
+                @click="${e=>this.toggleTool(tool.name)}" 
+                .active="${this.currentTool===tool.name}">
+              </map-iconbutton>
             </li>`
           })}
         </ul>
       </div>
       <div id="panel-container" class="${this.currentTool !==''?"active":""}">
         <map-panel .active="${this.currentTool==="search"}">
-          <map-search .active="${this.currentTool==="search"}" .viewbox="${this.viewbox}" @searchclick="${e=>this.fitBounds(e)}" @searchresult="${e=>this.webMapSearchResultManager.searchResult(e)}"></map-search>
+          <map-search .active="${this.currentTool==="search"}" .viewbox="${this.viewbox}" 
+            @persistSearchFeature="${(e)=>this.webMapSearchResultManager.persistSearchFeature(e)}" 
+            @searchclick="${e=>this.webMapSearchResultManager.fitBounds(e)}" 
+            @searchresult="${e=>this.webMapSearchResultManager.searchResult(e)}">
+          </map-search>
         </map-panel>
         <map-panel .active="${this.currentTool==="datacatalog"}">
-          <map-data-catalog .active="${this.currentTool==="datacatalog"}" .datacatalog="${this.datacatalog}" .maplayers="${this.layerlist}" .search=${layerSearch} @addlayer="${(e) => this.addLayer(e)}" @removelayer="${e=>this.removeLayer(e)}"></map-data-catalog>
+          <map-data-catalog .active="${this.currentTool==="datacatalog"}" 
+            .datacatalog="${this.datacatalog}" 
+            .maplayers="${this.layerlist}" 
+            .search=${layerSearch} 
+            @addlayer="${(e) => this.addLayer(e)}" 
+            @removelayer="${e=>this.removeLayer(e)}">
+          </map-data-catalog>
         </map-panel>
         <map-panel .active="${this.currentTool==='measure'}">
           <map-measure .webmap="${this.map}" .active="${this.currentTool==='measure'}"></map-measure>
         </map-panel>
         <map-panel .active="${this.currentTool==='info'}">
-          <map-info-formatted .info="${this.featureInfo}" .active="${this.currentTool==='info'}" @togglestreetview="${e=>this.toggleStreetView(e)}" @infomode="${e=>this.updateInfoMode(e)}"></map-info-formatted>
+          <map-info-formatted .info="${this.featureInfo}" .active="${this.currentTool==='info'}" 
+            @togglestreetview="${e=>this.toggleStreetView(e)}" 
+            @infomode="${e=>this.updateInfoMode(e)}">
+          </map-info-formatted>
         </map-panel>
         <map-panel .active="${this.currentTool==='maplanguage'}">
           <map-language .active="${this.currentTool==='maplanguage'}" language="autodetect" @languagechanged="${e=>this.setLanguage(e)}"></map-language>
@@ -756,7 +768,11 @@ class WebMap extends LitElement {
         </map-panel>
         <map-panel .active="${this.currentTool==='importexport'}">
           <div style="width:100%">${t('Save map')}</div>
-          <map-import-export .active="${this.currentTool==='importexport'}" .map="${this.map}" .toollist="${this.toolList}" .datacatalog="${this.datacatalog}" @droppedfile="${e=>this._processDroppedFile(e.detail)}"></map-import-export>
+          <map-import-export .active="${this.currentTool==='importexport'}" .map="${this.map}" 
+            .toollist="${this.toolList}" 
+            .datacatalog="${this.datacatalog}" 
+            @droppedfile="${e=>this._processDroppedFile(e.detail)}">
+          </map-import-export>
         </map-panel>
         <map-panel .active="${this.currentTool==='datatoolbox'}">
           <div style="width:100%"></div>
@@ -770,7 +786,9 @@ class WebMap extends LitElement {
         </map-panel>
         <map-panel .active="${this.currentTool==='sheetimport'}">
           <div style="width:100%"></div>
-          <map-sheet-tool .active="${this.currentTool==='sheetimport'}" .map="${this.map}" @droppedfile="${e=>this._processDroppedFile(e.detail)}"></map-sheet-tool>
+          <map-sheet-tool .active="${this.currentTool==='sheetimport'}" .map="${this.map}" 
+            @droppedfile="${e=>this._processDroppedFile(e.detail)}">
+          </map-sheet-tool>
         </map-panel>
         <map-panel .active="${this.currentTool==='projchooser'}">
           <map-proj-chooser .active="${this.currentTool==='projchooser'}" .map="${this.map}"></map-proj-chooser>
