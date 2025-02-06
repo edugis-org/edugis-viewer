@@ -83,10 +83,6 @@ import { ifDefined } from "lit/directives/if-defined.js";
         border-top: 1px solid lightgray;
         overflow: auto;
       }
-      .resultlist {
-        
-        
-      }
       
       .resultlist ul {
         list-style: none;
@@ -145,7 +141,8 @@ import { ifDefined } from "lit/directives/if-defined.js";
       info: {type: String},
       resultList: {type: Array},
       viewbox: {type: Array},
-      active: {type: Boolean}
+      active: {type: Boolean},
+      searching: {type: Boolean},
     };
   }
 
@@ -157,6 +154,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
     this.viewbox = [];
     this.active = true;
     this.lastSearchText = '';
+    this.searching = false;
   }
   connectedCallback() {
     super.connectedCallback()
@@ -170,17 +168,9 @@ import { ifDefined } from "lit/directives/if-defined.js";
   languageChanged() {
     this.info = `${t('Countries, Places, Rivers, ...')}`;
   }
-  triggerResult() {
-    if (this.prevResultList == null && this.resultList == null) {
-      return;
-    }
-    if (this.resultList?.length) {
-      for (const result of this.resultList) {
-        const icon = this.getIconUrl(result);
-        if (icon) {
-          result.icon = icon;
-        }
-      }
+  dispatchResult() {
+    if (this.prevResultList === null && this.resultList == null) {
+      return; // pass null resultList only once
     }
     this.prevResultList = this.resultList;
     this.dispatchEvent(new CustomEvent('searchresult', {
@@ -202,12 +192,31 @@ import { ifDefined } from "lit/directives/if-defined.js";
       } else {
         url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchText)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=15`;
       }
-
-      let response = await fetch(url);
-      if (response.ok) {
-        this.resultList = await response.json();
-        this.triggerResult();
+      this.searching = true;
+      try {
+        let response = await fetch(url);
+        if (response.ok) {
+          const geojson = await response.json();
+          if (geojson.features?.length) {
+            for (const feature of geojson.features) {
+              const icon = this.getIconUrl(feature);
+              if (icon) {
+                feature.properties.icon = icon;
+              }
+            }
+          }
+          this.resultList = geojson;
+        } else {
+          console.error('Error searching:', response.statusText);
+          this.resultList = {features: []};
+        }
+      } catch (error) {
+        this.searching = false;
+        console.error('Error searching:', error);
+        this.resultList = {features: []};
       };
+      this.searching = false;
+      this.dispatchResult();
     }
   }
 
@@ -217,13 +226,8 @@ import { ifDefined } from "lit/directives/if-defined.js";
     } else {
       this.resultList = null;
       this.lastSearchText = '';
-      this.triggerResult();
+      this.dispatchResult();
     }
-  }
-
-  changed(_e) {
-    this.resultList = null;
-    this.triggerResult();
   }
 
   zoomTo(bbox) {
@@ -245,7 +249,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
       
       this.resultList = null;
       this.lastSearchText = '';
-      this.triggerResult();
+      this.dispatchResult();
     }
   }
 
@@ -270,7 +274,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
   
       case 'Point':
       case 'MultiPoint': {
-          const url = this.getIconUrl(feature);
+          const url = feature.properties.icon;
           if (url) {
             return html`<img src="${url}" />`;
           }
@@ -319,12 +323,10 @@ import { ifDefined } from "lit/directives/if-defined.js";
     if (!this.resultList?.features?.length) {      
       return html`
         <div class="resultheader">Zoekresultaat '${this.lastSearchText}':</div>
-        <div class="resultlistcontainer">
-          <div class="resultlist">
-            <ul>
-              <li>${t('nothing found')}</li>
-            </ul>
-          </div>
+        <div class="resultlist">
+          <ul>
+            <li><b>${t('nothing found')}</b></li>
+          </ul>
         </div>`;
     }
     return html`
@@ -349,6 +351,16 @@ import { ifDefined } from "lit/directives/if-defined.js";
     }
   }
 
+  renderSearchInfo() {
+    if (this.searching) {
+      return html`<div class="searching">Zoeken...</div>`;
+    }
+    if (!this.lastSearchText && !this.resultList?.features?.length) {
+      return this.renderExplanation();
+    }
+    return this.renderResultList();
+  }
+
   render() {
     if (!this.active) {
       this.searchErase();
@@ -362,8 +374,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
           ${this.lastSearchText ? html`<span title="erase" class="erasebutton" @click="${e => this.searchErase(e)}">${closeIcon}</span>` : ''}
           <span title="${ifDefined(t('search')??undefined)}" class="searchbutton" @click="${e => this.search(e)}">${searchIcon}</span>
         </div>
-        ${this.renderExplanation()}
-        ${this.renderResultList()}
+        ${this.renderSearchInfo()}  
       </div>
     `;
   }

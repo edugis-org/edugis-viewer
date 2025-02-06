@@ -67,7 +67,7 @@ export class WebMapSearchResultManager {
     this.webMap = webMap;
     this.loadingImages = new Set();
   }
-  getIcon(iconUrl) {
+  addMapIcon(iconUrl) {
     const name = iconUrl.split('/').pop().split('.').shift();
     if (this.webMap.map.hasImage(name)) {
       return name;
@@ -124,11 +124,17 @@ export class WebMapSearchResultManager {
         this.webMap.map.addLayer(searchLines);
         this.webMap.map.addLayer(searchPoints);
       }
-      if (event.detail?.features?.length) {        
-        searchGeoJson.features = event.detail.features.map(feature=>{
-          feature.properties.icon = feature.properties.icon || 'star_11';
-          return feature;
-        });
+      if (event.detail?.features?.length) {
+        const searchGeoJson = JSON.parse(JSON.stringify(event.detail));
+        for (const feature of searchGeoJson.features) {
+          if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+            if (feature.properties.icon) {
+              feature.properties.icon = this.addMapIcon(feature.properties.icon);
+            } else {
+              feature.properties.icon = 'star_11';
+            }
+          }
+        }
         this.webMap.map.getSource('map-search-geojson').setData(searchGeoJson);
       } else {
         searchGeoJson.features = [];
