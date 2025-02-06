@@ -1,4 +1,4 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 
 /* polyfill */
@@ -19,6 +19,19 @@ class MapGeolocation extends LitElement {
       updatecount: Number
     }; 
   }
+  static styles = css`
+    .title {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+  `
   constructor() {
       super();
       this.active = false;
@@ -184,7 +197,7 @@ class MapGeolocation extends LitElement {
     if (this.pos) {
       // 1 meter => 6 digit coordinate, 10 meter => 5 digit coordinate, 100 meter 4 digit coordinate etc.
       const factor = 6 - Math.round(Math.log10(this.pos.coords.accuracy));
-      this.message = html`<b>${t('Location')}</b><br>
+      this.message = html`
       <b>${t('Longitude')}:</b> ${this.pos.coords.latitude.toFixed(factor)}&deg;<br>
       <b>${t('Latitude')}:</b> ${this.pos.coords.longitude.toFixed(factor)}&deg;<br>
       <b>${t('Precision')}:</b> ${Math.round(this.pos.coords.accuracy)} m`;
@@ -195,8 +208,8 @@ class MapGeolocation extends LitElement {
     }
   }
   render() {
-    
     return html`
+    <div class="title">${t('Location')}</div>
     <div>
       ${this.message}
     </div>`;

@@ -25,14 +25,22 @@ class MapDataToolbox extends LitElement {
       currentTool: {type: String}
     }; 
   }
-  static get styles() {
-    return css`
-      .drawcontainer {font-size: 14px;}
-      .header {font-weight: bold; padding-bottom:10px; padding-top: 10px; border-bottom: 1px solid lightgray;}
-      .buttonbar {height: auto;width:100%; margin-top: 19px; margin-bottom: 15px;}
-      .tool {display: inline-block; height: 55px; width: 55px; line-height: 67px;}
-    `
-  }
+  static styles = css`
+    .drawcontainer {font-size: 14px;}
+    .header {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .buttonbar {height: auto;width:100%; margin-top: 19px; margin-bottom: 15px;}
+    .tool {display: inline-block; height: 55px; width: 55px; line-height: 67px;}
+  `;
   constructor() {
       super();
       this.map = {};

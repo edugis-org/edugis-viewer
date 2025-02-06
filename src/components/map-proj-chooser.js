@@ -10,12 +10,64 @@ import {rootUrl} from '../utils/rooturl.js';
 * @extends HTMLElement
 */
 export default class MapProjChooser extends LitElement {
+  constructor() {
+    super();
+    this.map = {};
+    this.active = false;
+  }
   static get properties() { 
     return {
       active: {type: Boolean},
       map: {type: Object}
     }; 
   }
+  static styles = css`
+    .title {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .map-overlay {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+    .map-overlay .map-overlay-inner {
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }   
+    .map-overlay-inner fieldset {
+        border: none;
+        padding: 0;
+        margin: 0 0 10px;
+    }   
+    .map-overlay-inner fieldset:last-child {
+        margin: 0;
+    }   
+    .map-overlay-inner select,
+    .map-overlay-inner input {
+        width: 100%;
+    }   
+    .map-overlay-inner label {
+        display: block;
+        font-weight: bold;
+        margin: 0 0 5px;
+    }
+    .conic-param-input {
+        display: none;
+    }
+    #projimage {
+        width: 100%;
+    }
+  `;
+  
   static get projections() {
     return [
         {
@@ -68,11 +120,6 @@ export default class MapProjChooser extends LitElement {
         }
       ]
   }
-  constructor() {
-      super();
-      this.map = {};
-      this.active = false;
-  }
   connectedCallback() {
     super.connectedCallback()
     this.languageChanged = this.languageChanged.bind(this);
@@ -84,48 +131,6 @@ export default class MapProjChooser extends LitElement {
   }
   languageChanged() {
     this.requestUpdate();
-  }
-  static get styles() {
-    return css`
-    .map-overlay {
-        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-
-    }
-        
-    .map-overlay .map-overlay-inner {
-        background-color: #fff;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        border-radius: 3px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-        
-    .map-overlay-inner fieldset {
-        border: none;
-        padding: 0;
-        margin: 0 0 10px;
-    }
-        
-    .map-overlay-inner fieldset:last-child {
-        margin: 0;
-    }
-        
-    .map-overlay-inner select,
-    .map-overlay-inner input {
-        width: 100%;
-    }
-        
-    .map-overlay-inner label {
-        display: block;
-        font-weight: bold;
-        margin: 0 0 5px;
-    }
-    .conic-param-input {
-        display: none;
-    }
-    #projimage {
-        width: 100%;
-    }`
   }
   shouldUpdate(changedProp){
     return true;
@@ -141,6 +146,7 @@ export default class MapProjChooser extends LitElement {
     const projType = t(MapProjChooser.projections.find(proj=>proj.id===mapProj).type);
     const image = MapProjChooser.projections.find(proj=>proj.id===mapProj).image;
     return html`
+        <div class="title">${t('Map Projections')}</div>
         <div class="map-overlay top">
         <div class="map-overlay-inner">
         <fieldset>

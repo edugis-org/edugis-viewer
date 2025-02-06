@@ -1,4 +1,4 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import './map-iconbutton';
 import {openfileIcon, downloadIcon} from './my-icons';
@@ -25,6 +25,24 @@ export class MapImportExport extends LitElement {
       this.datacatalog = [];
       this.onlyselected = false;
   }
+  static styles = css`
+    .header {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .rowcontainer {display: flex; align-items: flex-end;}
+    .dropzone {flex-grow: 10; height: 24px; border: 1px dashed gray; border-radius: 2px; margin-right: 4px;}
+    .buttoncontainer {display: inline-block; width: 20px; height: 20px; border: 1px solid gray; border-radius:4px;padding:2px;fill:gray;}
+    .dragover {background-color: lightgray;}
+    .spacer {flex-grow: 10;}
+  `
   connectedCallback() {
     super.connectedCallback()
     this.languageChanged = this.languageChanged.bind(this);
@@ -48,14 +66,7 @@ export class MapImportExport extends LitElement {
       return html``;
     }
     return html`
-      <style>
-      .rowcontainer {display: flex; align-items: flex-end;}
-      .dropzone {flex-grow: 10; height: 24px; border: 1px dashed gray; border-radius: 2px; margin-right: 4px;}
-      .buttoncontainer {display: inline-block; width: 20px; height: 20px; border: 1px solid gray; border-radius:4px;padding:2px;fill:gray;}
-      .dragover {background-color: lightgray;}
-      .spacer {flex-grow: 10;}
-      </style>
-      <hr>
+      <div class="header">${t('Save map')}</div>
       <div>${t('Open')}</div>
       <div class="drawcontainer" @dragover="${e=>e.preventDefault()}" @drop="${(e)=>this._handleDropZoneDrop(e)}">
       <div class="rowcontainer">

@@ -17,19 +17,27 @@ class MapSheetTool extends LitElement {
       currentTool: {type: String}
     }; 
   }
-  static get styles() {
-    return css`
-      .drawcontainer {font-size: 14px;}
-      .header {font-weight: bold; padding-bottom:10px; padding-top: 10px; border-bottom: 1px solid lightgray;}
-      .buttonbar {height: 55px;width:100%; margin-top: 19px; margin-bottom: 15px;}
-      .tool {display: inline-block; height: 55px; width: 55px; line-height: 67px;}
-      .edugisblue {
-        --dark-color: var(--theme-background-color, #2e7dba);
-        --light-color: var(--theme-color, white);
-        width: 100%;
-      }
-    `
-  }
+  static styles = css`
+    .drawcontainer {font-size: 14px;}
+    .header {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .buttonbar {height: 55px;width:100%; margin-top: 19px; margin-bottom: 15px;}
+    .tool {display: inline-block; height: 55px; width: 55px; line-height: 67px;}
+    .edugisblue {
+      --dark-color: var(--theme-background-color, #2e7dba);
+      --light-color: var(--theme-color, white);
+      width: 100%;
+    }
+  `;
   constructor() {
       super();
       this.map = {};

@@ -767,7 +767,6 @@ class WebMap extends LitElement {
           </map-draw>
         </map-panel>
         <map-panel .active="${this.currentTool==='importexport'}">
-          <div style="width:100%">${t('Save map')}</div>
           <map-import-export .active="${this.currentTool==='importexport'}" .map="${this.map}" 
             .toollist="${this.toolList}" 
             .datacatalog="${this.datacatalog}" 

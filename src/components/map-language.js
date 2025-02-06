@@ -1,4 +1,4 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 /**
 * @polymer
@@ -16,6 +16,30 @@ class MapLanguage extends LitElement {
     this.active = false;
     this.language = 'autodetect';
   }
+  static styles = css`
+    #langbutton {width: 100px; cursor: pointer}
+    .title {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    div svg {display: inline-block; vertical-align: middle;}
+    select {width:100%;
+      border: 1px solid #d8e0e7;
+      border-radius: 2px;
+      background: #fff;
+      color: #6b7c93;
+      padding: 9.6px;
+      font-size: 14px;
+      height: 39.2px;
+    }
+  `
   connectedCallback() {
     super.connectedCallback()
     this.languageChanged = this.languageChanged.bind(this);
@@ -45,20 +69,8 @@ class MapLanguage extends LitElement {
     }
     return html`
     <div>
-      <style>
-        #langbutton {width: 100px; cursor: pointer} 
-        div svg {display: inline-block; vertical-align: middle;}
-        select {width:100%;
-              border: 1px solid #d8e0e7;
-              border-radius: 2px;
-              background: #fff;
-              color: #6b7c93;
-              padding: 9.6px;
-              font-size: 14px;
-              height: 39.2px;
-        }
-      </style>
-      ${t('Select language for map display')}:
+      <div class="title">${t('Map Language')}</div>
+      <div>${t('Select language for map display')}</div>
       <select @change="${e=>this.changeLangue(e)}">
         <option .selected="${this.language==="autodetect"?'selected':undefined}" value="autodetect">Browser</option>
         <option .selected="${this.language==="native"?'selected':undefined}" value="native">Local</option>

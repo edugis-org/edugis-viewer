@@ -17,7 +17,17 @@ class MapInfoFormatted extends LitElement {
   }
   static get styles() {
     return css`
-    .header {font-weight: bold; height: 1.5em; }
+    .header {
+      font-weight: bold;
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      border-bottom: 1px solid lightblue;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
     .content { height: calc(100% - 1.5em); overflow: auto; font-size: 12px; }
     .streetviewcontainer {display: flex; flex-direction:row;  justify-content: flex-end;  }
     .layer {
