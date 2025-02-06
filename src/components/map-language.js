@@ -65,6 +65,7 @@ class MapLanguage extends LitElement {
         <option .selected="${this.language==="en"?'selected':undefined}" value="en">English</option>
         <option .selected="${this.language==="de"?'selected':undefined}" value="de">Deutsch</option>
         <option .selected="${this.language==="fr"?'selected':undefined}" value="fr">Français</option>
+        <option .selected="${this.language==="fr"?'selected':undefined}" value="es">Español</option>
         <option .selected="${this.language==="nl"?'selected':undefined}" value="nl">Nederlands</option>
         <option .selected="${this.language==="zh"?'selected':undefined}" value="zh">橘子</option>
         <option .selected="${this.language==="ru"?'selected':undefined}" value="ru">русский</option>
