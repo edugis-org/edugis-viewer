@@ -95,6 +95,20 @@ class MapInfoFormatted extends LitElement {
     }
     return this.active;
   }
+  renderExplanation() {
+    if (this.info.filter(feature=>
+        !((feature.layer?.layout?.visibility === 'none') || 
+          (feature.layer?.metadata?.reference))).length == 0) {
+      return html`
+      <ul>
+      <li>${t('Click a map element for info on that element')}</li>
+      <li>${t('Note: most objects on the background maps do not have additional information.')}</li>
+      <li>${t('Click the StreetView button to show a streetview image')}</li>
+    </ul>
+      `;
+    }
+    return html``;
+  }
   render() {
     if (!this.active) {
       return html``;
@@ -112,7 +126,7 @@ class MapInfoFormatted extends LitElement {
         <span>StreetView</span><div class="${this.streetViewOn?'check-on':'check-off'}"></div>
       </div>
       </div>
-      ${this.info.length == 0? `${t('Click a map element for info on that element')}`:''}
+      ${this.renderExplanation()}
       <table class="attributetable">
       ${this.info.filter(feature=>(feature.layer.layout && feature.layer.layout.visibility && feature.layer.layout.visibility === 'none') ||  (feature.layer.metadata && feature.layer.metadata.reference)?false:true)
         .filter(feature=>{ // filter muliple features from same layer
@@ -272,7 +286,7 @@ class MapInfoFormatted extends LitElement {
           bubbles: true,
           composed: true,
           detail: {
-            markdown: `[![Afbeelding](${imageUrl})](${streetViewUrl})`
+            markdown: `[![Afbeelding](${imageUrl})](${streetViewUrl})\n\n${t("Click on the image for a full streetview")}`
           }
         }))
       }
