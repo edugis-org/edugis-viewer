@@ -31,19 +31,19 @@ export default {
     // Print bundle summary
     summary(),
     // Optional: copy any static assets to build directory
+    // note: glob patterns work different, see https://github.com/vladshcherbin/rollup-plugin-copy/issues/32
     copy({
       targets: [
-        {src: "images/**/*", dest: "build/images"},
-        {src: "maps/**/*", dest: "build/maps"},
-        {src: "styles/**/*", dest: "build/styles"},
-        {src: "notosans-*woff2", dest: "build"},
-        {src: "node_modules/hopscotch/dist/img/sprite-*.png", dest: "build/img"},
-        {src: "images/manifest/*", dest: "build/assets/images"},
-        {src: "course/**/*", dest: "build/course"},
-        {src: "src/workers/*", dest: "build/src"},
-        {src: "src/locales/**/*", dest: "build/src"}
-      ],
-      flatten: false
+        {src: "images/*", dest: "build/images/", flatten: false}, // deep recursive copy
+        {src: "maps/*", dest: "build/maps/", flatten: false},
+        {src: "styles/*", dest: "build/styles/", flatten: false},
+        {src: "notosans-*woff2", dest: "build/", flatten: false},
+        {src: "node_modules/hopscotch/dist/img/sprite-*.png", dest: "build/img/", flatten: true},
+        {src: "images/manifest/*", dest: "build/assets/images/manifest/", flatten: false},
+        {src: "course/*", dest: "build/course/", flatten: false},
+        {src: "src/workers/*", dest: "build/src/workers/", flatten: false},
+        {src: "src/locales/*", dest: "build/src/locales/", flatten: false},
+      ]
     }),
   ],
   output: {
