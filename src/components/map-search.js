@@ -349,8 +349,12 @@ import { ifDefined } from "lit/directives/if-defined.js";
   renderExplanation() {
     if (!this.lastSearchText && !this.resultList?.features?.length) {
       return html`
-        <div>- ${t("Enter at least 1 complete word above.")}
-        <p>- ${t("The search function prioritizes locations that are within the map view.")}</p></div>`;
+        <div>
+          <ul>
+            <li>${t("Enter at least 1 complete word above.")}</li>
+            <li>${t("The search function prioritizes locations that are within the map view.")}</li>
+          </ul>
+        </div>`
     } else {
       return html``;
     }
