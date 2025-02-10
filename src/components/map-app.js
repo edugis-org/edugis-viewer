@@ -12,7 +12,7 @@ import { LitElement, html, css } from 'lit';
 import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings.js';
 import rootUrl from '../utils/rooturl.js';
 import {translate as t, i18next,  changeLanguage} from '../i18n.js';
-
+import {startTour} from '../tour.js';
 
 // These are the actions needed by this element.
 //import {
@@ -278,62 +278,7 @@ class MapApp extends (LitElement) {
     if (this.helpstart && window.sessionStorage.getItem('helpstart') !== 'shown') {
       setTimeout(()=>{
           window.sessionStorage.setItem('helpstart', 'shown')
-          var tour = {
-              id: "hello-hopscotch",
-              i18n: {
-                nextBtn: `${t('Next')}`,
-                prevBtn: `${t('Previous')}`,
-                doneBtn: `${t('Done')}`,
-                skipBtn: `${t('Skip')}`,
-                closeTooltip: `${t('Close')}`,
-                stepNums : ["1/3", "2/3", "3/3"]
-              },
-              steps: [
-                  {
-                      title: `${t('Map')}`,
-                      content: `${t('Hopscotch map explain')}`,
-                      target: document.querySelector("map-app").shadowRoot.querySelector('web-map').shadowRoot.querySelector('map-spinner'),
-                      placement: "top"
-                  },
-                  {
-                      title: `${t('Tools')}`,
-                      content: `${t('Hopscotch tools explain')}`,
-                      target: document.querySelector("map-app").shadowRoot.querySelector('web-map').shadowRoot.querySelector('#tool-menu-container'),
-                      placement: "right",
-                      yOffset: "center"
-                  },
-                  {
-                      title: `${t('Legend')}`,
-                      content: `${t('Hopscotch legend explain')}`,
-                      target: document.querySelector("map-app").shadowRoot.querySelector('web-map').shadowRoot.querySelector('#legend-container-container > map-layer-container'),
-                      placement: "left",
-                      yOffset: "center"
-                  }
-              ]
-            };
-            // create custom border style for hopscotch bubbles
-            const style = document.createElement('style');
-            style.textContent = `
-            div.hopscotch-bubble {
-                border-color: var(--theme-background-color, #2e7dba);
-                border-radius: 3px !important;
-            }
-            div.hopscotch-bubble .hopscotch-bubble-arrow-container.up .hopscotch-bubble-arrow-border {
-              border-bottom: 17px solid var(--theme-background-color, #2e7dba);
-            }
-            div.hopscotch-bubble .hopscotch-bubble-arrow-container.down .hopscotch-bubble-arrow-border {
-              border-top: 17px solid var(--theme-background-color, #2e7dba);
-            }
-            div.hopscotch-bubble .hopscotch-bubble-arrow-container.left .hopscotch-bubble-arrow-border {
-              border-right: 17px solid var(--theme-background-color, #2e7dba);
-            }
-            div.hopscotch-bubble .hopscotch-bubble-arrow-container.right .hopscotch-bubble-arrow-border {
-              border-left: 17px solid var(--theme-background-color, #2e7dba);
-            }`;
-
-            document.head.appendChild(style);
-            // Start the tour!
-            hopscotch.startTour(tour);
+          startTour()
       }, 2000)
     }
   }
