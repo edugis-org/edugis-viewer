@@ -214,11 +214,25 @@ export class WebMapInitializer {
 
   mapCreated(config) {
     // map is created
+    this.setMapFog();
     // Setup map controls and event handlers
     this.initializeDataGetter();
     this.setupMapControls();
     this.setupEventHandlers();
     this.setupDatacatalog(config);
+  }
+
+  setMapFog() {
+    if (this.webMap.map.setFog) {
+      this.webMap.map.setFog({
+        "range": [0.8, 8],
+        "color": "#ffffff",
+        "horizon-blend": 0.2,
+        "high-color": "#4faac6",
+        "space-color": "#000000",
+        "star-intensity": 0.15
+      });
+    }
   }
   
   createMap(config) {

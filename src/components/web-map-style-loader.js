@@ -207,19 +207,6 @@ export class WebMapStyleLoader {
     }
   }
 
-  setMapFog() {
-    if (this.webMap.map.setFog) {
-      this.webMap.map.setFog({
-        "range": [0.8, 8],
-        "color": "#ffffff",
-        "horizon-blend": 0.2,
-        "high-color": "#4faac6",
-        "space-color": "#000000",
-        "star-intensity": 0.15
-      });
-    }
-  }
-
   _addStyleObject(styleInfo, readyCallback) {
       const styleId = styleInfo.id;
       const styleTitle = styleInfo.metadata?.title || styleInfo.name || styleId || "style title not defined";  
@@ -234,7 +221,6 @@ export class WebMapStyleLoader {
         /* set handler for style.load event */
         this.map.once("style.load", ()=>{
           this._restoreThematicLayers();
-          this.setMapFog();
           readyCallback();
         });
 
