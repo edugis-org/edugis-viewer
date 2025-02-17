@@ -20,19 +20,31 @@ class MapSpinner extends LitElement {
       this.webmap = {};
   }
   showSpinner() {
+    if (this.visible) {
+      return;
+    }
+    if (this.showSpinnerTimeout) {
+      return;
+    }
     // prevent short-duration spinners
     this.delay = true;
-    setTimeout(()=>
+    this.showSpinnerTimeout = setTimeout(()=>
       {
         if (this.delay) {
           this.visible = true;
         }
+        this.showSpinnerTimeout = null;
       }, 300)
   }
   hideSpinner() {
     if(this.webmap.loaded()) {
         this.delay = false;
         this.visible = false;
+        if (this.showSpinnerTimeout) {
+          clearTimeout(this.showSpinnerTimeout);
+          this.showSpinnerTimeout = null;
+        }
+        
     }
   }
   registerMapEvents(prevMap, newMap)
@@ -58,7 +70,6 @@ class MapSpinner extends LitElement {
   render() {
     return html`<style>
         :host {
-          z-index: 100;
           position: absolute;
           margin-left: auto;
           margin-right: auto;
