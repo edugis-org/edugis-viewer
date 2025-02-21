@@ -318,22 +318,16 @@ class MapMeasure extends LitElement {
       this.requestUpdate();
     };
   };
-  updateActivation() {
-    if (this.active === this.activated) {
-      return;
-    }
-    this.activated = this.active;
-    if (this.webmap.version) {
-      if (this.activated) {
-        // setup measuring on map
-        if (this.webmap.doubleClickZoom.isEnabled()) {
-          this.webmap.doubleClickZoom.disable();
-          this.shouldReenableDoubleClickZoom = true;
-        }
+  addMeasureLayers() {
+    try {
+      if (!this.webmap.getSource('map-measure-geojson')) {
         this.webmap.addSource('map-measure-geojson', {
           "type":"geojson", 
           "data":this.geojson
         });
+      }
+
+      if (!this.webmap.getLayer('map-measure-line')) {
         this.webmap.addLayer({
           "id": "map-measure-line",
           "type": "line",
@@ -350,6 +344,8 @@ class MapMeasure extends LitElement {
           },
           "filter": ['in', '$type', 'LineString']
         });
+      }
+      if (!this.webmap.getLayer('map-measure-points')) {
         this.webmap.addLayer({
           "id": "map-measure-points",
           "type": "circle",
@@ -364,6 +360,8 @@ class MapMeasure extends LitElement {
           },
           "filter": ['>', 'id', '']
         });
+      }
+      if (!this.webmap.getLayer('map-measure-surface')) {
         this.webmap.addLayer({
           "id": "map-measure-surface",
           "type": "fill",
@@ -378,6 +376,8 @@ class MapMeasure extends LitElement {
             "fill-opacity": 0.4
           }
         })
+      }
+      if (!this.webmap.getLayer('map-measure-line-length')) {
         this.webmap.addLayer({
           "id": "map-measure-line-length",
           "type": "symbol",
@@ -397,6 +397,32 @@ class MapMeasure extends LitElement {
             "text-halo-width": 4
           }
         });
+      }
+    } catch (e) {
+      console.error(e.message);
+      return false;
+    }
+    return this.webmap.getLayer('map-measure-line-length') !== undefined;
+  }
+  async updateActivation() {
+    if (this.active === this.activated) {
+      return;
+    }
+    this.activated = this.active;
+    if (this.webmap.version) {
+      if (this.activated) {
+        // setup measuring on map
+        if (this.webmap.doubleClickZoom.isEnabled()) {
+          this.webmap.doubleClickZoom.disable();
+          this.shouldReenableDoubleClickZoom = true;
+        }
+        for (let i = 0; i < 20; i++) {
+          while (!this.addMeasureLayers()) {
+            // sleep 100ms, map still loading?
+            await new Promise(r => setTimeout(r, 100));
+          } 
+        }
+        this.addMeasureLayers();
         this.webmap.on('click', this._boundHandleClick);
         this.webmap.on('mousemove', this._boundHandleMapMouseMove);
         this.webmap.getCanvasContainer().addEventListener('keydown', this._boundHandleKeyPress);
