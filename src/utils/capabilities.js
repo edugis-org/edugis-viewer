@@ -166,7 +166,7 @@ function layerToNode(Layer, Request, scaleHintType) {
     return node;
 }
 
-function addNodesFromLayer(Layer, Request, scaleHintType, deniedlayers, allowedlayers) {
+function addNodesFromLayer(Layer, Request, scaleHintType, deniedlayers, allowedlayers, depth = 0) {
   if (!Array.isArray(Layer)) {
     Layer = [Layer];
   }
@@ -174,18 +174,27 @@ function addNodesFromLayer(Layer, Request, scaleHintType, deniedlayers, allowedl
   Layer.forEach(layer=>{
     if (layer.Name && layer.Name !== '') {
       if (allowedLayer(layer, deniedlayers, allowedlayers)) {
-        result.push(layerToNode(layer, Request, scaleHintType))
+        if (!layer.Layer?.length) { // only add leaf nodes
+          result.push(layerToNode(layer, Request, scaleHintType))
+        }
       }
     }
     if (layer.Layer && allowedLayer(layer.Layer, deniedlayers, allowedlayers)) {
       // layer has sublayers
-      const sublayers = addNodesFromLayer(layer.Layer, Request, scaleHintType, deniedlayers, allowedlayers);
-      if (result.length === 0) {
+      const sublayers = addNodesFromLayer(layer.Layer, Request, scaleHintType, deniedlayers, allowedlayers, depth + 1);
+      if (depth === 0) {
         result = sublayers;
       } else {
-        const node = layerGroup(layer);
-        node.sublayers = sublayers;
-        result.push(node);
+        if (sublayers.length > 0) {
+          const node = layerGroup(layer);
+          node.sublayers = sublayers;
+          result.push(node);
+        } else {
+          // no sublayers (unnamed or denied or not allowed), show group as layer
+          if (layer.Name && layer.Name !== '') {
+            result.push(layerToNode(layer, Request, scaleHintType));
+          }
+        }
       }
     }
   })
