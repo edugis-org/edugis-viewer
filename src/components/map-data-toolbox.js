@@ -1,7 +1,7 @@
 import {LitElement, html, svg, css} from 'lit';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import './map-iconbutton';
-import './map-datatool-distance';
+import './map-datatool-shortest-distance';
 import './map-datatool-buffer';
 import './map-datatool-intersect';
 import './map-datatool-filter';
@@ -69,7 +69,7 @@ class MapDataToolbox extends LitElement {
         ${t('Select a tool button')}
           <div class="buttonbar">
             <div class="tool">
-            <map-iconbutton .active="${this.currentTool==='distancetool'}" .icon="${measureIcon}" info="${t('Calculate distances')}" @click="${e=>this.currentTool='distancetool'}"></map-iconbutton>
+            <map-iconbutton .active="${this.currentTool==='shortestdistancetool'}" .icon="${measureIcon}" info="${t('Calculate shortest distance')}" @click="${e=>this.currentTool='shortestdistancetool'}"></map-iconbutton>
             </div>
             <div class="tool">
             <map-iconbutton .active="${this.currentTool==='buffertool'}" .icon="${bufferIcon}" info="${t('Buffer')}" @click="${e=>this.currentTool='buffertool'}"></map-iconbutton>
@@ -94,8 +94,8 @@ class MapDataToolbox extends LitElement {
     switch (this.currentTool) {
       case "":
         return html`${t('Select a tool button')}`;
-      case "distancetool":
-        return html`<map-datatool-distance .map=${this.map}></map-datatool-distance>`;
+      case "shortestdistancetool":
+        return html`<map-datatool-shortest-distance .map=${this.map}></map-datatool-shortest-distance>`;
       case "buffertool":
         return html`<map-datatool-buffer @titlechange="${()=>this._titlechange()}" .map=${this.map}></map-datatool-buffer>`;
       case "intersecttool":

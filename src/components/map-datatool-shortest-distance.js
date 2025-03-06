@@ -1,5 +1,6 @@
 import {LitElement, html, svg, css} from 'lit';
 import {GeoJSON} from '../utils/geojson';
+import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import GeoJSONParser from 'jsts/org/locationtech/jts/io/GeoJSONParser';
 import DistanceOp from 'jsts/org/locationtech/jts/operation/distance/DistanceOp';
 import {customSelectCss} from './custom-select-css.js';
@@ -13,7 +14,7 @@ let addedLayerCounter = 0;
 * @polymer
 * @extends HTMLElement
 */
-class MapDataToolDistance extends LitElement {
+class MapDataToolShortestDistance extends LitElement {
   static get properties() { 
     return {
       map: {type: Object},
@@ -39,9 +40,21 @@ class MapDataToolDistance extends LitElement {
       this.resultMessage = null;
       this.timeoutId = null;
   }
+  connectedCallback() {
+    super.connectedCallback()
+    this.languageChanged = this.languageChanged.bind(this);
+    registerLanguageChangedListener(this.languageChanged);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    unregisterLanguageChangedListener(this.languageChanged);
+  }
+  languageChanged() {
+    this.requestUpdate();
+  }
   render() {
     return html`
-      <b>Afstand berekenen</b><p></p>
+      <b>${t('Calculate shortest distance')}</b><p></p>
       Bereken de kortste afstand van alle elementen in kaartlaag 1 tot het dichtsbijzijnde element in kaartlaag 2.<p></p>
       <b>Kaartlaag 1</b><br>
       ${this._renderLayerList()}<p></p>
@@ -223,4 +236,4 @@ class MapDataToolDistance extends LitElement {
     }
   }
 }
-customElements.define('map-datatool-distance', MapDataToolDistance);
+customElements.define('map-datatool-shortest-distance', MapDataToolShortestDistance);

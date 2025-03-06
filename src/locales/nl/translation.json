@@ -18,6 +18,7 @@
     "Calculate a 'buffer' around the visible elements in map layer 1": "Bereken een 'buffer' rondom de zichtbare elementen in kaartlaag 1",
     "Calculate Buffer": "Buffer berekenen",
     "Calculate distances": "Afstanden berekenen",
+    "Calculate shortest distance": "Kortste afstand berekenen",
     "Calculating buffers, please wait": "Buffer(s) berekenen, dit kan even duren",
     "Cancel": "Annuleer",
     "Center Latitude": "Centrale breedtegraad",
