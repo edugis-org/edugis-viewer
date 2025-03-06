@@ -55,23 +55,23 @@ class MapDataToolShortestDistance extends LitElement {
   render() {
     return html`
       <b>${t('Calculate shortest distance')}</b><p></p>
-      Bereken de kortste afstand van alle elementen in kaartlaag 1 tot het dichtsbijzijnde element in kaartlaag 2.<p></p>
-      <b>Kaartlaag 1</b><br>
+      ${t('Calculate the shortest distance from all elements in layer 1 to the nearest element in layer 2.')}<p></p>
+      <b>${t('Layer')} 1</b><br>
       ${this._renderLayerList()}<p></p>
-      <b>Kaartlaag 2</b><br>
+      <b>${t('Layer')} 2</b><br>
       ${this._renderLayerList()}<p></p>
-      <wc-button class="edugisblue" @click="${e=>this._handleClick(e)}" ?disabled="${!this.buttonEnabled}">Berekenen</wc-button><br>
-      ${this.resultMessage?this.resultMessage:''}
+      <wc-button class="edugisblue" @click="${e=>this._handleClick(e)}" ?disabled="${!this.buttonEnabled}">${t('Calculate')}</wc-button><br>
+      ${this.resultMessage ? this.resultMessage : ''}
     </div>
     `
   }
   _renderLayerList() {
     const layers = this.map.getStyle().layers.filter(layer=>layer.metadata && !layer.metadata.reference && !layer.metadata.isToolLayer && ['fill','line','circle','symbol'].includes(layer.type));
     if (layers.length < 2) {
-      return html`${layers.length} kaartlagen aanwezig (minimaal 2 nodig)`;
+      return html`${layers.length} ${t('map layers available (at least 2 required)')}`;
     }
     return html`<div class="styled-select"><select @change="${e=>this._layerSelected(e)}">
-    <option value="" disabled selected>Selecteer kaartlaag</option>
+    <option value="" disabled selected>${t('Select map layer')}</option>
     ${layers.map(layer=>html`<option value=${layer.id}>${layer.metadata.title?layer.metadata.title:layer.id}</option>`)}
     </select><span class="arrow"></span></div>`
   }

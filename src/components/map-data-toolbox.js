@@ -68,7 +68,7 @@ class MapDataToolbox extends LitElement {
         ${t('Select a tool button')}
           <div class="buttonbar">
             <div class="tool">
-            <map-iconbutton .active="${this.currentTool==='shortestdistancetool'}" .icon="${shortestDistanceIcon}" info="${t('Calculate shortest distance')}" @click="${e=>this.currentTool='shortestdistancetool'}"></map-iconbutton>
+            <map-iconbutton .active="${this.currentTool==='shortestdistancetool'}" .icon="${shortestDistanceIcon}" info="${t('Shortest distance')}" @click="${e=>this.currentTool='shortestdistancetool'}"></map-iconbutton>
             </div>
             <div class="tool">
             <map-iconbutton .active="${this.currentTool==='buffertool'}" .icon="${bufferIcon}" info="${t('Buffer')}" @click="${e=>this.currentTool='buffertool'}"></map-iconbutton>
