@@ -7,8 +7,7 @@ import './map-datatool-intersect';
 import './map-datatool-filter';
 import './map-datatool-route';
 import './map-iconbutton';
-import {bufferIcon, intersectIcon, filterIcon, zigzagIcon} from './my-icons';
-import { measureIcon} from '../gm/gm-iconset-svg';
+import {bufferIcon, intersectIcon, shortestDistanceIcon, filterIcon, zigzagIcon} from './my-icons';
 
 //const dummyIcon = svg`<svg height="24" width="24" viewbox="0 0 24 24"><style>.normal{ font: bold 18px sans-serif;}</style><text x="4" y="16" class="normal">A</text></svg>`;
 
@@ -69,7 +68,7 @@ class MapDataToolbox extends LitElement {
         ${t('Select a tool button')}
           <div class="buttonbar">
             <div class="tool">
-            <map-iconbutton .active="${this.currentTool==='shortestdistancetool'}" .icon="${measureIcon}" info="${t('Calculate shortest distance')}" @click="${e=>this.currentTool='shortestdistancetool'}"></map-iconbutton>
+            <map-iconbutton .active="${this.currentTool==='shortestdistancetool'}" .icon="${shortestDistanceIcon}" info="${t('Calculate shortest distance')}" @click="${e=>this.currentTool='shortestdistancetool'}"></map-iconbutton>
             </div>
             <div class="tool">
             <map-iconbutton .active="${this.currentTool==='buffertool'}" .icon="${bufferIcon}" info="${t('Buffer')}" @click="${e=>this.currentTool='buffertool'}"></map-iconbutton>
