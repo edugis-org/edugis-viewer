@@ -34,7 +34,7 @@
     "@turf/turf": "^6.5.0",
     "@webcomponents/webcomponentsjs": "^2.7.0",
     "@xmldom/xmldom": "^0.9.4",
-    "dompurify": "^2.4.1",
+    "dompurify": "^3.2.4",
     "file-saver": "^2.0.5",
     "flatbush": "^4.0.0",
     "hopscotch": "^0.3.1",
