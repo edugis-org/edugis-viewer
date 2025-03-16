@@ -1,14 +1,13 @@
 import {LitElement, html, svg, css} from 'lit';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import './map-iconbutton';
-import './map-datatool-distance';
+import './map-datatool-shortest-distance';
 import './map-datatool-buffer';
 import './map-datatool-intersect';
 import './map-datatool-filter';
 import './map-datatool-route';
 import './map-iconbutton';
-import {bufferIcon, intersectIcon, filterIcon, zigzagIcon} from './my-icons';
-import { measureIcon} from '../gm/gm-iconset-svg';
+import {bufferIcon, intersectIcon, shortestDistanceIcon, filterIcon, zigzagIcon} from './my-icons';
 
 //const dummyIcon = svg`<svg height="24" width="24" viewbox="0 0 24 24"><style>.normal{ font: bold 18px sans-serif;}</style><text x="4" y="16" class="normal">A</text></svg>`;
 
@@ -69,7 +68,7 @@ class MapDataToolbox extends LitElement {
         ${t('Select a tool button')}
           <div class="buttonbar">
             <div class="tool">
-            <map-iconbutton .active="${this.currentTool==='distancetool'}" .icon="${measureIcon}" info="${t('Calculate distances')}" @click="${e=>this.currentTool='distancetool'}"></map-iconbutton>
+            <map-iconbutton .active="${this.currentTool==='shortestdistancetool'}" .icon="${shortestDistanceIcon}" info="${t('Shortest distance')}" @click="${e=>this.currentTool='shortestdistancetool'}"></map-iconbutton>
             </div>
             <div class="tool">
             <map-iconbutton .active="${this.currentTool==='buffertool'}" .icon="${bufferIcon}" info="${t('Buffer')}" @click="${e=>this.currentTool='buffertool'}"></map-iconbutton>
@@ -94,8 +93,8 @@ class MapDataToolbox extends LitElement {
     switch (this.currentTool) {
       case "":
         return html`${t('Select a tool button')}`;
-      case "distancetool":
-        return html`<map-datatool-distance .map=${this.map}></map-datatool-distance>`;
+      case "shortestdistancetool":
+        return html`<map-datatool-shortest-distance .map=${this.map}></map-datatool-shortest-distance>`;
       case "buffertool":
         return html`<map-datatool-buffer @titlechange="${()=>this._titlechange()}" .map=${this.map}></map-datatool-buffer>`;
       case "intersecttool":
