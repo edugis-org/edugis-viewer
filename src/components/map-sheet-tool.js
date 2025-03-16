@@ -1,7 +1,7 @@
 import {LitElement, html, svg, css} from 'lit';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import './map-iconbutton';
-import './map-datatool-distance';
+import './map-datatool-shortest-distance';
 import './map-iconbutton';
 import MapImportExport from './map-import-export';
 
@@ -74,8 +74,8 @@ class MapSheetTool extends LitElement {
     switch (this.currentTool) {
       case "":
         return html`Kies combineergereedschap via de knoppen`;
-      case "distancetool":
-        return html`<map-datatool-distance .map=${this.map}></map-datatool-distance>`;
+      case "shortestdistancetool":
+        return html`<map-datatool-shortest-distance .map=${this.map}></map-datatool-shortest-distance>`;
       default:
         return html`Nog niet geimplementeerd: '${this.currentTool}'`;
     }

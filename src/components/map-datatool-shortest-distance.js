@@ -1,5 +1,6 @@
 import {LitElement, html, svg, css} from 'lit';
 import {GeoJSON} from '../utils/geojson';
+import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import GeoJSONParser from 'jsts/org/locationtech/jts/io/GeoJSONParser';
 import DistanceOp from 'jsts/org/locationtech/jts/operation/distance/DistanceOp';
 import {customSelectCss} from './custom-select-css.js';
@@ -13,7 +14,7 @@ let addedLayerCounter = 0;
 * @polymer
 * @extends HTMLElement
 */
-class MapDataToolDistance extends LitElement {
+class MapDataToolShortestDistance extends LitElement {
   static get properties() { 
     return {
       map: {type: Object},
@@ -39,26 +40,38 @@ class MapDataToolDistance extends LitElement {
       this.resultMessage = null;
       this.timeoutId = null;
   }
+  connectedCallback() {
+    super.connectedCallback()
+    this.languageChanged = this.languageChanged.bind(this);
+    registerLanguageChangedListener(this.languageChanged);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    unregisterLanguageChangedListener(this.languageChanged);
+  }
+  languageChanged() {
+    this.requestUpdate();
+  }
   render() {
     return html`
-      <b>Afstand berekenen</b><p></p>
-      Bereken de kortste afstand van alle elementen in kaartlaag 1 tot het dichtsbijzijnde element in kaartlaag 2.<p></p>
-      <b>Kaartlaag 1</b><br>
+      <b>${t('Calculate shortest distance')}</b><p></p>
+      ${t('Calculate the shortest distance from all elements in layer 1 to the nearest element in layer 2.')}<p></p>
+      <b>${t('Layer')} 1</b><br>
       ${this._renderLayerList()}<p></p>
-      <b>Kaartlaag 2</b><br>
+      <b>${t('Layer')} 2</b><br>
       ${this._renderLayerList()}<p></p>
-      <wc-button class="edugisblue" @click="${e=>this._handleClick(e)}" ?disabled="${!this.buttonEnabled}">Berekenen</wc-button><br>
-      ${this.resultMessage?this.resultMessage:''}
+      <wc-button class="edugisblue" @click="${e=>this._handleClick(e)}" ?disabled="${!this.buttonEnabled}">${t('Calculate')}</wc-button><br>
+      ${this.resultMessage ? this.resultMessage : ''}
     </div>
     `
   }
   _renderLayerList() {
     const layers = this.map.getStyle().layers.filter(layer=>layer.metadata && !layer.metadata.reference && !layer.metadata.isToolLayer && ['fill','line','circle','symbol'].includes(layer.type));
     if (layers.length < 2) {
-      return html`${layers.length} kaartlagen aanwezig (minimaal 2 nodig)`;
+      return html`${layers.length} ${t('map layers available (at least 2 required)')}`;
     }
     return html`<div class="styled-select"><select @change="${e=>this._layerSelected(e)}">
-    <option value="" disabled selected>Selecteer kaartlaag</option>
+    <option value="" disabled selected>${t('Select map layer')}</option>
     ${layers.map(layer=>html`<option value=${layer.id}>${layer.metadata.title?layer.metadata.title:layer.id}</option>`)}
     </select><span class="arrow"></span></div>`
   }
@@ -223,4 +236,4 @@ class MapDataToolDistance extends LitElement {
     }
   }
 }
-customElements.define('map-datatool-distance', MapDataToolDistance);
+customElements.define('map-datatool-shortest-distance', MapDataToolShortestDistance);
