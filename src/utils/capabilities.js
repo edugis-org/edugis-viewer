@@ -269,6 +269,8 @@ export function copyMetadataToCapsNodes(sourceLayerInfo, capsNodes) {
       }
       if (sourceLayerInfo.tilecacheurl) {
         node.layerInfo.metadata.tilecacheurl = sourceLayerInfo.tilecacheurl;
+      } else if (sourceLayerInfo.metadata.tilecacheurl) {
+        node.layerInfo.metadata.tilecacheurl = sourceLayerInfo.metadata.tilecacheurl;
       }
     }
     if (node.sublayers) {
