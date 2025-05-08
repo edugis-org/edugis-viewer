@@ -20,6 +20,7 @@ import './map-draw';
 import './map-data-toolbox';
 import './map-sheet-tool';
 import './map-modal-dialog';
+import './map-dialog-layer-external.js';
 import './map-proj-chooser';
 import "./map-save-layer";
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from "../i18n.js";
@@ -671,6 +672,12 @@ class WebMap extends LitElement {
     this.currentTool = '';
     this.resetLayerList();
   }
+  addExternalLayer(e) {
+    const MapDialogLayerExternal = this.shadowRoot.querySelector('map-dialog-layer-external');
+    if (MapDialogLayerExternal) {
+      MapDialogLayerExternal.showDialog();
+    }
+  }
   renderToolbarTools()
   {
     const toolbar = this.toolList.find(tool=>tool.name==="toolbar");
@@ -727,7 +734,8 @@ class WebMap extends LitElement {
             .maplayers="${this.layerlist}" 
             .search=${layerSearch} 
             @addlayer="${(e) => this.addLayer(e)}" 
-            @removelayer="${e=>this.removeLayer(e)}">
+            @removelayer="${e=>this.removeLayer(e)}"
+            @addExternalLayer="${e=>this.addExternalLayer(e)}">
           </map-data-catalog>
         </map-panel>
         <map-panel .active="${this.currentTool==='measure'}">
@@ -968,6 +976,7 @@ class WebMap extends LitElement {
     ${this.sheetdialog?html`<map-dialog dialogtitle="Sheet-Kaart" @close="${e=>{this.sheetdialog=null;this.requestUpdate();}}"><map-gsheet-form .layerinfo="${this.sheetdialog}" @addlayer="${(e) => this.addLayer(e)}"></map-gsheet-form></map-dialog>`:html``} 
     <map-spinner .webmap=${this.map}></map-spinner>
     <map-modal-dialog></map-modal-dialog>
+    <map-dialog-layer-external></map-dialog-layer-external>
     <map-save-layer .webmap=${this.map} .container=${this} @beforesave="${(e)=>this._beforeSaveLayer(e)}"></map-save-layer>
     `
   }
