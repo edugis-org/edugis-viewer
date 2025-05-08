@@ -67,7 +67,14 @@ class MapDataCatalog extends LitElement {
     }
   }
   render() {
-    return html`<map-layer-tree headertext="${ifDefined(t('Add map layers')??undefined)}" .nodelist="${this.datacatalog}" .maplayers="${this.maplayers}" @toggleitem="${e=>this.toggleLayer(e)}" .search="${this.search}"></map-layer-tree>`;
+    return html`<map-layer-tree 
+      headertext="${ifDefined(t('Add map layers')??undefined)}" 
+      .nodelist="${this.datacatalog}" 
+      .maplayers="${this.maplayers}" 
+      @toggleitem="${e=>this.toggleLayer(e)}"
+      @addExternalLayer="${e=>this.dispatchEvent(new CustomEvent('addExternalLayer', {detail: e.detail}))}"
+      .search="${this.search}">
+      </map-layer-tree>`;
   }
   getDataInfo(treenodes, dataid) {
     let result = null;

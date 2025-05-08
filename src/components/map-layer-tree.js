@@ -370,7 +370,15 @@ class MapLayerTree extends LitElement {
   }
   render() {
     return html`
-    <div class="title">${this.headertext}<div id="filebutton"><input @change="${(e)=>this.openFile(e)}" id="edugisfile" type="file" accept=".json,.geojson,.zip"/><label for="edugisfile"><map-iconbutton info="${ifDefined(t('open file')??undefined)}" .icon="${openfileIcon}"></map-iconbutton></label></div></div>
+    <div class="title">${this.headertext}
+      <span id="addlayer"><button @click="${(e)=>this.dispatchEvent(new Event('addExternalLayer', {}))}">addlayer</button></span>
+      <span id="filebutton">
+        <input @change="${(e)=>this.openFile(e)}" id="edugisfile" type="file" accept=".json,.geojson,.zip"/>
+        <label for="edugisfile">
+          <map-iconbutton info="${ifDefined(t('open file')??undefined)}" .icon="${openfileIcon}"></map-iconbutton>
+        </label>
+      </span>
+    </div>
     <div class="wrapper">
       ${this.search?html`<div class="search"><div class="searchicon">${filterIcon}</div><input autocomplete="off" id="searchinput" spellcheck="false" type="text" placeholder="${t('find map layer')}..." @input="${(e)=>this.input(e)}"/><div class="clear ${this.clearbtnvisible?"":"hidden"}" @click="${(e)=>this.handleClearButton(e)}"></div></div>`:html``}
       <div class="layertree">
