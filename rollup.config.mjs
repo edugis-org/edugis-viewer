@@ -3,28 +3,39 @@ import { rollupPluginHTML as html } from "@web/rollup-plugin-html";
 import copy from 'rollup-plugin-copy';
 import resolve from '@rollup/plugin-node-resolve';
 import {terser} from 'rollup-plugin-terser';
-import { minifyTemplateLiterals } from "rollup-plugin-minify-template-literals";import summary from 'rollup-plugin-summary';
+import { minifyTemplateLiterals } from "rollup-plugin-minify-template-literals";
+import summary from 'rollup-plugin-summary';
 import del from 'rollup-plugin-delete'
 import sourcemaps from 'rollup-plugin-sourcemaps';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
   plugins: [
-    sourcemaps(),
     del({ targets: 'build/**/*'}),
     // Entry point for application build; can specify a glob to build multiple
     // HTML files for non-SPA app
     html({
       input: ['index.html', 'demo.html', 'mapbox.html','cgstromen.html'],
     }),
+    // Handle TypeScript files
+    typescript({
+      tsconfig: './tsconfig.json',
+      sourceMap: true,
+      inlineSources: true,
+      noEmitOnError: false,
+      allowImportingTsExtensions: true,
+      include: ["src/**/*.ts"]
+    }),
     // Resolve bare module specifiers to relative paths
     resolve({
-      exportConditions: ['production']
+      exportConditions: ['production'],
+      extensions: ['.js', '.ts']
     }),
     // Minify HTML template literals
     minifyTemplateLiterals(),
     // Minify JS
     terser({
-      ecma: 2020,
+      ecma: 2022,
       module: true,
       warnings: true,
     }),
@@ -45,6 +56,7 @@ export default {
         {src: "src/locales/*", dest: "build/src/locales/", flatten: false},
       ]
     }),
+    sourcemaps(),
   ],
   output: {
     sourcemap: true,

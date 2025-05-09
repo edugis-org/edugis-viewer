@@ -1,3 +1,5 @@
+import { serviceGetWMSCapabilities } from "./service-wms.js";
+
 function validateURL(url) {
 
   try {
@@ -37,6 +39,14 @@ export async function loadService(url) {
     const response = await fetch(serviceUrl.href, { method: 'HEAD' });
     if (!response.ok) {
       throw new Error(`Service not reachable: ${response.statusText}`);
+    }
+    // Check if the URL is a WMS service
+    const wmsCapabilities = await serviceGetWMSCapabilities(serviceUrl.href);
+    if (wmsCapabilities) {
+      serviceInfo.type = 'WMS';
+      serviceInfo.capabilities = wmsCapabilities;
+    } else {
+      serviceInfo.error = 'Service is not a valid WMS service.';
     }
   } catch (error) {
     serviceInfo.error = `Error accessing service: ${error.message}`;
