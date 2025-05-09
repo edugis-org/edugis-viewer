@@ -1,5 +1,6 @@
 import {LitElement, html,css} from 'lit';
 import {loadService} from '../service/service.js';
+import {MapServiceInfo} from './service/map-service-info';
 
 /**
 * @polymer
@@ -12,6 +13,7 @@ export class MapDialogLayerExternal extends LitElement {
       serviceError: {type: String},
       loading: {type: Boolean},
       serviceURL: {type: String},
+      serviceInfo: {type: Object},
     }; 
   }
   static get styles() {
@@ -86,6 +88,7 @@ export class MapDialogLayerExternal extends LitElement {
       this.active = false;
       this.serviceURL = "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0";
       this.serviceError = "";
+      this.serviceInfo = {};
   }
   render() {
     if (!this.active) {
@@ -97,32 +100,32 @@ export class MapDialogLayerExternal extends LitElement {
         <div id="dialog-header">
           <div id="dialog-title">Add External Layer</div>
           <div @click="${e=>this._close(e)}" id="closebutton">x</div>
-        </div>
+        </div> <!-- dialog-header -->
         <div id="dialog-content">
           <form>
             <div class="form-group">
               ${this._renderFieldHeader('Service URL', 'url')}
-            </div>
-            <div class="input-with-button">
-              <input
-                type="url"
-                id="serviceURL"
-                .value=${this.serviceURL}
-                @input=${(e) => this._handleInputChange(e, 'serviceURL')}
-                required
-                placeholder="Enter a valid service URL">
-            <button type="button"
-              @click=${() => this._loadService()}
-              ?disabled=${this.loading}>
-              Load
-            </button>
-          </div>
-        </div>
-        ${this.serviceError ? html`<p class="error">${this.serviceError}</p>` : null}
+              <div class="input-with-button">
+                <input
+                  type="url"
+                  id="serviceURL"
+                  .value=${this.serviceURL}
+                  @input=${(e) => this._handleInputChange(e, 'serviceURL')}
+                  required
+                  placeholder="Enter a valid service URL">
+                <button type="button"
+                  @click=${() => this._loadService()}
+                  ?disabled=${this.loading}>
+                  Load
+                </button>
+              </div><!-- input-with-button -->
+              <div class="error">${this.serviceError}</div>
+            </div> <!-- form-group -->
           </form>
-        </div><!-- dialog-content -->
-      </div>
-    </div>`
+          <map-service-info .serviceInfo=${this.serviceInfo}></map-service-info>
+        </div> <!-- dialog-content -->
+      </div> <!-- dialog-window -->
+    </div> <!-- overlay -->`
   }
   _renderFieldHeader(label, forId) {
     return html`
@@ -143,6 +146,7 @@ export class MapDialogLayerExternal extends LitElement {
   }
   async _loadService() {
     this.serviceError = '';
+    this.serviceInfo = {};
     const urlInput = this.shadowRoot.getElementById('serviceURL');
     const serviceURL = urlInput.value;
     if (serviceURL) {
@@ -154,12 +158,15 @@ export class MapDialogLayerExternal extends LitElement {
       }
       urlInput.value = serviceInfo.serviceURL;
       this.serviceUrl = serviceInfo.serviceURL;
+      this.serviceInfo = serviceInfo;
       this.loading = false;
     } else {
       this.serviceError = 'Please enter a valid service URL.';
     }
   }
   showDialog() {
+    this.serviceError = '';
+    this.serviceInfo = {};
     this.active = true;
   }
 }

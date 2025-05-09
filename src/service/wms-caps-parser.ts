@@ -21,7 +21,7 @@ export function parseWMSCapabilities(xmlString: string): WMSCapabilities {
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
   if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
-      throw new Error("Invalid XML");
+      throw new Error("Invalid WMS Capabilities XML");
   }
 
   const root = xmlDoc.documentElement;

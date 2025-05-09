@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "useDefineForClassFields": false,
     "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",

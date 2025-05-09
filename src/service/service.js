@@ -41,13 +41,8 @@ export async function loadService(url) {
       throw new Error(`Service not reachable: ${response.statusText}`);
     }
     // Check if the URL is a WMS service
-    const wmsCapabilities = await serviceGetWMSCapabilities(serviceUrl.href);
-    if (wmsCapabilities) {
-      serviceInfo.type = 'WMS';
-      serviceInfo.capabilities = wmsCapabilities;
-    } else {
-      serviceInfo.error = 'Service is not a valid WMS service.';
-    }
+    const WMSServiceInfo = await serviceGetWMSCapabilities(serviceUrl.href);
+    return WMSServiceInfo;
   } catch (error) {
     serviceInfo.error = `Error accessing service: ${error.message}`;
   }
