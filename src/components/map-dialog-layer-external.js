@@ -11,6 +11,7 @@ export class MapDialogLayerExternal extends LitElement {
       active: {type: Boolean},
       serviceError: {type: String},
       loading: {type: Boolean},
+      serviceURL: {type: String},
     }; 
   }
   static get styles() {
@@ -91,7 +92,7 @@ export class MapDialogLayerExternal extends LitElement {
       return html``;
     }
     return html`
-    <div id="overlay" @click="${e=>this._close(e)}">
+    <div id="overlay">
       <div id="dialog-window" @click="${e=>e.stopPropagation()}">
         <div id="dialog-header">
           <div id="dialog-title">Add External Layer</div>
@@ -142,7 +143,8 @@ export class MapDialogLayerExternal extends LitElement {
   }
   async _loadService() {
     this.serviceError = '';
-    const serviceURL = this.shadowRoot.getElementById('serviceURL').value;
+    const urlInput = this.shadowRoot.getElementById('serviceURL');
+    const serviceURL = urlInput.value;
     if (serviceURL) {
       this.loading = true;
       this.serviceURL = serviceURL;      
@@ -150,6 +152,8 @@ export class MapDialogLayerExternal extends LitElement {
       if (serviceInfo.error) {
         this.serviceError = serviceInfo.error;
       }
+      urlInput.value = serviceInfo.serviceURL;
+      this.serviceUrl = serviceInfo.serviceURL;
       this.loading = false;
     } else {
       this.serviceError = 'Please enter a valid service URL.';
