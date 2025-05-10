@@ -12,20 +12,24 @@ export class WmsServiceInfo extends LitElement {
     .wms-info {
       border: 1px solid #e0e0e0;
       border-radius: 4px;
-      padding: 16px;
+      padding: 12px;
       background-color: #f9f9f9;
+      margin-top: 10px;
     }
+    
     .service-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
+    
     .service-title {
       font-size: 1.2em;
       font-weight: bold;
       color: #2e7dba;
     }
+    
     .service-badge {
       background-color: #2e7dba;
       color: white;
@@ -33,30 +37,77 @@ export class WmsServiceInfo extends LitElement {
       border-radius: 4px;
       font-size: 0.8em;
     }
+    
     .service-abstract {
-      margin: 12px 0;
+      margin: 8px 0;
       color: #666;
       font-style: italic;
+      max-height: 60px;
+      overflow-y: auto;
+      font-size: 0.9em;
     }
+    
     .layer-list {
-      margin-top: 16px;
+      margin-top: 10px;
     }
+    
+    .layer-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .layer-list-title {
+      font-weight: bold;
+      font-size: 1em;
+    }
+    
+    .layer-count {
+      color: #666;
+      font-size: 0.9em;
+    }
+    
+    .layer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
     .layer-item {
       padding: 8px;
-      border-bottom: 1px solid #eee;
+      border: 1px solid #eee;
+      border-radius: 4px;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
+    
     .layer-item:hover {
       background-color: #f0f7fd;
     }
+    
     .layer-title {
       font-weight: bold;
+      font-size: 0.95em;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    
     .layer-details {
-      font-size: 0.9em;
+      font-size: 0.85em;
       color: #666;
-      margin-top: 4px;
+      max-height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
+    
     .add-button {
       background-color: #2e7dba;
       color: white;
@@ -64,10 +115,19 @@ export class WmsServiceInfo extends LitElement {
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
-      margin-top: 4px;
+      margin-top: 6px;
+      width: 100%;
+      font-size: 0.9em;
     }
+    
     .add-button:hover {
       background-color: #246499;
+    }
+    
+    .no-layers {
+      color: #666;
+      font-style: italic;
+      padding: 8px;
     }
   `;
   
@@ -76,9 +136,9 @@ export class WmsServiceInfo extends LitElement {
       return html`<div>Loading WMS service information...</div>`;
     }
     
-    const title = this.serviceInfo.capabilities.service.title || 'WMS Service';
-    const abstract = this.serviceInfo.capabilities.service.abstract || 'No description available';
-    const layers = this.serviceInfo.capabilities.capability.layers || [];
+    const title = this.serviceInfo.capabilities?.service?.title || 'WMS Service';
+    const abstract = this.serviceInfo.capabilities?.service?.abstract || 'No description available';
+    const layers = this.serviceInfo.capabilities?.capability?.layers || [];
     
     return html`
       <div class="wms-info">
@@ -90,10 +150,18 @@ export class WmsServiceInfo extends LitElement {
         <div class="service-abstract">${abstract}</div>
         
         <div class="layer-list">
-          <h3>Available Layers (${layers.length})</h3>
+          <div class="layer-list-header">
+            <div class="layer-list-title">Available Layers</div>
+            <div class="layer-count">(${layers.length})</div>
+          </div>
+          
           ${layers.length === 0 
-            ? html`<div>No layers available</div>` 
-            : layers.map(layer => this._renderLayerItem(layer))
+            ? html`<div class="no-layers">No layers available</div>` 
+            : html`
+                <div class="layer-grid">
+                  ${layers.map(layer => this._renderLayerItem(layer))}
+                </div>
+              `
           }
         </div>
       </div>
@@ -101,10 +169,14 @@ export class WmsServiceInfo extends LitElement {
   }
   
   _renderLayerItem(layer) {
+    const name = layer.name || layer.Name || '';
+    const title = layer.title || layer.Title || name || 'Unnamed Layer';
+    const abstract = layer.abstract || layer.Abstract || 'No description';
+    
     return html`
       <div class="layer-item">
-        <div class="layer-title">${layer.name || layer.Title}</div>
-        <div class="layer-details">${layer.abstract || layer.Abstract || 'No description'}</div>
+        <div class="layer-title" title="${title}">${title}</div>
+        <div class="layer-details" title="${abstract}">${abstract}</div>
         <button class="add-button" @click=${() => this._addLayer(layer)}>Add to Map</button>
       </div>
     `;
