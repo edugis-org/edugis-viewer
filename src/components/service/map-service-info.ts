@@ -2,6 +2,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './wms-service-info';
+import './wmts-service-info';
 
 // Service type interfaces
 export interface ServiceInfoType {

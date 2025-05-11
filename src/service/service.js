@@ -1,4 +1,5 @@
 import { serviceGetWMSCapabilities } from "./service-wms.js";
+import { serviceGetWMTSCapabilities } from "./service-wmts.js";
 
 function validateURL(url) {
 
@@ -37,12 +38,15 @@ export async function loadService(url) {
     serviceInfo.serviceURL = serviceUrl.href;
     // Check if the URL is valid and accessible
     const response = await fetch(serviceUrl.href, { method: 'HEAD' });
-    if (!response.ok) {
-      throw new Error(`Service not reachable: ${response.statusText}`);
-    }
-    // Check if the URL is a WMS service
+    // Ignore 404 errors, check if the URL is a WMS service
     const WMSServiceInfo = await serviceGetWMSCapabilities(serviceUrl.href);
-    return WMSServiceInfo;
+    if (!WMSServiceInfo.error) {
+      return WMSServiceInfo;
+    }
+    const WMTSServiceInfo = await serviceGetWMTSCapabilities(serviceUrl.href);
+    if (!WMTSServiceInfo.error) {
+      return WMTSServiceInfo;
+    }
   } catch (error) {
     serviceInfo.error = `Error accessing service: ${error.message}`;
   }

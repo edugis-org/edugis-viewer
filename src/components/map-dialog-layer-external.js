@@ -117,8 +117,8 @@ export class MapDialogLayerExternal extends LitElement {
       .dropdown-menu {
         position: fixed;
         z-index: 10;
-        min-width: 250px;
-        max-width: 400px;
+        min-width: 300px;
+        max-width: 90%;
         max-height: 300px;
         overflow-y: auto;
         background-color: white;
@@ -145,7 +145,7 @@ export class MapDialogLayerExternal extends LitElement {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin-right: 8px;
+        margin-right: 16px;
       }
       
       .dropdown-item:hover {
@@ -357,22 +357,44 @@ export class MapDialogLayerExternal extends LitElement {
       const toggleButton = e.target.closest('.dropdown-toggle');
       const rect = toggleButton.getBoundingClientRect();
       
+      // Get the dialog content element to calculate available space
+      const dialogWindow = this.shadowRoot.querySelector('#dialog-window');
+      const dialogRect = dialogWindow.getBoundingClientRect();
+      
+      // Get input container and URL input field for better positioning
+      const inputContainer = this.shadowRoot.querySelector('.input-container');
+      const inputRect = inputContainer.getBoundingClientRect();
+      
+      // Get the URL input field specifically to match its width
+      const urlInput = this.shadowRoot.querySelector('#serviceURL');
+      const urlInputRect = urlInput.getBoundingClientRect();
+      
+      // Calculate dropdown width based on the dialog width for maximum space
+      // Make it wider to show more of the service titles
+      const dialogContentWidth = dialogRect.width - 40; // Subtract margins
+      // Use a percentage of the available dialog content width, but no less than URL input width
+      const dropdownWidth = Math.min(dialogContentWidth * 0.9, Math.max(urlInputRect.width, 400));
+      
+      // Position dropdown initially aligned with input left edge
+      let leftPos = inputRect.left;
+      
+      // Check right boundary - ensure dropdown stays within dialog
+      if (leftPos + dropdownWidth > dialogRect.right - 20) {
+        // Align right edges instead
+        leftPos = dialogRect.right - dropdownWidth - 20;
+      }
+      
+      // Ensure we don't go off the left edge either
+      leftPos = Math.max(dialogRect.left + 10, leftPos);
+      
       // Position dropdown below the toggle button
       this.dropdownPosition = {
         top: rect.bottom + 2,
-        left: rect.left - 200 + rect.width // Align right edge with toggle button
+        left: leftPos
       };
       
-      // Ensure dropdown is within viewport
-      const viewportWidth = window.innerWidth;
+      // Ensure dropdown is within viewport height
       const viewportHeight = window.innerHeight;
-      
-      // Adjust horizontal position if needed
-      if (this.dropdownPosition.left < 10) {
-        this.dropdownPosition.left = 10;
-      } else if (this.dropdownPosition.left + 250 > viewportWidth - 10) {
-        this.dropdownPosition.left = viewportWidth - 260;
-      }
       
       // If dropdown would go below viewport, position it above the button
       if (this.dropdownPosition.top + 300 > viewportHeight - 10) {
@@ -457,7 +479,7 @@ export class MapDialogLayerExternal extends LitElement {
           
           // Add to previously used services if not already there and if successful
           const existingIndex = this.previousServices.findIndex(s => s.url === serviceInfo.serviceURL);
-          const serviceTitle = serviceInfo.title || 
+          const serviceTitle = serviceInfo.serviceTitle || 
                               (serviceInfo.capabilities?.service?.title) || 
                               serviceInfo.serviceURL;
           

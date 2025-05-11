@@ -707,8 +707,29 @@ class WebMap extends LitElement {
           this.addLayer({detail: layerInfo});
         }
         break;
+      case 'WMTS':
+        {
+          const layer = e.detail.layer;
+          const tileUrl = e.detail.tileUrl;
+          const layerInfo = {
+            id: GeoJSON._uuidv4(),
+            type: 'raster',
+            metadata: {
+              title: layer.title,
+              abstract: layer.abstract,
+            },
+            source: {
+              type: 'raster',
+              tiles: [tileUrl],
+              minzoom: 0,
+              maxzoom: 22
+            },
+          }
+          this.addLayer({detail: layerInfo});
+        }
+        break;
       default:
-          alert('Unsupported layer type: ${LayerInfo.type}');
+          alert(`Unsupported layer type: ${LayerInfo.type}`);
     }
   }
   renderToolbarTools()

@@ -7,15 +7,18 @@ import { parseWMSCapabilities } from './wms-caps-parser';
 function wmsCapbilitiesURL(url) {
   try {
     // Check if the URL is valid and accessible
-    const urlObj = new URL(url);
+    const urlObj = new URL(url);    
     // remove possibly existing WMS parameters 'service', 'request', 'version' etc
     const capabilitiesParams = ['service', 'request', 'version', 'bbox', 'width', 'height', 'srs', 'crs', 'format', 'layers', 'styles', 'transparent'];
     const urlParams = new URLSearchParams(urlObj.search);
     const paramNames = Array.from(urlParams).map((param) => param[0]);
     for (const paramName of paramNames) {
       if (capabilitiesParams.includes(paramName.toLowerCase())) {
-        urlParams.delete(paramName);
+        if (paramName.toLowerCase() === 'service' && urlParams.get(paramName).toLowerCase() !== 'wms') {
+          return null; // not a WMS service
+        }
       }
+      urlParams.delete(paramName);
     }
     urlParams.set('service', 'WMS');
     urlParams.set('request', 'GetCapabilities');
@@ -52,6 +55,7 @@ function cleanupWMSURL(url) {
 export async function serviceGetWMSCapabilities(url) {
   const result = {
     serviceURL: url,
+    serviceTitle: null,
     type: null,
     capabilities: null,
     error: null
@@ -72,8 +76,8 @@ export async function serviceGetWMSCapabilities(url) {
         return result;
       }
       const contentLength = response.headers.get('Content-Length');
-      if (contentLength && parseInt(contentLength) < 1000) {
-        result.error = `Content too small: ${contentLength} bytes`;
+      if (contentLength && parseInt(contentLength) > 5000000) {
+        result.error = `Content too large: ${contentLength} bytes`;
         return result;
       }
       response = await fetch(url, { method: 'GET' });
@@ -82,6 +86,7 @@ export async function serviceGetWMSCapabilities(url) {
       result.type = 'WMS';
       result.capabilities = capabilities;
       result.serviceURL = cleanupWMSURL(result.serviceURL);
+      result.serviceTitle = capabilities?.service?.title || result.serviceURL;
       return result;
     } catch (error) {      
       result.error = `Error fetching WMS capabilities: ${error.message}`;
