@@ -23,7 +23,6 @@ export default {
       sourceMap: true,
       inlineSources: true,
       noEmitOnError: false,
-      allowImportingTsExtensions: true,
       include: ["src/**/*.ts"]
     }),
     // Resolve bare module specifiers to relative paths

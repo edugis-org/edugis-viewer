@@ -3,7 +3,7 @@
 
 import { parseWMTSCapabilities } from './wmts-caps-parser';
 
-function inferWMTSBaseUrl(tileUrl) {
+function inferWMTSBaseUrl(tileUrl, withStyle) {
   try {
     const url = new URL(tileUrl);
     const pathname = url.pathname;
@@ -35,8 +35,9 @@ function inferWMTSBaseUrl(tileUrl) {
     if (numericStartIndex > 0) {
       // In WMTS RESTful pattern, we assume:
       // .../layer/style/tileMatrixSet/tileMatrix/tileRow/tileCol.format
-      // So skip 3 segments back from the numeric part for layer/style/tileMatrixSet
-      const baseUrlEndIndex = Math.max(0, numericStartIndex - 3);
+      // .../layer/tileMatrixSet/tileMatrix/tileRow/tileCol.format
+      // So skip 2 (no style) or 3 (style) segments back from the numeric part for layer/style/tileMatrixSet
+      const baseUrlEndIndex = Math.max(0, numericStartIndex - (withStyle ? 3 : 2));
       
       // Reconstruct the base URL
       const baseSegments = segments.slice(0, baseUrlEndIndex);
@@ -52,7 +53,7 @@ function inferWMTSBaseUrl(tileUrl) {
   }
 }
 
-function wmtsCapbilitiesURL(url) {
+function wmtsCapbilitiesURL(url, withStyle = false) {
   // the given WMTS url can either be:
   // the base URL of the service (e.g. https://example.com/wmts/v2.0)
   // or a KVP request (e.g. https://example.com/wmts/v2.0?service=WMTS&request=GetCapabilities)
@@ -76,7 +77,7 @@ function wmtsCapbilitiesURL(url) {
           urlObj.searchParams.set('request', 'GetCapabilities');
           return urlObj.href;
     }
-    const baseWmtsUrl = inferWMTSBaseUrl(urlObj.href);
+    const baseWmtsUrl = inferWMTSBaseUrl(urlObj.href, withStyle);
     if (baseWmtsUrl === null) {
       return null; // not a valid WMTS base URL
     }
@@ -142,39 +143,49 @@ export async function serviceGetWMTSCapabilities(url) {
     capabilities: null,
     error: null
   }
-  url = wmtsCapbilitiesURL(url);
-  if (url) {
-    result.serviceURL = url;
-    try {
-      let response = await fetch(url, { method: 'HEAD' });
-      if (!response.ok) {
-        result.error = `Service not reachable: ${response.statusText}`;
+  for (const withStyle of [false, true]) {
+    url = wmtsCapbilitiesURL(url, withStyle);
+    if (url) {
+      result.serviceURL = url;
+      try {
+        let response = await fetch(url, { method: 'HEAD' });
+        if (!response.ok) {
+          result.error = `Service not reachable: ${response.statusText}`;
+          if (withStyle) {
+            return result;
+          } else {
+            continue;
+          }
+        }
+        // Check content type and possibly content-length
+        const contentType = response.headers.get('Content-Type');
+        if (!contentType || !contentType.includes('xml')) {
+          result.error = `Invalid content type: ${contentType}`;
+          if (withStyle) {
+            return result;
+          } else {
+            continue;
+          }
+        }
+        const contentLength = response.headers.get('Content-Length');
+        if (contentLength && parseInt(contentLength) > 5000000) {
+          result.error = `Content too large: ${contentLength} bytes`;
+          return result;
+        }
+        response = await fetch(url, { method: 'GET' });
+        const capabilitiesXML = await response.text();
+        const capabilities = parseWMTSCapabilities(capabilitiesXML);
+        result.type = 'WMTS';
+        result.capabilities = capabilities;
+        result.serviceURL = baseURLFromCapabilitiesURL(result.serviceURL);
+        result.serviceTitle = capabilities?.serviceIdentification?.title || result.serviceURL;
         return result;
+      } catch (error) {      
+        result.error = `Error fetching WMTS capabilities: ${error.message}`;
       }
-      // Check content type and possibly content-length
-      const contentType = response.headers.get('Content-Type');
-      if (!contentType || !contentType.includes('xml')) {
-        result.error = `Invalid content type: ${contentType}`;
-        return result;
-      }
-      const contentLength = response.headers.get('Content-Length');
-      if (contentLength && parseInt(contentLength) > 5000000) {
-        result.error = `Content too large: ${contentLength} bytes`;
-        return result;
-      }
-      response = await fetch(url, { method: 'GET' });
-      const capabilitiesXML = await response.text();
-      const capabilities = parseWMTSCapabilities(capabilitiesXML);
-      result.type = 'WMTS';
-      result.capabilities = capabilities;
-      result.serviceURL = baseURLFromCapabilitiesURL(result.serviceURL);
-      result.serviceTitle = capabilities?.serviceIdentification?.title || result.serviceURL;
-      return result;
-    } catch (error) {      
-      result.error = `Error fetching WMTS capabilities: ${error.message}`;
+    } else {
+      result.error = 'Invalid URL for WMTS capabilities.';
     }
-  } else {
-    result.error = 'Invalid URL for WMTS capabilities.';
   }
   return result;
 }

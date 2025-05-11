@@ -782,15 +782,15 @@ class WebMap extends LitElement {
             @searchresult="${e=>this.webMapSearchResultManager.searchResult(e)}">
           </map-search>
         </map-panel>
-        <map-panel .active="${this.currentTool==="datacatalog"}">
-          <map-data-catalog .active="${this.currentTool==="datacatalog"}" 
+        <map-panel .active="${this.currentTool==='datacatalog'}">
+          <map-data-catalog .active="${this.currentTool==='datacatalog'}"
             .datacatalog="${this.datacatalog}" 
             .maplayers="${this.layerlist}" 
             .search=${layerSearch} 
             @addlayer="${(e) => this.addLayer(e)}" 
             @removelayer="${e=>this.removeLayer(e)}"
             @addExternalLayer="${e=>this.showExternalLayerDialog(e)}"
-            @addLayerFromService="${e=>this.addLayerFromService(e)}"
+            @addLayerFromService="${e=>this.addLayerFromService(e)}">
           </map-data-catalog>
         </map-panel>
         <map-panel .active="${this.currentTool==='measure'}">
