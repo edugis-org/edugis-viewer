@@ -43,7 +43,8 @@ export class MapDialogLayerExternal extends LitElement {
         box-shadow: 4px 4px 9px 0px rgba(168,168,168,1);
         border-radius: 4px;
         max-width: 90%;
-        height: 80%;
+        min-height: 120px;
+        max-height: 80%;
         background-color: white;  
       }
       
@@ -114,34 +115,62 @@ export class MapDialogLayerExternal extends LitElement {
       }
       
       .dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
+        position: fixed;
         z-index: 10;
-        min-width: 200px;
+        min-width: 250px;
+        max-width: 400px;
         max-height: 300px;
         overflow-y: auto;
         background-color: white;
         border: 1px solid #ccc;
         border-radius: 4px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        display: none;
-      }
-      
-      .dropdown-menu.show {
-        display: block;
       }
       
       .dropdown-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 8px 12px;
         cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
+      .dropdown-item:last-child {
+        border-bottom: none;
+      }
+      
+      .dropdown-item-text {
+        flex: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-right: 8px;
       }
       
       .dropdown-item:hover {
         background-color: #f0f7fd;
+      }
+      
+      .dropdown-item-remove {
+        color: #d9534f;
+        padding: 2px 6px;
+        font-size: 12px;
+        border-radius: 3px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+      
+      .dropdown-item-remove:hover {
+        opacity: 1;
+        background-color: #f9f2f2;
+      }
+      
+      .empty-dropdown {
+        padding: 8px 12px;
+        color: #666;
+        font-style: italic;
+        text-align: center;
       }
       
       button {
@@ -187,19 +216,45 @@ export class MapDialogLayerExternal extends LitElement {
   constructor() {
     super();
     this.active = false;
-    this.serviceURL = "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0";
+    //this.serviceURL = "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0";
+    this.serviceURL = "";
     this.serviceError = "";
     this.serviceInfo = {};
-    this.previousServices = [
-      { title: "Landelijke Voorziening Beeldmateriaal", url: "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0" },
-      { title: "Kadaster BRT Achtergrondkaart", url: "https://service.pdok.nl/brt/achtergrondkaart/wms/v2_0" },
-      { title: "BAG WMS", url: "https://service.pdok.nl/lv/bag/wms/v2_0" },
-      { title: "Nationaal Georegister", url: "https://nationaalgeoregister.nl/geonetwork/srv/dut/csw" }
-    ];
+    this.previousServices = [];
     this.showDropdown = false;
+    this.dropdownPosition = { top: 0, left: 0 };
+    
+    // Load saved services from localStorage
+    this._loadSavedServices();
     
     // Click outside handler for dropdown
     this._handleClickOutside = this._handleClickOutside.bind(this);
+  }
+  
+  _loadSavedServices() {
+    try {
+      const savedServices = localStorage.getItem('mapServiceHistory');
+      if (savedServices) {
+        this.previousServices = JSON.parse(savedServices);
+      } else {
+        // Default services as fallback
+        this.previousServices = [
+          { title: "Landelijke Voorziening Beeldmateriaal", url: "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0" }
+        ];
+        this._saveServices();
+      }
+    } catch (e) {
+      console.error("Error loading saved services:", e);
+      this.previousServices = [];
+    }
+  }
+  
+  _saveServices() {
+    try {
+      localStorage.setItem('mapServiceHistory', JSON.stringify(this.previousServices));
+    } catch (e) {
+      console.error("Error saving services:", e);
+    }
   }
   
   connectedCallback() {
@@ -242,15 +297,6 @@ export class MapDialogLayerExternal extends LitElement {
                     <div class="dropdown-toggle" @click="${this._toggleDropdown}">
                       <span>▼</span>
                     </div>
-                    ${this.showDropdown ? html`
-                      <div class="dropdown-menu show">
-                        ${this.previousServices.map(service => html`
-                          <div class="dropdown-item" @click="${() => this._selectPreviousService(service.url)}">
-                            ${service.title}
-                          </div>
-                        `)}
-                      </div>
-                    ` : ''}
                   </div>
                   
                   <button type="button"
@@ -263,10 +309,38 @@ export class MapDialogLayerExternal extends LitElement {
               </div> <!-- form-group -->
             </form>
             
+            ${this.showDropdown ? this._renderDropdown() : ''}
+            
             <map-service-info .serviceInfo=${this.serviceInfo} @add-layer="${this._handleAddLayer}"></map-service-info>
           </div> <!-- dialog-content -->
         </div> <!-- dialog-window -->
       </div> <!-- overlay -->
+    `;
+  }
+  
+  _renderDropdown() {
+    const style = `top: ${this.dropdownPosition.top}px; left: ${this.dropdownPosition.left}px;`;
+    
+    return html`
+      <div class="dropdown-menu" style="${style}">
+        ${this.previousServices.length === 0 ? 
+          html`<div class="empty-dropdown">No saved services</div>` :
+          this.previousServices.map(service => html`
+            <div class="dropdown-item">
+              <div class="dropdown-item-text" 
+                   title="${service.title}"
+                   @click="${() => this._selectPreviousService(service.url)}">
+                ${service.title}
+              </div>
+              <div class="dropdown-item-remove" 
+                   title="Remove from history"
+                   @click="${(e) => this._removeService(e, service.url)}">
+                ✕
+              </div>
+            </div>
+          `)
+        }
+      </div>
     `;
   }
   
@@ -289,13 +363,54 @@ export class MapDialogLayerExternal extends LitElement {
   
   _toggleDropdown(e) {
     e.stopPropagation();
+    
+    if (!this.showDropdown) {
+      // Calculate dropdown position
+      const toggleButton = e.target.closest('.dropdown-toggle');
+      const rect = toggleButton.getBoundingClientRect();
+      
+      // Position dropdown below the toggle button
+      this.dropdownPosition = {
+        top: rect.bottom + 2,
+        left: rect.left - 200 + rect.width // Align right edge with toggle button
+      };
+      
+      // Ensure dropdown is within viewport
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      // Adjust horizontal position if needed
+      if (this.dropdownPosition.left < 10) {
+        this.dropdownPosition.left = 10;
+      } else if (this.dropdownPosition.left + 250 > viewportWidth - 10) {
+        this.dropdownPosition.left = viewportWidth - 260;
+      }
+      
+      // If dropdown would go below viewport, position it above the button
+      if (this.dropdownPosition.top + 300 > viewportHeight - 10) {
+        this.dropdownPosition.top = rect.top - 302; // Position above with 2px gap
+        
+        // If that would put it above the viewport, cap the height
+        if (this.dropdownPosition.top < 10) {
+          this.dropdownPosition.top = 10;
+          // We'll let the max-height and scrolling handle this case
+        }
+      }
+    }
+    
     this.showDropdown = !this.showDropdown;
   }
   
   _handleClickOutside(e) {
     const path = e.composedPath();
-    const dropdown = this.shadowRoot?.querySelector('.dropdown-container');
-    if (dropdown && !path.includes(dropdown) && this.showDropdown) {
+    const dropdown = this.shadowRoot?.querySelector('.dropdown-menu');
+    const toggleButton = this.shadowRoot?.querySelector('.dropdown-toggle');
+    
+    if (this.showDropdown && 
+        dropdown && 
+        toggleButton && 
+        !path.includes(dropdown) && 
+        !path.includes(toggleButton)) {
       this.showDropdown = false;
       this.requestUpdate();
     }
@@ -307,17 +422,25 @@ export class MapDialogLayerExternal extends LitElement {
     this.requestUpdate();
   }
   
-  _handleAddLayer(e) {
-    // Forward the add-layer event to parent components
-    const detail = e.detail;
-    this.dispatchEvent(new CustomEvent('add-layer', {
-      detail,
-      bubbles: true,
-      composed: true
-    }));
+  _removeService(e, url) {
+    e.stopPropagation(); // Prevent triggering selection
     
-    // Optionally close the dialog after adding a layer
-    // this._close();
+    this.previousServices = this.previousServices.filter(service => service.url !== url);
+    this._saveServices();
+    
+    if (this.previousServices.length === 0) {
+      this.showDropdown = false;
+    }
+    
+    this.requestUpdate();
+  }
+  
+  _handleAddLayer(e) {
+    // Prevent default behavior    
+    e.preventDefault();
+    e.stopPropagation();
+    // Forward the add-layer event to the dialog callback
+    this.addLayerCallback(e);
   }
   
   async _loadService() {
@@ -336,26 +459,33 @@ export class MapDialogLayerExternal extends LitElement {
           // Update service URL if it was redirected
           this.serviceURL = serviceInfo.serviceURL || this.serviceURL;
           
-          // Add to previously used services if not already there
+          // Add to previously used services if not already there and if successful
           const existingIndex = this.previousServices.findIndex(s => s.url === serviceInfo.serviceURL);
+          const serviceTitle = serviceInfo.title || 
+                              (serviceInfo.capabilities?.service?.title) || 
+                              serviceInfo.serviceURL;
           
           if (existingIndex === -1) {
             // Add new service to the beginning of the array
             this.previousServices = [
               { 
-                title: serviceInfo.title || serviceInfo.serviceURL, 
+                title: serviceTitle, 
                 url: serviceInfo.serviceURL 
               },
-              ...this.previousServices.slice(0, 9) // Keep max 10 items
+              ...this.previousServices.slice(0, 19) // Keep max 20 items
             ];
+            this._saveServices();
           } else if (existingIndex > 0) {
             // Move existing service to the top of the list
             const service = this.previousServices[existingIndex];
+            // Update title in case it changed
+            service.title = serviceTitle;
             this.previousServices = [
               service,
               ...this.previousServices.slice(0, existingIndex),
               ...this.previousServices.slice(existingIndex + 1)
             ];
+            this._saveServices();
           }
         }
         
@@ -370,7 +500,8 @@ export class MapDialogLayerExternal extends LitElement {
     }
   }
   
-  showDialog() {
+  showDialog(addLayerCallback) {
+    this.addLayerCallback = addLayerCallback;
     this.serviceError = '';
     this.serviceInfo = {};
     this.active = true;

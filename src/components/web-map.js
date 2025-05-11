@@ -672,10 +672,43 @@ class WebMap extends LitElement {
     this.currentTool = '';
     this.resetLayerList();
   }
-  addExternalLayer(e) {
+  showExternalLayerDialog(e) {
     const MapDialogLayerExternal = this.shadowRoot.querySelector('map-dialog-layer-external');
     if (MapDialogLayerExternal) {
-      MapDialogLayerExternal.showDialog();
+      MapDialogLayerExternal.showDialog((e)=>this.addLayerFromService(e));
+    }
+  }
+  addLayerFromService(e) {
+    const serviceInfo = e.detail.serviceInfo;
+    switch (serviceInfo.type) {
+      case 'WMS':
+        {
+          const layer = e.detail.layer;
+          const layerUrl = new URL(serviceInfo.serviceURL);
+          layerUrl.searchParams.set('layers', layer.name);
+          layerUrl.searchParams.set('bbox', '{bbox-epsg-3857}');
+          layerUrl.searchParams.set('transparent', 'true');
+          const wmsUrl = layerUrl.href.replace('%7Bbbox-epsg-3857%7D', '{bbox-epsg-3857}');
+          const layerInfo = {
+            id: GeoJSON._uuidv4(),
+            type: 'raster',
+            metadata: {
+              wms: true,
+              title: layer.title,
+              abstract: layer.abstract,
+            },
+            source: {
+              type: 'raster',
+              tiles: [layerUrl.href],
+              minzoom: 0,
+              maxzoom: 22
+            },
+          }
+          this.addLayer({detail: layerInfo});
+        }
+        break;
+      default:
+          alert('Unsupported layer type: ${LayerInfo.type}');
     }
   }
   renderToolbarTools()
@@ -735,7 +768,8 @@ class WebMap extends LitElement {
             .search=${layerSearch} 
             @addlayer="${(e) => this.addLayer(e)}" 
             @removelayer="${e=>this.removeLayer(e)}"
-            @addExternalLayer="${e=>this.addExternalLayer(e)}">
+            @addExternalLayer="${e=>this.showExternalLayerDialog(e)}"
+            @addLayerFromService="${e=>this.addLayerFromService(e)}"
           </map-data-catalog>
         </map-panel>
         <map-panel .active="${this.currentTool==='measure'}">

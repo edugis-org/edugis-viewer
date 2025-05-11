@@ -11,7 +11,7 @@
   "repository": "https://github.com/edugis-org/edugis-viewer",
   "scripts": {
     "startold": "web-dev-server --node-resolve --open --watch",
-    "start": "vite --port 8080 --host",
+    "start": "vite --port 8000 --host",
     "build": "rollup -c",
     "test": "npm run test:unit && npm run test:integration",
     "test:integration": "mocha test/integration --timeout=10000",

@@ -187,7 +187,7 @@ export class WmsServiceInfo extends LitElement {
     this.dispatchEvent(new CustomEvent('add-layer', {
       detail: { 
         type: 'WMS',
-        serviceURL: this.serviceInfo.serviceURL,
+        serviceInfo: JSON.parse(JSON.stringify(this.serviceInfo)),
         layer
       },
       bubbles: true,
