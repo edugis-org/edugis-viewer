@@ -704,13 +704,16 @@ class WebMap extends LitElement {
               maxzoom: 22
             },
           }
+          if (e.detail.bbox?.length === 4) {
+            layerInfo.source.bounds = e.detail.bbox;
+          }
           this.addLayer({detail: layerInfo});
         }
         break;
       case 'WMTS':
         {
           const layer = e.detail.layer;
-          const tileUrl = e.detail.tileUrl;
+          const tileUrl = e.detail.tileUrl;          
           const layerInfo = {
             id: GeoJSON._uuidv4(),
             type: 'raster',
@@ -724,6 +727,12 @@ class WebMap extends LitElement {
               minzoom: 0,
               maxzoom: 22
             },
+          }
+          if (e.detail.legendUrl) {
+            layerInfo.metadata.legendurl = e.detail.legendUrl;
+          }
+          if (e.detail.bbox?.length === 4) {
+            layerInfo.source.bounds = e.detail.bbox;
           }
           this.addLayer({detail: layerInfo});
         }

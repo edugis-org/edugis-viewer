@@ -184,11 +184,24 @@ export class WmsServiceInfo extends LitElement {
   
   _addLayer(layer) {
     // Dispatch an event that the parent can listen for
+    let bbox = [];
+    if (layer.boundingBox) {
+      if (layer.boundingBox.geographic) {
+        const geo = layer.boundingBox.geographic;
+        bbox = [geo.minx, geo.miny, geo.maxx, geo.maxy];
+      } else {
+        const geo = layer.boundingBox.boundingBoxes?.filter(bbox=> bbox.crs === 'EPSG:4326' || bbox.crs === 'CRS:84')[0];
+        if (geo) {
+          bbox = [geo.minx, geo.miny, geo.maxx, geo.maxy];
+        }        
+      }
+    }
     this.dispatchEvent(new CustomEvent('add-layer', {
       detail: { 
         type: 'WMS',
         serviceInfo: JSON.parse(JSON.stringify(this.serviceInfo)),
-        layer
+        layer,
+        bbox
       },
       bubbles: true,
       composed: true

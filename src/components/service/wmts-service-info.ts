@@ -273,13 +273,21 @@ export class WmtsServiceInfo extends LitElement {
     if (!tileUrl) {
       alert(`Tile URL not found for layer: ${layer.identifier}`);
       return;
-    } 
+    }
+    let bbox = [];
+    if (layer.bounds?.lowerCorner && layer.bounds?.upperCorner) {
+      layer.bounds.lowerCorner = layer.bounds.lowerCorner.map(coord => parseFloat(coord));
+      bbox = [...layer.bounds.lowerCorner.map(coord=>parseFloat(coord)), ...layer.bounds.upperCorner.map(coord=>parseFloat(coord))];
+    }
+    let legendUrl = layer.styles?.[0]?.legendURL?.href || ''; 
     this.dispatchEvent(new CustomEvent('add-layer', {
       detail: { 
         type: 'WMTS',
         serviceInfo: JSON.parse(JSON.stringify(this.serviceInfo)),
         layer,
-        tileUrl: tileUrl
+        tileUrl: tileUrl,
+        legendUrl: legendUrl,
+        bbox: bbox
       },
       bubbles: true,
       composed: true
