@@ -346,6 +346,7 @@ export class MapDialogLayerExternal extends LitElement {
   }
   
   _handleInputChange(e) {
+    this.serviceInfo = {};
     this.serviceURL = e.target.value;
   }
   
@@ -437,7 +438,7 @@ export class MapDialogLayerExternal extends LitElement {
   _selectPreviousService(url) {
     this.serviceURL = url;
     this.showDropdown = false;
-    this.requestUpdate();
+    this._loadService();
   }
   
   _removeService(e, url) {

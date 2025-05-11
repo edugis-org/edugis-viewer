@@ -242,13 +242,44 @@ export class WmtsServiceInfo extends LitElement {
     `;
   }
   
+  _getTileUrl(serviceInfo, layer) {
+    // Construct the tile URL based on the service info and layer
+    // 1. get the tilematrix set for EPSG:3857
+    let tileMatrixSetName = '';
+    for (const tileMatrixSet in serviceInfo.capabilities?.contents?.tileMatrixSets || {}) {
+      const supportedCRS = serviceInfo.capabilities?.contents?.tileMatrixSets[tileMatrixSet]?.supportedCRS || [];
+      if (supportedCRS.includes('EPSG::3857') || supportedCRS.includes('EPSG:900913')) {
+        tileMatrixSetName = serviceInfo.capabilities?.contents?.tileMatrixSets[tileMatrixSet]?.identifier || tileMatrixSet;
+        break;
+      }
+    }
+    // 2 get the template url for the layer tilematrix set
+    const templateUrl = layer.resourceUrls?.filter(resource=> resource.resourceType === 'tile')[0]?.template;
+    // 3 replace by {x}, {y}, {z} in the template url
+    if (!templateUrl) {
+      console.error('No template URL found for layer:', layer);
+      return '';
+    }
+    let tileUrl = templateUrl.replace('{TileMatrixSet}', tileMatrixSetName);
+    tileUrl = tileUrl.replace('{TileMatrix}', '{z}');
+    tileUrl = tileUrl.replace('{TileRow}', '{y}');
+    tileUrl = tileUrl.replace('{TileCol}', '{x}');
+    return tileUrl;
+  }
+
   _addLayer(layer) {
     // Dispatch an event that the parent can listen for
+    const tileUrl = this._getTileUrl(this.serviceInfo, layer);
+    if (!tileUrl) {
+      alert(`Tile URL not found for layer: ${layer.identifier}`);
+      return;
+    } 
     this.dispatchEvent(new CustomEvent('add-layer', {
       detail: { 
         type: 'WMTS',
         serviceInfo: JSON.parse(JSON.stringify(this.serviceInfo)),
-        layer
+        layer,
+        tileUrl: tileUrl
       },
       bubbles: true,
       composed: true
