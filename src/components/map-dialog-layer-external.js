@@ -227,8 +227,6 @@ export class MapDialogLayerExternal extends LitElement {
     // Load saved services from localStorage
     this._loadSavedServices();
     
-    // Click outside handler for dropdown
-    this._handleClickOutside = this._handleClickOutside.bind(this);
   }
   
   _loadSavedServices() {
@@ -257,24 +255,14 @@ export class MapDialogLayerExternal extends LitElement {
     }
   }
   
-  connectedCallback() {
-    super.connectedCallback();
-    document.addEventListener('click', this._handleClickOutside);
-  }
-  
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    document.removeEventListener('click', this._handleClickOutside);
-  }
-  
   render() {
     if (!this.active) {
       return html``;
     }
     
     return html`
-      <div id="overlay">
-        <div id="dialog-window" @click="${e => e.stopPropagation()}">
+      <div id="overlay" @click="${(e)=>this._handleClickOutside(e)}">
+        <div id="dialog-window">
           <div id="dialog-header">
             <div id="dialog-title">Add External Layer</div>
             <div @click="${e => this._close(e)}" id="closebutton">×</div>
@@ -401,16 +389,24 @@ export class MapDialogLayerExternal extends LitElement {
     this.showDropdown = !this.showDropdown;
   }
   
-  _handleClickOutside(e) {
-    const path = e.composedPath();
-    const dropdown = this.shadowRoot?.querySelector('.dropdown-menu');
-    const toggleButton = this.shadowRoot?.querySelector('.dropdown-toggle');
+  _handleClickOutside(e) {    
+    if (!this.showDropdown) {
+      return; // Do nothing if dropdown is not shown
+    }
     
-    if (this.showDropdown && 
-        dropdown && 
-        toggleButton && 
-        !path.includes(dropdown) && 
-        !path.includes(toggleButton)) {
+    // Get click path
+    const path = e.composedPath();
+    
+    // Check if click is inside dropdown or toggle button
+    const isClickInsideDropdown = path.some(el => 
+      el.classList && (
+        el.classList.contains('dropdown-toggle') || 
+        el.classList.contains('dropdown-menu')
+      )
+    );
+    
+    if (!isClickInsideDropdown) {
+      // Click was outside dropdown, so hide it
       this.showDropdown = false;
       this.requestUpdate();
     }
