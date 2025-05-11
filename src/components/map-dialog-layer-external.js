@@ -307,7 +307,7 @@ export class MapDialogLayerExternal extends LitElement {
   }
   
   _renderDropdown() {
-    const style = `top: ${this.dropdownPosition.top}px; left: ${this.dropdownPosition.left}px;`;
+    const style = `top: ${this.dropdownPosition.top}px; left: ${this.dropdownPosition.left}px; max-height: ${this.dropdownPosition.maxHeight}px;`;
     
     return html`
       <div class="dropdown-menu" style="${style}">
@@ -316,13 +316,13 @@ export class MapDialogLayerExternal extends LitElement {
           this.previousServices.map(service => html`
             <div class="dropdown-item">
               <div class="dropdown-item-text" 
-                   title="${service.title}"
-                   @click="${() => this._selectPreviousService(service.url)}">
+                  title="${service.title}"
+                  @click="${() => this._selectPreviousService(service.url)}">
                 ${service.title}
               </div>
               <div class="dropdown-item-remove" 
-                   title="Remove from history"
-                   @click="${(e) => this._removeService(e, service.url)}">
+                  title="Remove from history"
+                  @click="${(e) => this._removeService(e, service.url)}">
                 ✕
               </div>
             </div>
@@ -330,7 +330,7 @@ export class MapDialogLayerExternal extends LitElement {
         }
       </div>
     `;
-  }
+}
   
   _renderFieldHeader(label, forId) {
     return html`
@@ -371,9 +371,7 @@ export class MapDialogLayerExternal extends LitElement {
       const urlInputRect = urlInput.getBoundingClientRect();
       
       // Calculate dropdown width based on the dialog width for maximum space
-      // Make it wider to show more of the service titles
       const dialogContentWidth = dialogRect.width - 40; // Subtract margins
-      // Use a percentage of the available dialog content width, but no less than URL input width
       const dropdownWidth = Math.min(dialogContentWidth * 0.9, Math.max(urlInputRect.width, 400));
       
       // Position dropdown initially aligned with input left edge
@@ -394,24 +392,52 @@ export class MapDialogLayerExternal extends LitElement {
         left: leftPos
       };
       
-      // Ensure dropdown is within viewport height
+      // Calculate available space below the dropdown
       const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom - 10; // 10px bottom margin
       
-      // If dropdown would go below viewport, position it above the button
-      if (this.dropdownPosition.top + 300 > viewportHeight - 10) {
-        this.dropdownPosition.top = rect.top - 302; // Position above with 2px gap
-        
-        // If that would put it above the viewport, cap the height
-        if (this.dropdownPosition.top < 10) {
-          this.dropdownPosition.top = 10;
-          // We'll let the max-height and scrolling handle this case
+      // Calculate available space above the dropdown
+      const spaceAbove = rect.top - 10; // 10px top margin
+      
+      // Define a minimum height for the dropdown
+      const minDropdownHeight = 100; // In pixels
+      
+      // Define a preferred maximum height (for very large spaces)
+      const preferredMaxHeight = Math.min(400, Math.max(spaceBelow, spaceAbove)); 
+      
+      let maxHeight, dropdownTop;
+      
+      // Determine if dropdown should go below or above the button
+      if (spaceBelow >= minDropdownHeight) {
+        // Position below with calculated max height
+        dropdownTop = rect.bottom + 2;
+        maxHeight = Math.min(spaceBelow, preferredMaxHeight);
+      } else if (spaceAbove >= minDropdownHeight) {
+        // Position above with calculated max height
+        dropdownTop = rect.top - 2 - Math.min(spaceAbove, preferredMaxHeight);
+        maxHeight = Math.min(spaceAbove, preferredMaxHeight);
+      } else {
+        // Not enough space above or below, use the larger of the two
+        if (spaceBelow >= spaceAbove) {
+          dropdownTop = rect.bottom + 2;
+          maxHeight = spaceBelow;
+        } else {
+          dropdownTop = Math.max(10, rect.top - 2 - spaceAbove);
+          maxHeight = spaceAbove;
         }
       }
+      
+      // Update position with calculated values
+      this.dropdownPosition = {
+        top: dropdownTop,
+        left: leftPos,
+        maxHeight: maxHeight // Add maxHeight to the position object
+      };
     }
     
     this.showDropdown = !this.showDropdown;
   }
-  
+
   _handleClickOutside(e) {    
     if (!this.showDropdown) {
       return; // Do nothing if dropdown is not shown
