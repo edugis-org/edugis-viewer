@@ -104,23 +104,56 @@ interface InheritedProps {
 function parseLayers(capabilityElement: Element, rootProps: InheritedProps = {}): Layer[] {
   const layers: Layer[] = [];
   
+  // Use Sets for more efficient deduplication of CRS values
   function parseLayer(layerElement: Element, inheritedProps: InheritedProps = {}): void {
+    // Get layer's own CRS values
     const layerCRS = Array.from(layerElement.children)
       .filter(el => el.localName === 'CRS' || el.localName === 'SRS')
       .map(crs => crs.textContent?.trim())
       .filter((crs): crs is string => !!crs);
-
-    const crs = [
-      ...(inheritedProps.crs || []),
-      ...(rootProps.crs || []),
-      ...layerCRS
-    ].filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates (keep only first occurrences)
-
-    const styles = [
-      ...(inheritedProps.styles || []),
-      ...parseStyles(layerElement)
-    ];
-
+    
+    // Use a Set for efficient deduplication
+    const crsSet = new Set<string>();
+    
+    // Add inherited CRS first (preserves order)
+    if (inheritedProps.crs) {
+      for (const crs of inheritedProps.crs) {
+        crsSet.add(crs);
+      }
+    }
+    
+    // Add root CRS
+    if (rootProps.crs) {
+      for (const crs of rootProps.crs) {
+        crsSet.add(crs);
+      }
+    }
+    
+    // Add layer's own CRS
+    for (const crs of layerCRS) {
+      crsSet.add(crs);
+    }
+    
+    // Convert back to array only once
+    const uniqueCrs = Array.from(crsSet);
+    
+    // For styles, only create a new array if we're adding to it
+    let styles: Style[];
+    const newStyles = parseStyles(layerElement);
+    
+    if (inheritedProps.styles && inheritedProps.styles.length > 0) {
+      if (newStyles.length > 0) {
+        // Only create a new array if we need to combine
+        styles = [...inheritedProps.styles, ...newStyles];
+      } else {
+        // Reuse the inherited array directly
+        styles = inheritedProps.styles;
+      }
+    } else {
+      styles = newStyles;
+    }
+    
+    // Rest of the original code...
     let maxScaleDenominator: number | null = parseFloat(getElementText(layerElement, "MaxScaleDenominator") || "NaN");
     let minScaleDenominator: number | null = parseFloat(getElementText(layerElement, "MinScaleDenominator") || "NaN");
 
@@ -143,10 +176,10 @@ function parseLayers(capabilityElement: Element, rootProps: InheritedProps = {})
       title: getElementText(layerElement, "Title"),
       abstract: getElementText(layerElement, "Abstract"),
       keywords: parseKeywords(layerElement),
-      crs: crs,
+      crs: uniqueCrs,  // Use our efficiently deduplicated array
       boundingBox: parseBoundingBox(layerElement) || inheritedProps.boundingBox || null,
       attribution: parseAttribution(layerElement) || inheritedProps.attribution || null,
-      styles: styles,
+      styles: styles,  // Use our efficiently handled styles
       metadataURLs: parseMetadataURLs(layerElement) || inheritedProps.metadataURLs || [],
       dimensions: parseDimensions(layerElement) || inheritedProps.dimensions || [],
       maxScaleDenominator,
@@ -154,9 +187,10 @@ function parseLayers(capabilityElement: Element, rootProps: InheritedProps = {})
       queryable: layerElement.getAttribute("queryable") === "1"
     };
 
+    // For inherited properties, avoid creating new objects if possible
     const propsToInherit: InheritedProps = {
-      crs: layer.crs,
-      styles: layer.styles,
+      crs: uniqueCrs,
+      styles: styles,
       boundingBox: layer.boundingBox,
       attribution: layer.attribution,
       metadataURLs: layer.metadataURLs,
@@ -167,6 +201,7 @@ function parseLayers(capabilityElement: Element, rootProps: InheritedProps = {})
       layers.push(layer);
     }
 
+    // Process child layers with optimized inherited props
     for (const child of Array.from(layerElement.children)) {
       if (child.localName === 'Layer') {
         parseLayer(child, propsToInherit);
@@ -174,9 +209,10 @@ function parseLayers(capabilityElement: Element, rootProps: InheritedProps = {})
     }
   }
 
+  // Start processing from top-level layers
   for (const child of Array.from(capabilityElement.children)) {
     if (child.localName === 'Layer') {
-      parseLayer(child);
+      parseLayer(child, rootProps);
     }
   }
   
