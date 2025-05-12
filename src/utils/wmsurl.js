@@ -34,6 +34,7 @@ export function wmsUrl(baseUrl, request)
             wmsParameters.push(["QUERY_LAYERS", ""]);
             wmsParameters.push(["FORMAT", "image/png"]);
             wmsParameters.push(["STYLES", ""]);
+            wmsRemoveParameters.push(...["BBOX","SRS","WIDTH","HEIGHT"]);
             break;
     }
     const urlInfo = new URL(baseUrl);

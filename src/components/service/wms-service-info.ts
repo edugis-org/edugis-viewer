@@ -2,6 +2,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ServiceInfoType } from './map-service-info';
+import { coordProject } from '@edugis/proj-convert';
 
 @customElement('wms-service-info')
 export class WmsServiceInfo extends LitElement {
@@ -182,6 +183,7 @@ export class WmsServiceInfo extends LitElement {
     `;
   }
   
+
   _addLayer(layer) {
     // Dispatch an event that the parent can listen for
     let bbox = [];
@@ -193,7 +195,20 @@ export class WmsServiceInfo extends LitElement {
         const geo = layer.boundingBox.boundingBoxes?.filter(bbox=> bbox.crs === 'EPSG:4326' || bbox.crs === 'CRS:84')[0];
         if (geo) {
           bbox = [geo.minx, geo.miny, geo.maxx, geo.maxy];
-        }        
+        } else {
+          if (layer.boundingBox.boundingBoxes) {
+            for (const capsBbox of layer.boundingBox.boundingBoxes) {
+              if (typeof capsBbox.minx === 'number' && typeof capsBbox.miny === 'number' && typeof capsBbox.maxx === 'number' && typeof capsBbox.maxy === 'number') {
+                const ll = coordProject([capsBbox.minx, capsBbox.miny], capsBbox.crs, 'EPSG:4326');
+                const tr = coordProject([capsBbox.maxx,capsBbox.maxy], capsBbox.crs, 'EPSG:4326');
+                if (ll && tr) {
+                  bbox = [ll[0], ll[1], tr[0], tr[1]];            
+                  break;
+                }
+              }
+            }
+          }
+        }    
       }
     }
     this.dispatchEvent(new CustomEvent('add-layer', {

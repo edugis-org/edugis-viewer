@@ -678,7 +678,21 @@ class WebMap extends LitElement {
       MapDialogLayerExternal.showDialog((e)=>this.addLayerFromService(e));
     }
   }
-  addLayerFromService(e) {
+
+  async testLegendUrl(url) {
+    try {
+      const response = await fetch(url, {method: 'HEAD'});
+      if (response.ok) {
+        if (response.headers.get('content-type').includes('image')) {
+          return url;
+        }
+      } 
+    } catch (error) {
+      console.error('Error fetching legend URL:', error.message);
+    }
+    return '';
+  }
+  async addLayerFromService(e) {
     const serviceInfo = e.detail.serviceInfo;
     switch (serviceInfo.type) {
       case 'WMS':
@@ -688,7 +702,8 @@ class WebMap extends LitElement {
           layerUrl.searchParams.set('layers', layer.name);
           layerUrl.searchParams.set('bbox', '{bbox-epsg-3857}');
           layerUrl.searchParams.set('transparent', 'true');
-          const wmsUrl = layerUrl.href.replace('%7Bbbox-epsg-3857%7D', '{bbox-epsg-3857}');
+          const wmsMapUrl = layerUrl.href.replace('%7Bbbox-epsg-3857%7D', '{bbox-epsg-3857}');
+          const legendUrl = await this.testLegendUrl(wmsUrl(wmsMapUrl, 'getlegendgraphic'));
           const layerInfo = {
             id: GeoJSON._uuidv4(),
             type: 'raster',
@@ -696,10 +711,11 @@ class WebMap extends LitElement {
               wms: true,
               title: layer.title,
               abstract: layer.abstract,
+              legendurl: legendUrl,
             },
             source: {
               type: 'raster',
-              tiles: [layerUrl.href],
+              tiles: [wmsMapUrl],
               minzoom: 0,
               maxzoom: 22
             },
