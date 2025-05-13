@@ -149,6 +149,9 @@ export async function serviceGetWMTSCapabilities(url) {
       result.serviceURL = url;
       try {
         let response = await fetch(url, { method: 'HEAD' });
+        if (!response.ok && response.status === 405) {            
+            response = await fetch(url, { method: 'GET' });
+        }
         if (!response.ok) {
           result.error = `Service not reachable: ${response.statusText}`;
           if (withStyle) {

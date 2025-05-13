@@ -682,6 +682,9 @@ class WebMap extends LitElement {
   async testLegendUrl(url) {
     try {
       const response = await fetch(url, {method: 'HEAD'});
+      if (!response.ok && response.status === 405) { // 405 Method Not Allowed   
+        const response = await fetch(url, {method: 'GET'});
+      }
       if (response.ok) {
         if (response.headers.get('content-type').includes('image')) {
           return url;

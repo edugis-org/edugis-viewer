@@ -37,8 +37,6 @@ export async function loadService(url) {
     const serviceUrl = validateURL(url);
     serviceInfo.serviceURL = serviceUrl.href;
     // Check if the URL is valid and accessible
-    const response = await fetch(serviceUrl.href, { method: 'HEAD' });
-    // Ignore 404 errors, check if the URL is a WMS service
     const WMSServiceInfo = await serviceGetWMSCapabilities(serviceUrl.href);
     if (!WMSServiceInfo.error) {
       return WMSServiceInfo;
