@@ -81,10 +81,9 @@ function wmtsCapbilitiesURL(url, withStyle = false) {
     if (baseWmtsUrl === null) {
       return null; // not a valid WMTS base URL
     }
-    const baseUrlObj = new URL(baseWmtsUrl);    
-    baseUrlObj.search = '';
-    baseUrlObj.searchParams.set('service', 'WMTS');
-    baseUrlObj.searchParams.set('request', 'GetCapabilities');
+    const baseUrlObj = new URL(baseWmtsUrl);
+    // default to REST capabilities
+    baseUrlObj.pathname = baseUrlObj.pathname.replace(/\/$/, '') + '/WMTSCapabilities.xml';
     return baseUrlObj.href;    
   } catch (error) {
     console.error(`Error creating WMTS capabilities URL: ${error.message}`);
