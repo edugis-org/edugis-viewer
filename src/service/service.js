@@ -48,5 +48,8 @@ export async function loadService(url) {
   } catch (error) {
     serviceInfo.error = `Error accessing service: ${error.message}`;
   }
+  if (!serviceInfo.error) {
+    serviceInfo.error = 'Unknown service type or error';
+  }
   return serviceInfo;
 }
