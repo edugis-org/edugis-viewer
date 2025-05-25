@@ -73,11 +73,13 @@ export async function serviceGetWMSCapabilities(url) {
       const contentType = response.headers.get('Content-Type');
       if (!contentType || !contentType.includes('xml')) {
         result.error = `Invalid content type: ${contentType}`;
+        result.body?.cancel();
         return result;
       }
       const contentLength = response.headers.get('Content-Length');
       if (contentLength && parseInt(contentLength) > 5000000) {
         result.error = `Content too large: ${contentLength} bytes`;
+        result.body?.cancel();
         return result;
       }
       const capabilitiesXML = await response.text();

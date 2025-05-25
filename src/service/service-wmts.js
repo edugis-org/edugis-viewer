@@ -53,7 +53,7 @@ function inferWMTSBaseUrl(tileUrl, withStyle) {
   }
 }
 
-function wmtsCapbilitiesURL(url, withStyle = false) {
+function wmtsCapbilitiesURL(url, withStyle = false, withVersion = false) {
   // the given WMTS url can either be:
   // the base URL of the service (e.g. https://example.com/wmts/v2.0)
   // or a KVP request (e.g. https://example.com/wmts/v2.0?service=WMTS&request=GetCapabilities)
@@ -69,13 +69,22 @@ function wmtsCapbilitiesURL(url, withStyle = false) {
       // a REST Capabilities request
       return urlObj.href;
     }
-    if (urlObj.searchParams.has('service') && 
-        urlObj.searchParams.get('service').toLowerCase() === 'wmts') {
-          // a KVP request url
-          urlObj.search = '';
-          urlObj.searchParams.set('service', 'WMTS');
-          urlObj.searchParams.set('request', 'GetCapabilities');
-          return urlObj.href;
+    // iterate urlObj.searchParams
+    for (const [key, value] of urlObj.searchParams) {
+      if (key.toLowerCase() === 'service' && value.toLowerCase() === 'wmts' ||
+        key.toLowerCase() === 'request' && value.toLowerCase() === 'getcapabilities') {    
+        // a KVP request url
+        const removeParams = ['service', 'request', 'version'];
+        const searchParams = Array.from(urlObj.searchParams.keys());
+        for (const paramName of searchParams) {
+          if (removeParams.includes(paramName.toLowerCase())) {
+            urlObj.searchParams.delete(paramName);
+          }
+        }
+        urlObj.searchParams.set('service', 'WMTS');
+        urlObj.searchParams.set('request', 'GetCapabilities');
+        return urlObj.href;
+      }
     }
     const baseWmtsUrl = inferWMTSBaseUrl(urlObj.href, withStyle);
     if (baseWmtsUrl === null) {
@@ -83,7 +92,7 @@ function wmtsCapbilitiesURL(url, withStyle = false) {
     }
     const baseUrlObj = new URL(baseWmtsUrl);
     // default to REST capabilities
-    baseUrlObj.pathname = baseUrlObj.pathname.replace(/\/$/, '') + '/WMTSCapabilities.xml';
+    baseUrlObj.pathname = baseUrlObj.pathname.replace(/\/$/, '') + `${withVersion? '/1.0.0' : ''}` + '/WMTSCapabilities.xml';
     return baseUrlObj.href;    
   } catch (error) {
     console.error(`Error creating WMTS capabilities URL: ${error.message}`);
@@ -126,7 +135,13 @@ function baseURLFromCapabilitiesURL(url) {
       }
       return urlObj.href;
     }
-    urlObj.search = '';
+    const removeParams = ['service', 'request', 'version', 'tilerow', 'tilecol', 'tilematrix', 'tilematrixset', 'style', 'format', 'layer'];
+    const searchParams = Array.from(urlObj.searchParams.keys());
+    for (const paramName of searchParams) {
+      if (removeParams.includes(paramName.toLowerCase())) {
+        urlObj.searchParams.delete(paramName);
+      }
+    }
     return urlObj.href;
   } catch (error) {
     console.error(`Error creating base URL from capabilities URL: ${error.message}`);
@@ -142,49 +157,52 @@ export async function serviceGetWMTSCapabilities(url) {
     capabilities: null,
     error: null
   }
-  for (const withStyle of [false, true]) {
-    url = wmtsCapbilitiesURL(url, withStyle);
-    if (url) {
-      result.serviceURL = url;
-      try {
-        let response = await fetch(url, { method: 'GET' });
-        if (!response.ok) {
-          result.error = `Service not reachable: ${response.statusText}`;
-          if (withStyle) {
-            return result;
-          } else {
-            continue;
+  for (const withVersion of [false, true]) {
+    for (const withStyle of [false, true]) {
+      const testUrl = wmtsCapbilitiesURL(url, withStyle, withVersion);
+      if (testUrl) {
+        result.serviceURL = testUrl;
+        try {
+          let response = await fetch(testUrl, { method: 'GET' });
+          if (!response.ok) {
+            result.error = `Service not reachable: ${response.statusText}`;
+            if (withStyle && withVersion) {
+              return result;
+            } else {
+              continue;
+            }
           }
-        }
-        // Check content type and possibly content-length
-        const contentType = response.headers.get('Content-Type');
-        if (!contentType || !contentType.includes('xml')) {
-          result.error = `Invalid content type: ${contentType}`;
-          response.body?.cancel();
-          if (withStyle) {
-            return result;
-          } else {
-            continue;
+          // Check content type and possibly content-length
+          const contentType = response.headers.get('Content-Type');
+          if (!contentType || !contentType.includes('xml')) {
+            result.error = `Invalid content type: ${contentType}`;
+            response.body?.cancel();
+            if (withStyle && withVersion) {
+              return result;
+            } else {
+              continue;
+            }
           }
-        }
-        const contentLength = response.headers.get('Content-Length');
-        if (contentLength && parseInt(contentLength) > 5000000) {
-          result.error = `Content too large: ${contentLength} bytes`;
-          response.body?.cancel();
+          const contentLength = response.headers.get('Content-Length');
+          if (contentLength && parseInt(contentLength) > 5000000) {
+            result.error = `Content too large: ${contentLength} bytes`;
+            response.body?.cancel();
+            return result;
+          }
+          const capabilitiesXML = await response.text();
+          const capabilities = parseWMTSCapabilities(capabilitiesXML);
+          result.type = 'WMTS';
+          result.capabilities = capabilities;
+          result.serviceURL = baseURLFromCapabilitiesURL(result.serviceURL);
+          result.serviceTitle = capabilities?.serviceIdentification?.title || result.serviceURL;
+          result.error = null;
           return result;
+        } catch (error) {      
+          result.error = `Error fetching WMTS capabilities: ${error.message}`;
         }
-        const capabilitiesXML = await response.text();
-        const capabilities = parseWMTSCapabilities(capabilitiesXML);
-        result.type = 'WMTS';
-        result.capabilities = capabilities;
-        result.serviceURL = baseURLFromCapabilitiesURL(result.serviceURL);
-        result.serviceTitle = capabilities?.serviceIdentification?.title || result.serviceURL;
-        return result;
-      } catch (error) {      
-        result.error = `Error fetching WMTS capabilities: ${error.message}`;
+      } else {
+        result.error = 'Invalid URL for WMTS capabilities.';
       }
-    } else {
-      result.error = 'Invalid URL for WMTS capabilities.';
     }
   }
   return result;

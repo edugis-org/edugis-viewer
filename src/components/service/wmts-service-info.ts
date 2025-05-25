@@ -247,18 +247,31 @@ export class WmtsServiceInfo extends LitElement {
     // 1. get the tilematrix set for EPSG:3857
     let tileMatrixSetName = '';
     for (const tileMatrixSet in serviceInfo.capabilities?.contents?.tileMatrixSets || {}) {
-      const supportedCRS = serviceInfo.capabilities?.contents?.tileMatrixSets[tileMatrixSet]?.supportedCRS || [];
-      if (supportedCRS.includes('EPSG::3857') || supportedCRS.includes('EPSG:900913')) {
+      let supportedCRS = serviceInfo.capabilities?.contents?.tileMatrixSets[tileMatrixSet]?.supportedCRS || [];
+      if (!Array.isArray(supportedCRS)) {
+        supportedCRS = [supportedCRS];
+      }
+      if (supportedCRS.includes('EPSG:3857') || supportedCRS.includes('EPSG:900913')) {
         tileMatrixSetName = serviceInfo.capabilities?.contents?.tileMatrixSets[tileMatrixSet]?.identifier || tileMatrixSet;
         break;
       }
     }
     // 2 get the template url for the layer tilematrix set
-    const templateUrl = layer.resourceUrls?.filter(resource=> resource.resourceType === 'tile')[0]?.template;
+    let templateUrl = layer.resourceUrls?.filter(resource=> resource.resourceType === 'tile')[0]?.template;
     // 3 replace by {x}, {y}, {z} in the template url
     if (!templateUrl) {
-      console.error('No template URL found for layer:', layer);
-      return '';
+      const templateUrl = new URL(serviceInfo.serviceURL)
+      templateUrl.searchParams.set('tileMatrixSet', tileMatrixSetName);
+      templateUrl.searchParams.set('TileMatrix', '{z}');
+      templateUrl.searchParams.set('TileCol', '{x}');
+      templateUrl.searchParams.set('TileRow', '{y}');
+      templateUrl.searchParams.set('Service', 'WMTS');
+      templateUrl.searchParams.set('Request', 'GetTile');
+      templateUrl.searchParams.set('format', layer.formats?.[0]);
+      templateUrl.searchParams.set('Layer', layer.identifier);
+      templateUrl.searchParams.set('Version', serviceInfo.capabilities?.version || '1.0.0');
+      templateUrl.searchParams.set('Style', layer.styles?.[0]?.identifier || 'default');
+      return templateUrl.href.replace(/%7B/g, '{').replace(/%7D/g, '}');
     }
     let tileUrl = templateUrl.replace('{TileMatrixSet}', tileMatrixSetName);
     tileUrl = tileUrl.replace('{TileMatrix}', '{z}');

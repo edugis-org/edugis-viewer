@@ -1,6 +1,21 @@
 import {LitElement, html, css} from 'lit';
 import {loadService} from '../service/service.js';
 import './service/map-service-info';
+import psl from 'psl';
+
+
+function getBaseName(url) {
+  try {
+    const urlObj = new URL(url);
+    // Use psl to get the base domain
+    const parsed = psl.parse(urlObj.hostname);
+    return parsed ? parsed.domain : urlObj.hostname;
+  } catch (error) {
+    console.error(`Error parsing URL: ${error.message}`);
+    return url; // Fallback to the original URL if parsing fails
+  }
+}
+
 
 /**
 * @polymer
@@ -237,7 +252,7 @@ export class MapDialogLayerExternal extends LitElement {
       } else {
         // Default services as fallback
         this.previousServices = [
-          { title: "Landelijke Voorziening Beeldmateriaal", url: "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0" }
+          { title: "pdok.nl: Landelijke Voorziening Beeldmateriaal", url: "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0" }
         ];
         this._saveServices();
       }
@@ -506,15 +521,15 @@ export class MapDialogLayerExternal extends LitElement {
           
           // Add to previously used services if not already there and if successful
           const existingIndex = this.previousServices.findIndex(s => s.url === serviceInfo.serviceURL);
-          const serviceTitle = serviceInfo.serviceTitle || 
-                              (serviceInfo.capabilities?.service?.title) || 
-                              serviceInfo.serviceURL;
+          let title = getBaseName(serviceInfo.serviceURL) +': ' +
+             serviceInfo.serviceTitle || serviceInfo.capabilities?.service?.title || serviceInfo.serviceURL;
+          const serviceTitle = title;
           
           if (existingIndex === -1) {
             // Add new service to the beginning of the array
             this.previousServices = [
               { 
-                title: serviceTitle, 
+                title: serviceTitle,
                 url: serviceInfo.serviceURL 
               },
               ...this.previousServices.slice(0, 19) // Keep max 20 items
