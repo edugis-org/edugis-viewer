@@ -243,7 +243,16 @@ export class WmtsServiceInfo extends LitElement {
   }
   
   _getTileUrl(serviceInfo, layer) {
-    // Construct the tile URL based on the service info and layer
+    // utility function to check if the CRS is Web Mercator
+    function isWebMercator(crs) {
+      const normalizedCRS = crs.toLowerCase();
+      if (normalizedCRS === 'epsg:3857' || normalizedCRS === 'epsg:900913') {
+        return true;
+      }
+      // URN format with optional version: urn:ogc:def:crs:EPSG:[version:]code
+      const urnPattern = /^urn:ogc:def:crs:epsg:(?:\d+(?:\.\d+)?:)?(3857|900913)$/i;
+      return urnPattern.test(normalizedCRS);
+    }
     // 1. get the tilematrix set for EPSG:3857
     let tileMatrixSetName = '';
     for (const tileMatrixSet in serviceInfo.capabilities?.contents?.tileMatrixSets || {}) {
@@ -251,7 +260,7 @@ export class WmtsServiceInfo extends LitElement {
       if (!Array.isArray(supportedCRS)) {
         supportedCRS = [supportedCRS];
       }
-      if (supportedCRS.includes('EPSG:3857') || supportedCRS.includes('EPSG:900913')) {
+      if (supportedCRS.some(crs => isWebMercator(crs))) {
         tileMatrixSetName = serviceInfo.capabilities?.contents?.tileMatrixSets[tileMatrixSet]?.identifier || tileMatrixSet;
         break;
       }
