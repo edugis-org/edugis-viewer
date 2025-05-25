@@ -64,10 +64,7 @@ export async function serviceGetWMSCapabilities(url) {
   if (url) {
     result.serviceURL = url;
     try {
-      let response = await fetch(url, { method: 'HEAD' });
-      if (!response.ok && response.status === 405) {
-        response = await fetch(url, { method: 'GET' });
-      }
+      let response = await fetch(url, { method: 'GET' });
       if (!response.ok) {      
         result.error = `Service not reachable: ${response.statusText}`;
         return result;
@@ -83,7 +80,6 @@ export async function serviceGetWMSCapabilities(url) {
         result.error = `Content too large: ${contentLength} bytes`;
         return result;
       }
-      response = await fetch(url, { method: 'GET' });
       const capabilitiesXML = await response.text();
       const capabilities = parseWMSCapabilities(capabilitiesXML);
       result.type = 'WMS';

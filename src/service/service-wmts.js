@@ -147,10 +147,7 @@ export async function serviceGetWMTSCapabilities(url) {
     if (url) {
       result.serviceURL = url;
       try {
-        let response = await fetch(url, { method: 'HEAD' });
-        if (!response.ok && response.status === 405) {            
-            response = await fetch(url, { method: 'GET' });
-        }
+        let response = await fetch(url, { method: 'GET' });
         if (!response.ok) {
           result.error = `Service not reachable: ${response.statusText}`;
           if (withStyle) {
@@ -163,6 +160,7 @@ export async function serviceGetWMTSCapabilities(url) {
         const contentType = response.headers.get('Content-Type');
         if (!contentType || !contentType.includes('xml')) {
           result.error = `Invalid content type: ${contentType}`;
+          response.body?.cancel();
           if (withStyle) {
             return result;
           } else {
@@ -172,9 +170,9 @@ export async function serviceGetWMTSCapabilities(url) {
         const contentLength = response.headers.get('Content-Length');
         if (contentLength && parseInt(contentLength) > 5000000) {
           result.error = `Content too large: ${contentLength} bytes`;
+          response.body?.cancel();
           return result;
         }
-        response = await fetch(url, { method: 'GET' });
         const capabilitiesXML = await response.text();
         const capabilities = parseWMTSCapabilities(capabilitiesXML);
         result.type = 'WMTS';
