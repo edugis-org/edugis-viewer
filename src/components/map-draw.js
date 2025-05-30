@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import './map-iconbutton';
-import {selectIcon, pointIcon, lineIcon, polygonIcon, trashIcon, checkIcon, combineIcon, uncombineIcon, downloadIcon, openfileIcon, threeDIcon} from './my-icons';
+import {selectIcon, pointIcon, lineIcon, polygonIcon, trashIcon, checkIcon, warningIcon, combineIcon, uncombineIcon, downloadIcon, openfileIcon, threeDIcon} from './my-icons';
 import drawStyle from './map-draw-theme.js';
 import drawCss from './map-draw-css.js';
 import {MapDrawLayerDialog} from './map-draw-layerdialog';
@@ -149,14 +149,16 @@ class MapDraw extends LitElement {
               delete properties[key]; // only handle user defined properties
             }
           }
-          return Object.keys(properties).map(key=>html`
+          return Object.keys(properties).map(key=> {
+            const type = currentLayer.metadata.properties.find(attr=>attr.name===key)?.type;
+            return html`
             <tr><td class="propertyname">${t(key)}</td>
-              <td><input ?disabled=${key==="id" || !["string","number"].includes(currentLayer.metadata.properties.find(attr=>attr.name===key).type)} 
-                    type="text" 
+              <td><input ?disabled=${key==="id" || !["string","number","url"].includes(type)} 
+                    type="${type==='url' ? 'url' : 'text'}"
                     @input="${(e)=>this._updateFeatureProperty(e, feature, key)}" 
                     .value="${this.mbDraw.get(feature.id).properties[key]?this.mbDraw.get(feature.id).properties[key]:''}"></td>
             </tr>`
-          );
+          });
         })}
       </table>
     </div>`
@@ -246,6 +248,10 @@ class MapDraw extends LitElement {
       .buttonbar {font-size: 0;}
       .buttoncontainer {display: inline-block; box-sizing: border-box; width: 55px; height: 55px; line-height:75px;fill:darkgray;}
       .message {background-color: rgba(146,195,41,0.98);width: 100%;box-shadow: 2px 2px 4px 0; height: 36px; color: white; font-weight: bold; line-height: 36px;padding: 2px;}
+      .message.warning {
+        background-color: rgba(255,165,0,0.98);
+        fill: white;
+      }
       .iconcontainer {display: inline-block; width: 24px; height: 24px; fill: white; margin: 5px; vertical-align: middle;}
       .scrollcontainer {flex-grow: 1; overflow: auto;}
       .layertype {
@@ -503,9 +509,10 @@ class MapDraw extends LitElement {
   }
   _renderMessage() {
     if (this.message) {
-      return html`
-      <div class="message"><div class="iconcontainer">${checkIcon}</div>${this.message}</div>
-      `
+      if (this.messageIsError) {
+        return html`<div class="message warning"><div class="iconcontainer">${warningIcon}</div>${this.message}</div>`
+      }
+      return html`<div class="message"><div class="iconcontainer">${checkIcon}</div>${this.message}</div>`
     }
     return ''
   }
@@ -779,6 +786,7 @@ class MapDraw extends LitElement {
     switch (type) {
       case 'number':
       case 'string':
+      case 'url':
         return null;
       case 'longitude':
         return turf.centroid(feature).geometry.coordinates[0];
@@ -844,28 +852,52 @@ class MapDraw extends LitElement {
     this.hasUnsavedFeatures = true;
     this.requestUpdate();
   }
-  _convertType(key, value) {
-    if (this.currentLayer[this.featureType].metadata && this.currentLayer[this.featureType].metadata.properties) {
-      const typeInfo = this.currentLayer[this.featureType].metadata.properties.find(({name})=>name===key);
-      if (typeInfo) {
-        if (typeInfo.type === 'number') {
-          return parseFloat(value.replace(',','.'));
-        } 
+  _convertType(key, value, typeInfo) {    
+    if (typeInfo) {
+      if (typeInfo.type === 'number') {
+        const numberValue = parseFloat(value.replace(',','.'));
+        return isNaN(numberValue) ? null : numberValue;          
       }
     }
     return value;
   }
   _updateFeatureProperty(e, feature, key) {
     const value = e.target.value;
-    let convertedValue = this._convertType(key, value);
+    let typeInfo = null;
+    if (this.currentLayer[this.featureType].metadata && this.currentLayer[this.featureType].metadata.properties) {
+      typeInfo = this.currentLayer[this.featureType].metadata.properties.find(({name})=>name===key);
+    }
+    let convertedValue = this._convertType(key, value, typeInfo);
     if (convertedValue !== value) {
       const floatValue = value.replace(',', '.').replace(/([\+\-]?)[^\d\.]*([0-9]*)[^\.]*([\.]?)[^0-9]*([0-9]*).*/,'$1$2$3$4')
       e.target.value = floatValue;
     }
     this._applyFeatureProperty(feature.id, key, convertedValue);
-    feature.properties[key] = convertedValue;
-    this.hasUnsavedFeatures = true;
-    this._setMessage(`'${e.target.value}' opgeslagen`);
+    if (feature.properties[key] !== convertedValue) {
+      feature.properties[key] = convertedValue;
+      this.hasUnsavedFeatures = true;
+      if (typeInfo?.type === 'url') {
+        // if the property is a url, we need to check if it is a valid url
+        try {
+          const url = new URL(convertedValue);
+          if (url.protocol === 'http:') {
+            url.protocol = 'https:'; // convert http to https
+            const newValue = url.href;
+            if (newValue.endsWith('/') && !convertedValue.endsWith('/')) {
+              convertedValue = newValue.slice(0, -1);
+            } else {
+              convertedValue = newValue;
+            }            
+            e.target.value = convertedValue;
+            this._applyFeatureProperty(feature.id, key, convertedValue);
+          }
+        } catch (e) {
+          this._setMessage(`'${convertedValue}' ${t("invalid URL")}`, true);
+          return;
+        }
+      }
+      this._setMessage(`'${e.target.value}' ${t("saved")}`);
+    }
   }
   _featuresCreated(e) {
     // update history
@@ -935,12 +967,13 @@ class MapDraw extends LitElement {
     }, 100);
     this.hasUnsavedFeatures = true;
   }
-  _setMessage(message) {
+  _setMessage(message, isError = false) {
     if (message !== null && this.timeoutId != null) {
       clearTimeout(this.timeoutId);
       this.timeoutId = null;
     }
     this.message = message;
+    this.messageIsError = isError;
     if (message !== null) {
       this.timeoutId = setTimeout(()=>this._setMessage(null), 4000)
     }

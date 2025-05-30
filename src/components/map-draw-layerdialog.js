@@ -18,9 +18,9 @@ const FormError = {
 }
 
 const propertyTypes ={
-    "Point":  ["string", "number", "longitude", "latitude"],
-    "Line": ["string", "number", "length"],
-    "Polygon": ["string", "number", "longitude", "latitude", "perimeter", "area"]
+    "Point":  ["string", "number", "longitude", "latitude", "url"],
+    "Line": ["string", "number", "length", "url"],
+    "Polygon": ["string", "number", "longitude", "latitude", "perimeter", "area", "url"]
 }
 const defaultProperties = [
     {name: "id", type: "number"},
