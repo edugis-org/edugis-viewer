@@ -6,16 +6,22 @@ import { parseWMTSCapabilities } from './wmts-caps-parser';
 function inferWMTSBaseUrl(tileUrl, withStyle) {
   try {
     const url = new URL(tileUrl);
-    const pathname = url.pathname;
+    const pathname = decodeURIComponent(url.pathname)
+      .replace(/%7B/g, '{')
+      .replace(/%7D/g, '}')
+      .replace(/{x}/g, '0')
+      .replace(/{y}/g, '0')
+      .replace(/{z}/g, '0'); // Replace any placeholders with dummy values
     
     // Identify the numeric segments (z/x/y) that indicate tile coordinates
     const segments = pathname.split('/').filter(s => s.length > 0);
     
-    // Find the position of the first numeric segment (usually the z/tileMatrix value)
+    // Find the position of the LAST occurrence of 3 consecutive numeric segments
+    // since WMTS tile coordinates (tileMatrix/tileRow/tileCol) are always at the end
     let numericStartIndex = -1;
     
-    // Look for consecutive numeric segments (at least 3 for z/x/y)
-    for (let i = 0; i < segments.length - 2; i++) {
+    // Look for consecutive numeric segments (at least 3 for z/x/y) - search from end
+    for (let i = segments.length - 3; i >= 0; i--) {
       if (/^\d+$/.test(segments[i]) && 
           /^\d+$/.test(segments[i+1]) && 
           /^\d+\.[a-zA-Z0-9]+$/.test(segments[i+2])) {
@@ -31,21 +37,31 @@ function inferWMTSBaseUrl(tileUrl, withStyle) {
       }
     }
     
-    // If we found a pattern, assume everything before it is the base URL
-    if (numericStartIndex > 0) {
+    // If we found a pattern of 3 consecutive numbers, try to extract base URL
+    if (numericStartIndex >= 0) {
       // In WMTS RESTful pattern, we assume:
       // .../layer/style/tileMatrixSet/tileMatrix/tileRow/tileCol.format
       // .../layer/tileMatrixSet/tileMatrix/tileRow/tileCol.format
       // So skip 2 (no style) or 3 (style) segments back from the numeric part for layer/style/tileMatrixSet
-      const baseUrlEndIndex = Math.max(0, numericStartIndex - (withStyle ? 3 : 2));
+      const segmentsToRemove = withStyle ? 3 : 2;
+      const baseUrlEndIndex = numericStartIndex - segmentsToRemove;
+      
+      // Check if we have enough segments left for a valid WMTS base URL
+      // After removing tile coordinates and layer/style/tileMatrixSet, 
+      // we should have at least some base path (could be empty for root-level services)
+      if (baseUrlEndIndex < 0) {
+        // Not enough segments to form a valid WMTS structure
+        return null;
+      }
       
       // Reconstruct the base URL
       const baseSegments = segments.slice(0, baseUrlEndIndex);
-      const basePathname = '/' + baseSegments.join('/');
+      const basePathname = baseSegments.length > 0 ? '/' + baseSegments.join('/') : '';
       
       url.pathname = basePathname;
       return url.href;
     } else {
+      // No numeric pattern found, assume it's already a base URL
       return url.href;
     }
   } catch (e) {
@@ -161,6 +177,9 @@ export async function serviceGetWMTSCapabilities(url) {
     for (const withStyle of [false, true]) {
       const testUrl = wmtsCapbilitiesURL(url, withStyle, withVersion);
       if (testUrl) {
+        if (withStyle && testUrl === wmtsCapbilitiesURL(url, false, withVersion)) {
+          continue; // Skip if the URL is the same as without style
+        }
         result.serviceURL = testUrl;
         try {
           let response = await fetch(testUrl, { method: 'GET' });
