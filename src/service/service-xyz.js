@@ -90,7 +90,7 @@ function normalizeToXYZFormat(pathname) {
  * Tests an XYZ URL with different image formats to find a working one
  */
 async function testXYZUrl(urlObj, pathname) {
-  const supportedFormats = ['.png', '.jpg', '.jpeg', '.webp', ''];
+  const supportedFormats = ['', '.png', '.jpg', '.jpeg', '.webp'];
   const errors = [];
 
   // Extract current format from pathname
@@ -160,10 +160,13 @@ async function testSingleFormat(urlObj, pathname) {
       };
     }
 
+    // Get tile dimensions
+    const tileSize = await getTileDimensions(response);
+
     return {
       success: true,
       url: testUrl,
-      capabilities: { format: contentType }
+      capabilities: { format: contentType, tileSize: tileSize }
     };
 
   } catch (error) {
@@ -193,4 +196,43 @@ function isValidImageContentType(contentType, pathname) {
   const expectedType = format === 'jpg' ? 'image/jpeg' : `image/${format}`;
   
   return contentType.toLowerCase() === expectedType.toLowerCase();
+}
+
+/**
+ * Gets the dimensions of a tile image from the fetch response
+ */
+async function getTileDimensions(response) {
+  try {
+    // Clone the response to avoid consuming the body multiple times
+    const imageBlob = await response.blob();
+    
+    // Create an image element to load and measure the tile
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      
+      img.onload = function() {
+        // Clean up object URL
+        URL.revokeObjectURL(img.src);
+        
+        // Return dimensions object
+        resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
+      };
+      
+      img.onerror = function() {
+        URL.revokeObjectURL(img.src);
+        reject(new Error('Failed to load image for dimension measurement'));
+      };
+      
+      // Create object URL and load image
+      img.src = URL.createObjectURL(imageBlob);
+    });
+    
+  } catch (error) {
+    // If we can't determine dimensions, return null rather than failing
+    console.warn('Could not determine tile dimensions:', error.message);
+    return null;
+  }
 }

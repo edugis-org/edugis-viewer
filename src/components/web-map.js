@@ -759,6 +759,7 @@ class WebMap extends LitElement {
         {
           const layer = e.detail.layer;
           const tileUrl = e.detail.tileUrl;
+          const tileSize = serviceInfo.capabilities?.tileSize?.height || 256;
           const layerInfo = {
             id: GeoJSON._uuidv4(),
             type: 'raster',
@@ -770,7 +771,7 @@ class WebMap extends LitElement {
               tiles: [tileUrl],
               minzoom: 0,
               maxzoom: 22,
-              tileSize: 256,
+              tileSize: tileSize,
             },
           }
           this.addLayer({detail: layerInfo});
