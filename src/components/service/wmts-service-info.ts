@@ -250,7 +250,7 @@ export class WmtsServiceInfo extends LitElement {
         return true;
       }
       // URN format with optional version: urn:ogc:def:crs:EPSG:[version:]code
-      const urnPattern = /^urn:ogc:def:crs:epsg:(?:\d+(?:\.\d+)?:)?(3857|900913)$/i;
+      const urnPattern = /^urn:ogc:def:crs:epsg:(?:(?:\d+(?:\.\d+)?|):)?(3857|900913)$/i;
       return urnPattern.test(normalizedCRS);
     }
     // 1. get the tilematrix set for EPSG:3857
