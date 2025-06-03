@@ -1,5 +1,6 @@
 import { serviceGetWMSCapabilities } from "./service-wms.js";
 import { serviceGetWMTSCapabilities } from "./service-wmts.js";
+import { serviceGetXYZInfo } from "./service-xyz.js";
 
 function validateURL(url) {
 
@@ -44,6 +45,10 @@ export async function loadService(url) {
     const WMTSServiceInfo = await serviceGetWMTSCapabilities(serviceUrl.href);
     if (!WMTSServiceInfo.error) {
       return WMTSServiceInfo;
+    }
+    const XYZServiceInfo = await serviceGetXYZInfo(serviceUrl.href);
+    if (!XYZServiceInfo.error) {
+      return XYZServiceInfo;
     }
   } catch (error) {
     serviceInfo.error = `Error accessing service: ${error.message}`;

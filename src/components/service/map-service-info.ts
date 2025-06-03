@@ -3,6 +3,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './wms-service-info';
 import './wmts-service-info';
+import './xyz-service-info';
 
 // Service type interfaces
 export interface ServiceInfoType {
@@ -78,6 +79,11 @@ export class MapServiceInfo extends LitElement {
         return html`
           <div class="service-info">
             <wmts-service-info .serviceInfo=${this.serviceInfo}></wmts-service-info>
+          </div>`;
+      case 'XYZ':
+        return html`
+          <div class="service-info">
+            <xyz-service-info .serviceInfo=${this.serviceInfo}></xyz-service-info>
           </div>`;
       case 'WFS':
         return html`

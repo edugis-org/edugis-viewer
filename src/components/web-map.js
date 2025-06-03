@@ -741,7 +741,9 @@ class WebMap extends LitElement {
               type: 'raster',
               tiles: [tileUrl],
               minzoom: 0,
-              maxzoom: 22
+              maxzoom: 22,
+              tileSize: 256,
+              //sheme: 'tms'
             },
           }
           if (e.detail.legendUrl) {
@@ -753,8 +755,29 @@ class WebMap extends LitElement {
           this.addLayer({detail: layerInfo});
         }
         break;
+      case 'XYZ':
+        {
+          const layer = e.detail.layer;
+          const tileUrl = e.detail.tileUrl;
+          const layerInfo = {
+            id: GeoJSON._uuidv4(),
+            type: 'raster',
+            metadata: {
+              title: serviceInfo.serviceTitle
+            },
+            source: {
+              type: 'raster',
+              tiles: [tileUrl],
+              minzoom: 0,
+              maxzoom: 22,
+              tileSize: 256,
+            },
+          }
+          this.addLayer({detail: layerInfo});
+        }
+        break;
       default:
-          alert(`Unsupported layer type: ${LayerInfo.type}`);
+          alert(`Unsupported layer type: ${serviceInfo.type}`);
     }
   }
   renderToolbarTools()
