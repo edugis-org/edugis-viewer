@@ -777,6 +777,68 @@ class WebMap extends LitElement {
           this.addLayer({detail: layerInfo});
         }
         break;
+      case 'GeoJSON':
+        {
+          const geometryTypes = serviceInfo.capabilities?.analysis?.geometryTypes;
+          const layer = e.detail.layer;
+          const mapboxType = e.detail.mapboxType;
+          const layerInfo = {
+            id: GeoJSON._uuidv4(),
+            metadata: {
+              title: layer.title,
+              abstract: layer.abstract,
+              cansave: true,
+              originaldata: serviceInfo.serviceURL
+            },
+            source: {
+              type: 'geojson',
+              data: serviceInfo.serviceURL,
+              promoteId: 'id'
+            },
+          }
+          switch (mapboxType) {
+            case 'circle':
+              layerInfo.type = 'circle';
+              layerInfo.paint = {
+                'circle-color': "orange",
+                'circle-radius': 5,
+                'circle-opacity': 1,
+                'circle-stroke-color': "white",
+                'circle-stroke-width': 1,
+                'circle-stroke-opacity': 1
+              };
+              layerInfo.filter = ['==', '$type', 'Point'];
+              break;
+            case 'line':
+              layerInfo.type = 'line';
+              layerInfo.paint = {
+                'line-color': "gray",
+                'line-width': 2,
+                'line-opacity': 1
+              },
+              layerInfo.filter = ['!=', '$type', 'Point'];
+              break;
+            case 'fill':
+              layerInfo.type = 'fill';
+              layerInfo.paint = {
+                'fill-color': "gray",
+                'fill-opacity': 0.9
+              }
+              layerInfo.filter = ['==', '$type', 'Polygon'];
+          }
+          if (e.detail.bbox?.length === 4) {
+            // bbox not allowed for geojson source, so we add it to metadata
+            layerInfo.metadata.bbox = e.detail.bbox;
+          }
+          if (e.detail.legendUrl) {
+            layerInfo.metadata.legendurl = e.detail.legendUrl;
+          }
+          if (e.detail.imageData) {
+            layerInfo.metadata.imageData = e.detail.imageData;
+          }
+          this.addLayer({detail: layerInfo});
+        }
+        break;
       default:
           alert(`Unsupported layer type: ${serviceInfo.type}`);
     }

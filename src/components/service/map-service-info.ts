@@ -4,12 +4,14 @@ import { customElement, property } from 'lit/decorators.js';
 import './wms-service-info';
 import './wmts-service-info';
 import './xyz-service-info';
+import './geojson-service-info';
 
 // Service type interfaces
 export interface ServiceInfoType {
   type?: string | null;
   error?: string | null;
   serviceURL?: string;
+  serviceTitle?: string;
   capabilities?: any;
   title?: string;
   abstract?: string;
@@ -84,6 +86,11 @@ export class MapServiceInfo extends LitElement {
         return html`
           <div class="service-info">
             <xyz-service-info .serviceInfo=${this.serviceInfo}></xyz-service-info>
+          </div>`;
+      case 'GeoJSON':
+        return html`
+          <div class="service-info">
+            <geojson-service-info .serviceInfo=${this.serviceInfo}></geojson-service-info>
           </div>`;
       case 'WFS':
         return html`

@@ -1,8 +1,9 @@
 import { serviceGetWMSCapabilities } from "./service-wms.js";
 import { serviceGetWMTSCapabilities } from "./service-wmts.js";
 import { serviceGetXYZInfo } from "./service-xyz.js";
+import { serviceGetGeoJSON } from "./service-geojson.js";
 
-function validateURL(url) {
+function validateURLSyntaxAndProtocol(url) {
 
   try {
     const test = new URL(url);
@@ -35,20 +36,25 @@ export async function loadService(url) {
     error: null
   }
   try {
-    const serviceUrl = validateURL(url);
+    const serviceUrl = validateURLSyntaxAndProtocol(url);
     serviceInfo.serviceURL = serviceUrl.href;
-    // Check if the URL is valid and accessible
-    const WMSServiceInfo = await serviceGetWMSCapabilities(serviceUrl.href);
-    if (!WMSServiceInfo.error) {
-      return WMSServiceInfo;
+
+    const geoJSONInfo = await serviceGetGeoJSON(serviceUrl.href);
+    if (!geoJSONInfo.error) {
+      return geoJSONInfo;
     }
-    const WMTSServiceInfo = await serviceGetWMTSCapabilities(serviceUrl.href);
-    if (!WMTSServiceInfo.error) {
-      return WMTSServiceInfo;
+    
+    const wmsServiceInfo = await serviceGetWMSCapabilities(serviceUrl.href);
+    if (!wmsServiceInfo.error) {
+      return wmsServiceInfo;
     }
-    const XYZServiceInfo = await serviceGetXYZInfo(serviceUrl.href);
-    if (!XYZServiceInfo.error) {
-      return XYZServiceInfo;
+    const wmtsServiceInfo = await serviceGetWMTSCapabilities(serviceUrl.href);
+    if (!wmtsServiceInfo.error) {
+      return wmtsServiceInfo;
+    }
+    const xyzServiceInfo = await serviceGetXYZInfo(serviceUrl.href);
+    if (!xyzServiceInfo.error) {
+      return xyzServiceInfo;
     }
   } catch (error) {
     serviceInfo.error = `Error accessing service: ${error.message}`;
