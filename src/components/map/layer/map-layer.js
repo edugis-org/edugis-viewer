@@ -7,7 +7,7 @@ import "../../base/base-checkbox.js";
 import "./map-layer-info.js";
 import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
 import * as Gestures from '@polymer/polymer/lib/utils/gestures.js';
-import {arrowForwardIcon} from './map-layer-icons.js';
+import {arrowForwardIcon, dragIcon} from './map-layer-icons.js';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener } from '../../../i18n.js';
 
 /**
@@ -74,6 +74,18 @@ class MapLayer extends GestureEventListeners(LitElement) {
               padding-right: 10px;
               cursor: pointer;
             }
+            .mltitle svg {
+              position: absolute;
+              left: calc(50% - 12px);
+              top: 2px;
+              background-color: rgba(255,255,255,0.8);
+              opacity: 0;
+              padding: 3px;
+            }
+            .mltitle:hover svg {
+              opacity: 1;
+              cursor: grabbing;
+        }
             #layerinfo {
               position: relative;
               transition: height .5s ease-in-out;
@@ -201,6 +213,7 @@ class MapLayer extends GestureEventListeners(LitElement) {
                   @change="${(e)=>this._toggleVisibility(e)}"></base-checkbox>
                 <span>${this.layer.metadata?this.layer.metadata.title?this.layer.metadata.title:this.layer.id:this.layer.id}</span>
                 <base-arrow ?open="${this.open}" @change="${e=>this._openChange(e)}"></base-arrow>
+                ${dragIcon}
             </div>
             <div class="mlsubtitle">${this.subtitle}</div>
             ${this._renderEndDrawModeButton()}
