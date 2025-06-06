@@ -79,6 +79,7 @@ class MapLayer extends GestureEventListeners(LitElement) {
               left: calc(50% - 12px);
               top: 2px;
               background-color: rgba(255,255,255,0.8);
+              fill: #777;
               opacity: 0;
               padding: 3px;
             }
