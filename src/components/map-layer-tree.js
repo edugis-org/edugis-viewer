@@ -373,7 +373,7 @@ class MapLayerTree extends LitElement {
     <div class="title">${this.headertext}
       <span id="addlayer"><button @click="${(e)=>this.dispatchEvent(new Event('addExternalLayer', {}))}">addlayer</button></span>
       <span id="filebutton">
-        <input @change="${(e)=>this.openFile(e)}" id="edugisfile" type="file" accept=".json,.geojson,.zip"/>
+        <input @change="${(e)=>this.openFile(e)}" id="edugisfile" type="file" accept=".json,.geojson,.zip,.gpx,.kml,.xls,.xlsx,.csv"/>
         <label for="edugisfile">
           <map-iconbutton info="${ifDefined(t('open file')??undefined)}" .icon="${openfileIcon}"></map-iconbutton>
         </label>
