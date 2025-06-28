@@ -2,6 +2,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ServiceInfoType } from './map-service-info';
+import { translate as t } from '../../i18n.js';
 
 @customElement('wmts-service-info')
 export class WmtsServiceInfo extends LitElement {
@@ -237,7 +238,7 @@ export class WmtsServiceInfo extends LitElement {
           ${formatList.length > 1 ? html`<div>+${formatList.length - 1} more</div>` : ''}
         </div>
         
-        <button class="add-button" @click=${() => this._addLayer(layer)}>Add to Map</button>
+        <button class="add-button" @click=${() => this._addLayer(layer)}>${t('lfs: Add to Map')}</button>
       </div>
     `;
   }

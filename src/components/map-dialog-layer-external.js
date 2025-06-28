@@ -318,7 +318,7 @@ export class MapDialogLayerExternal extends LitElement {
                   <button type="button"
                     @click=${() => this._loadService()}
                     ?disabled=${this.loading}>
-                    Load
+                    ${this.loading ? t('lfs: Loading...') : t('lfs: Load')}
                   </button>
                 </div>
                 <div class="error">${this.serviceError}</div>

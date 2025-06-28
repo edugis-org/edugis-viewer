@@ -2,6 +2,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ServiceInfoType } from './map-service-info';
+import { translate as t } from '../../i18n.js';
 
 @customElement('xyz-service-info')
 export class XYZServiceInfo extends LitElement {
@@ -170,7 +171,7 @@ export class XYZServiceInfo extends LitElement {
             <div class="preview-info">
               Preview tile: ${this._getPreviewTileUrl(serviceUrl)}
             </div>
-            <button class="add-button" @click=${() => this._addLayer()}>Add to Map</button>
+            <button class="add-button" @click=${() => this._addLayer()}>${t('lfs: Add to Map')}</button>
           </div>
         </div>
       </div>

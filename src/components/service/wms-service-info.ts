@@ -3,6 +3,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ServiceInfoType } from './map-service-info';
 import { coordProject } from '@edugis/proj-convert';
+import { translate as t } from '../../i18n.js';
 
 @customElement('wms-service-info')
 export class WmsServiceInfo extends LitElement {
@@ -178,7 +179,7 @@ export class WmsServiceInfo extends LitElement {
       <div class="layer-item">
         <div class="layer-title" title="${title}">${title}</div>
         <div class="layer-details" title="${abstract}">${abstract}</div>
-        <button class="add-button" @click=${() => this._addLayer(layer)}>Add to Map</button>
+        <button class="add-button" @click=${() => this._addLayer(layer)}>${t('lfs: Add to Map')}</button>
       </div>
     `;
   }

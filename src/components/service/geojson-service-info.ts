@@ -2,6 +2,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ServiceInfoType } from './map-service-info';
+import { translate as t } from '../../i18n.js';
 
 // Extended interface for GeoJSON service info
 interface GeoJSONServiceInfoType extends ServiceInfoType {
@@ -481,7 +482,7 @@ export class GeoJsonServiceInfo extends LitElement {
         <div class="geometry-info">
           <strong>Geometries:</strong> ${layerType.geometries.join(', ')}
         </div>
-        <button class="add-button" @click=${() => this._addLayer(layerType, title)}>Add to Map</button>
+        <button class="add-button" @click=${() => this._addLayer(layerType, title)}>${t('lfs: Add to Map')}</button>
       </div>
     `;
   }
