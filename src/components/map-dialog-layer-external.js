@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener} from '../i18n.js';
 import {loadService} from '../service/service.js';
 import './service/map-service-info';
 import psl from 'psl';
@@ -240,8 +241,20 @@ export class MapDialogLayerExternal extends LitElement {
     this.dropdownPosition = { top: 0, left: 0 };
     
     // Load saved services from localStorage
-    this._loadSavedServices();
-    
+    this._loadSavedServices(); 
+  }
+
+  connectedCallback() {
+    super.connectedCallback()
+    this.languageChanged = this.languageChanged.bind(this);
+    registerLanguageChangedListener(this.languageChanged);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    unregisterLanguageChangedListener(this.languageChanged);
+  }
+  languageChanged() {
+    this.requestUpdate();
   }
   
   _loadSavedServices() {
@@ -279,14 +292,14 @@ export class MapDialogLayerExternal extends LitElement {
       <div id="overlay" @click="${(e)=>this._handleClickOutside(e)}">
         <div id="dialog-window">
           <div id="dialog-header">
-            <div id="dialog-title">Add External Layer</div>
+            <div id="dialog-title">${t('lfs: Add External Layer')}</div>
             <div @click="${e => this._close(e)}" id="closebutton">×</div>
           </div> <!-- dialog-header -->
           
           <div id="dialog-content">
             <form @submit="${e => e.preventDefault()}">
               <div class="form-group">
-                ${this._renderFieldHeader('Service URL', 'serviceURL')}
+                ${this._renderFieldHeader(t('lfs: Service URL'), 'serviceURL')}
                 <div class="input-container">
                   <input
                     type="url"
@@ -294,7 +307,7 @@ export class MapDialogLayerExternal extends LitElement {
                     .value=${this.serviceURL}
                     @input=${(e) => this._handleInputChange(e)}
                     required
-                    placeholder="Enter a valid service URL">
+                    placeholder="${t('lfs: Enter a valid service URL')}">
                   
                   <div class="dropdown-container">
                     <div class="dropdown-toggle" @click="${this._toggleDropdown}">
@@ -551,12 +564,12 @@ export class MapDialogLayerExternal extends LitElement {
         
         this.serviceInfo = serviceInfo;
       } catch (err) {
-        this.serviceError = `Failed to load service: ${err.message || 'Unknown error'}`;
+        this.serviceError = `${t("lfs: Failed to load service:")} ${err.message || t('lfs: Unknown error')}`;
       } finally {
         this.loading = false;
       }
     } else {
-      this.serviceError = 'Please enter a valid service URL.';
+      this.serviceError = t('lfs: Please enter a valid service URL.');
     }
   }
   
