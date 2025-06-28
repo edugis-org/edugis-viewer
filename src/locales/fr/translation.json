@@ -96,6 +96,8 @@
     "layertypeLine": "couche de lignes",
     "layertypePoint": "couche de points",
     "layertypePolygon": "couche de formes",
+    "lfs: layer from service": "via service",
+    "ltr: open file": "depuis fichier",
     "Legend": "Légende",
     "Legend and map layers": "Légende et couches de la carte",
     "legend unavailable": "légende indisponible",

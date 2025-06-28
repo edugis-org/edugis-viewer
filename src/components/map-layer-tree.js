@@ -2,7 +2,7 @@ import {LitElement, html, css, unsafeCSS} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import {foldercss} from './folder-icon.css.js';
 import {getCapabilitiesNodes, copyMetadataToCapsNodes} from '../utils/capabilities';
-import {filterIcon, openfileIcon} from './my-icons';
+import {addLayerFromServiceIcon, filterIcon, openfileIcon} from './my-icons';
 import rootUrl from '../utils/rooturl.js';
 import './map-iconbutton'
 import {translate as t} from '../i18n.js';
@@ -175,7 +175,13 @@ class MapLayerTree extends LitElement {
   #filebutton {
     display: inline-block;
     position: absolute;
-    right: 20px;
+    right: 0px;
+    height: 20px;
+  }
+  #addlayer {
+    display: inline-block;
+    position: absolute;
+    right: 28px;
     height: 20px;
   }
   .layergroup {
@@ -371,11 +377,18 @@ class MapLayerTree extends LitElement {
   render() {
     return html`
     <div class="title">${this.headertext}
-      <span id="addlayer"><button @click="${(e)=>this.dispatchEvent(new Event('addExternalLayer', {}))}">addlayer</button></span>
+      <span id="addlayer"> 
+        <map-iconbutton 
+          info="${ifDefined(t('lfs: layer from service')??undefined)}" 
+          .icon="${addLayerFromServiceIcon}"
+          @click="${(e)=>this.dispatchEvent(new Event('addExternalLayer', {}))}"
+        >  
+        </map-iconbutton>
+      </span>
       <span id="filebutton">
         <input @change="${(e)=>this.openFile(e)}" id="edugisfile" type="file" accept=".json,.geojson,.zip,.gpx,.kml,.xls,.xlsx,.csv"/>
         <label for="edugisfile">
-          <map-iconbutton info="${ifDefined(t('open file')??undefined)}" .icon="${openfileIcon}"></map-iconbutton>
+          <map-iconbutton info="${ifDefined(t('ltr: open file')??undefined)}" .icon="${openfileIcon}"></map-iconbutton>
         </label>
       </span>
     </div>
