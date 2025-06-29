@@ -165,7 +165,7 @@ export class WmtsServiceInfo extends LitElement {
     
     const abstract = this.serviceInfo.capabilities?.serviceIdentification?.abstract || 
                      this.serviceInfo.capabilities?.ServiceIdentification?.Abstract || 
-                     'No description available';
+                     t('lfs: No description available');
     
     const layers = this.serviceInfo.capabilities?.contents?.layers || 
                    this.serviceInfo.capabilities?.Contents?.Layers || 
@@ -185,7 +185,7 @@ export class WmtsServiceInfo extends LitElement {
         
         <div class="layer-list">
           <div class="layer-list-header">
-            <div class="layer-list-title">Available Layers</div>
+            <div class="layer-list-title">${t('lfs: Available layers')}</div>
             <div class="layer-count">(${layerList.length})</div>
           </div>
           
@@ -205,8 +205,8 @@ export class WmtsServiceInfo extends LitElement {
   _renderLayerItem(layer) {
     // Handle both camelCase and PascalCase property names
     const identifier = layer.identifier || layer.Identifier || '';
-    const title = layer.title || layer.Title || identifier || 'Unnamed Layer';
-    const abstract = layer.abstract || layer.Abstract || 'No description';
+    const title = layer.title || layer.Title || identifier || t('lfs: Unnamed Layer');
+    const abstract = layer.abstract || layer.Abstract || t('lfs: No description');
     
     // Get matrix sets associated with this layer
     const tileMatrixSets = layer.tileMatrixSetLinks || layer.TileMatrixSetLinks || [];

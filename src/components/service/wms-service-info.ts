@@ -139,7 +139,7 @@ export class WmsServiceInfo extends LitElement {
     }
     
     const title = this.serviceInfo.capabilities?.service?.title || 'WMS Service';
-    const abstract = this.serviceInfo.capabilities?.service?.abstract || 'No description available';
+    const abstract = this.serviceInfo.capabilities?.service?.abstract || t('lfs: No description available');
     const layers = this.serviceInfo.capabilities?.capability?.layers || [];
     
     return html`
@@ -153,7 +153,7 @@ export class WmsServiceInfo extends LitElement {
         
         <div class="layer-list">
           <div class="layer-list-header">
-            <div class="layer-list-title">Available Layers</div>
+            <div class="layer-list-title">${t('lfs: Available layers')}</div>
             <div class="layer-count">(${layers.length})</div>
           </div>
           
@@ -172,8 +172,8 @@ export class WmsServiceInfo extends LitElement {
   
   _renderLayerItem(layer) {
     const name = layer.name || layer.Name || '';
-    const title = layer.title || layer.Title || name || 'Unnamed Layer';
-    const abstract = layer.abstract || layer.Abstract || 'No description';
+    const title = layer.title || layer.Title || name || t('lfs: Unnamed Layer');
+    const abstract = layer.abstract || layer.Abstract || t('lfs: No description');
     
     return html`
       <div class="layer-item">
