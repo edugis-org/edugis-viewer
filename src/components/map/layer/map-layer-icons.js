@@ -32,3 +32,14 @@ export const dragIcon = svg`<svg width="24" height="24" viewBox="0 0 6.35 6.35" 
     <path transform="rotate(45,252.5,376)" d="m 214,327.5 h 77 c 5.54,0 10,4.46 10,10 v 77 c 0,5.54 -4.46,10 -10,10 h -77 c -5.54,0 -10,-4.46 -10,-10 v -77 c 0,-5.54 4.46,-10 10,-10 z"/>
   </g>
 </svg>`;
+export const dragIcon2 = svg`<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Row 1 -->
+  <circle cx="7" cy="7" r="1.5"/>
+  <circle cx="12" cy="7" r="1.5"/>
+  <circle cx="17" cy="7" r="1.5"/>
+  
+  <!-- Row 2 -->
+  <circle cx="7" cy="13" r="1.5"/>
+  <circle cx="12" cy="13" r="1.5"/>
+  <circle cx="17" cy="13" r="1.5"/>
+</svg>`;

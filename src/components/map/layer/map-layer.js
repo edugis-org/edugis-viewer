@@ -7,7 +7,7 @@ import "../../base/base-checkbox.js";
 import "./map-layer-info.js";
 import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
 import * as Gestures from '@polymer/polymer/lib/utils/gestures.js';
-import {arrowForwardIcon, dragIcon} from './map-layer-icons.js';
+import {arrowForwardIcon, dragIcon2 as dragIcon} from './map-layer-icons.js';
 import {translate as t, registerLanguageChangedListener, unregisterLanguageChangedListener } from '../../../i18n.js';
 
 /**
