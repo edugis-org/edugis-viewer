@@ -54,6 +54,10 @@ class MapSaveLayer extends LitElement {
             if (!metadata.title && metadata.styletitle) {
                 metadata.title = metadata.styletitle;
             }
+            if (metadata.inEditMode) {
+                delete metadata.visible;
+                delete metadata.inEditMode;
+            }
             delete metadata.boundspos;
             delete metadata.styleid;
             delete metadata.styletitle;
