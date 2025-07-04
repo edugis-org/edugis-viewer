@@ -165,6 +165,16 @@ export class GeoJSON {
     });
   }
 
+  static cleanupStyle(style) {
+    if (style.metadata) {
+      let metadata = style.metadata;
+      if (metadata.inEditMode) {
+        delete metadata.visible;
+        delete metadata.inEditMode;
+      }
+    }
+  }
+
   // returns a point-layer, line-layer, fill-layer if point, line, polygon features exist
   static createLayers(geojson, filename) {
     const result = [];
@@ -197,6 +207,7 @@ export class GeoJSON {
           if (attribution) {
             style.source.attribution = attribution;
           }
+          GeoJSON.cleanupStyle(style);
           result.push(style);
         } else {
           result.push( 
