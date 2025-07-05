@@ -84,6 +84,10 @@ export async function serviceGetWMSCapabilities(url) {
       }
       const capabilitiesXML = await response.text();
       const capabilities = parseWMSCapabilities(capabilitiesXML);
+      if (!capabilities || !capabilities.service || !capabilities.capability) {
+        result.error = 'Invalid WMS capabilities document.';
+        return result;
+      }
       result.type = 'WMS';
       result.capabilities = capabilities;
       result.serviceURL = cleanupWMSURL(result.serviceURL);

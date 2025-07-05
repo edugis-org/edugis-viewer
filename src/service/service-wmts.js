@@ -69,7 +69,7 @@ function inferWMTSBaseUrl(tileUrl, withStyle) {
   }
 }
 
-function wmtsCapbilitiesURL(url, withStyle = false, withVersion = false) {
+function wmtsCapbilitiesURL(url, useKVP = false, withStyle = false, withVersion = false) {
   // the given WMTS url can either be:
   // the base URL of the service (e.g. https://example.com/wmts/v2.0)
   // or a KVP request (e.g. https://example.com/wmts/v2.0?service=WMTS&request=GetCapabilities)
@@ -83,6 +83,27 @@ function wmtsCapbilitiesURL(url, withStyle = false, withVersion = false) {
     // check if the URL is a REST Capabilities request
     if (urlObj.pathname.endsWith('WMTSCapabilities.xml')) {
       // a REST Capabilities request
+      return urlObj.href;
+    }
+    if (useKVP) {
+      // create a KVP request URL
+      for (const [key, value] of urlObj.searchParams) {
+        if (key.toLowerCase() === 'service' && value.toLowerCase() !== 'wmts') {
+          return null; // not a WMTS service
+        }
+        if (key.toLowerCase() === 'request' || value.toLowerCase() === 'version') {
+          // remove key 
+          urlObj.searchParams.delete(key);
+        }
+      }
+      urlObj.searchParams.set('service', 'WMTS');
+      urlObj.searchParams.set('request', 'GetCapabilities');
+      if (withVersion) {
+        urlObj.searchParams.set('version', '1.0.0');
+      }
+      if (withStyle) {
+        urlObj.searchParams.set('style', 'default');
+      }
       return urlObj.href;
     }
     // iterate urlObj.searchParams
@@ -173,56 +194,64 @@ export async function serviceGetWMTSCapabilities(url) {
     capabilities: null,
     error: null
   }
-  for (const withVersion of [false, true]) {
-    for (const withStyle of [false, true]) {
-      const testUrl = wmtsCapbilitiesURL(url, withStyle, withVersion);
-      if (testUrl) {
-        if (withStyle && testUrl === wmtsCapbilitiesURL(url, false, withVersion)) {
-          continue; // Skip if the URL is the same as without style
-        }
-        result.serviceURL = testUrl;
-        try {
-          let response = await fetch(testUrl, { method: 'GET' });
-          if (!response.ok) {
-            result.error = `Service not reachable: ${response.statusText}`;
-            if (withStyle && withVersion) {
-              return result;
-            } else {
-              continue;
-            }
+  console.log('url', url);
+  for (const useKVP of [false, true]) {    
+    for (const withVersion of [false, true]) {
+      for (const withStyle of [false, true]) {
+        const testUrl = wmtsCapbilitiesURL(url, useKVP, withStyle, withVersion);
+        console.log('testUrl', testUrl);
+        if (testUrl) {
+          if (withStyle && testUrl === wmtsCapbilitiesURL(url, useKVP, false, withVersion)) {
+            continue; // Skip if the URL is the same as without style
           }
-          // Check content type and possibly content-length
-          const contentType = response.headers.get('Content-Type');
-          if (!contentType || !contentType.includes('xml')) {
-            result.error = `Invalid content type: ${contentType}`;
-            response.body?.cancel();
-            if (withStyle && withVersion) {
-              return result;
-            } else {
-              continue;
+          result.serviceURL = testUrl;
+          try {
+            let response = await fetch(testUrl, { method: 'GET' });
+            if (!response.ok) {
+              result.error = `Service not reachable: ${response.statusText}`;
+              if (withStyle && withVersion) {
+                return result;
+              } else {
+                continue;
+              }
             }
-          }
-          const contentLength = response.headers.get('Content-Length');
-          if (contentLength && parseInt(contentLength) > 5000000) {
-            result.error = `Content too large: ${contentLength} bytes`;
-            response.body?.cancel();
+            // Check content type and possibly content-length
+            const contentType = response.headers.get('Content-Type');
+            if (!contentType || !contentType.includes('xml')) {
+              result.error = `Invalid content type: ${contentType}`;
+              response.body?.cancel();
+              if (withStyle && withVersion) {
+                return result;
+              } else {
+                continue;
+              }
+            }
+            const contentLength = response.headers.get('Content-Length');
+            if (contentLength && parseInt(contentLength) > 5000000) {
+              result.error = `Content too large: ${contentLength} bytes`;
+              response.body?.cancel();
+              return result;
+            }
+            const capabilitiesXML = await response.text();
+            const capabilities = parseWMTSCapabilities(capabilitiesXML);
+            if (!capabilities || !capabilities.contents) {
+              result.error = 'Invalid WMTS capabilities document.';
+              return result;
+            }
+            result.type = 'WMTS';
+            result.capabilities = capabilities;
+            result.serviceURL = baseURLFromCapabilitiesURL(result.serviceURL);
+            result.serviceTitle = capabilities?.serviceIdentification?.title || result.serviceURL;
+            result.error = null;
             return result;
+          } catch (error) {      
+            result.error = `Error fetching WMTS capabilities: ${error.message}`;
           }
-          const capabilitiesXML = await response.text();
-          const capabilities = parseWMTSCapabilities(capabilitiesXML);
-          result.type = 'WMTS';
-          result.capabilities = capabilities;
-          result.serviceURL = baseURLFromCapabilitiesURL(result.serviceURL);
-          result.serviceTitle = capabilities?.serviceIdentification?.title || result.serviceURL;
-          result.error = null;
-          return result;
-        } catch (error) {      
-          result.error = `Error fetching WMTS capabilities: ${error.message}`;
-        }
-      } else {
-        result.error = 'Invalid URL for WMTS capabilities.';
-      }
-    }
-  }
+        } else {
+          result.error = 'Invalid URL for WMTS capabilities.';
+        } 
+      } // withStyle
+    } // witVersion
+  } // useKVP
   return result;
 }
