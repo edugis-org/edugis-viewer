@@ -779,7 +779,6 @@ class WebMap extends LitElement {
         break;
       case 'GeoJSON':
         {
-          const geometryTypes = serviceInfo.capabilities?.analysis?.geometryTypes;
           const layer = e.detail.layer;
           const mapboxType = e.detail.mapboxType;
           const layerInfo = {

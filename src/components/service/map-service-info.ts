@@ -5,6 +5,7 @@ import './wms-service-info';
 import './wmts-service-info';
 import './xyz-service-info';
 import './geojson-service-info';
+import './wfs-service-info';
 
 // Service type interfaces
 export interface ServiceInfoType {

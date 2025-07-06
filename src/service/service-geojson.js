@@ -472,9 +472,21 @@ export async function serviceGetGeoJSON(url) {
       if (testResult.data.name) {
         result.serviceTitle = testResult.data.name;
       } else if (testResult.analysis.featureCount > 0) {
+        const urlObj = new URL(url);
         result.serviceTitle = `${result.serviceTitle} (${testResult.analysis.featureCount} features)`;
+        for (const [key,value] of urlObj.searchParams) {
+          if (key.toLowerCase === 'typename' || key.toLowerCase() === 'typenames') {
+            result.serviceTitle = value;
+            // remove ugly prefix
+            if (result.serviceTitle.indexOf(':') > -1) {
+              const cleanTitle = result.serviceTitle.split(':')[1].trim();
+              if (cleanTitle.trim() !== '') {
+                result.serviceTitle = cleanTitle.trim();
+              }
+            }
+          }
+        }
       }
-      
       return result;
     }
 

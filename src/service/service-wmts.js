@@ -80,6 +80,12 @@ function wmtsCapbilitiesURL(url, useKVP = false, withStyle = false, withVersion 
   try {
     // Check if the URL is valid and accessible
     const urlObj = new URL(url);
+    // check if the URL explicitly requests another service type
+    for (const [key, value] of urlObj.searchParams) {
+      if (key.toLowerCase() === 'service' && value.toLowerCase() !== 'wmts') {
+        return null; // not a WMTS service
+      }
+    }
     // check if the URL is a REST Capabilities request
     if (urlObj.pathname.endsWith('WMTSCapabilities.xml')) {
       // a REST Capabilities request

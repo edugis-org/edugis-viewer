@@ -133,7 +133,7 @@ class MapInfoFormatted extends LitElement {
           if (feature.layer && feature.layer.id) {
             if (layerMap.has(feature.layer.id)) {
               let featureCount = layerMap.get(feature.layer.id);
-              const maxFeaturesPerLayer = feature.layer.metadata && feature.layer.metadata.maxinfofeatures ? feature.layer.metadata.maxinfofeatures : 1;
+              const maxFeaturesPerLayer = feature.layer.metadata?.maxinfofeatures || 1;
               if (featureCount < maxFeaturesPerLayer) {
                 layerMap.set(feature.layer.id, featureCount + 1);
                 return true;
