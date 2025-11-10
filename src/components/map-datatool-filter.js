@@ -327,9 +327,11 @@ class MapDatatoolFilter extends LitElement {
         } else {
             const inputLayer = this.map.getLayer(this.layerId).serialize();
             const newLayer = {...inputLayer};
+            newLayer.metadata = {...inputLayer.metadata};
             newLayer.id = this.outputLayerId;
             if (newLayer?.metadata?.abstract?.startsWith("Filter op")) {
                 newLayer.metadata.abstract += ` AND ${this.selectedProperty} ${this.selectedOperator} ${this.value}`;
+                newLayer.metadata.title = this.outputLayername;
             } else {
                 newLayer.metadata = {
                     title: this.outputLayername,
