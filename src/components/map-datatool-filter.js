@@ -328,12 +328,20 @@ class MapDatatoolFilter extends LitElement {
             const inputLayer = this.map.getLayer(this.layerId).serialize();
             const newLayer = {...inputLayer};
             newLayer.id = this.outputLayerId;
-            newLayer.metadata = {
-                title: this.outputLayername,
-                abstract: `Filter op ${this.selectedProperty} ${this.selectedOperator} ${this.value}`
+            if (newLayer?.metadata?.abstract?.startsWith("Filter op")) {
+                newLayer.metadata.abstract += ` AND ${this.selectedProperty} ${this.selectedOperator} ${this.value}`;
+            } else {
+                newLayer.metadata = {
+                    title: this.outputLayername,
+                    abstract: `Filter op ${this.selectedProperty} ${this.selectedOperator} ${this.value}`
+                }
             }
             newLayer.source = this.map.getSource(inputLayer.source).serialize();
-            newLayer.filter = filterExpression;
+            if (inputLayer.filter) {
+                newLayer.filter = ["all", inputLayer.filter, filterExpression];
+            } else {
+                newLayer.filter = filterExpression;
+            }
             this.dispatchEvent(new CustomEvent('addlayer', {detail: newLayer, bubbles: true, composed: true}));
             setTimeout(() => {
                 this.outputLayer = this.map.getLayer(this.outputLayerId);
