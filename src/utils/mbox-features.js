@@ -1,6 +1,18 @@
 import {SphericalMercator} from '../lib/sphericalmercator.js';
 import Flatbush from 'flatbush';
 import lineUnion from '@edugis/lineunion';
+import { featureFilter } from '@maplibre/maplibre-gl-style-spec';
+
+// Maps GeoJSON geometry types to the numeric type used by MapLibre filters
+// $type in MapLibre treats Multi* variants the same as their base types
+const geometryTypeMap = {
+  'Point': 1,
+  'MultiPoint': 1,
+  'LineString': 2,
+  'MultiLineString': 2,
+  'Polygon': 3,
+  'MultiPolygon': 3
+};
 
 const featurePropertiesAreEqual = (feature1, feature2) => {
     for (const key in feature1.properties) {
@@ -41,6 +53,23 @@ export const getVisibleFeatures = async (map, layerid) => {
         if (response.ok) {
           source.data = await response.json();
         }
+      }
+      if (layer.filter) {
+        const compiledFilter = featureFilter(layer.filter);
+        const filteredFeatures = source.data.features.filter(feature => {
+          // Wrap the feature with the numeric type for $type expression support
+          const wrappedFeature = {
+            type: geometryTypeMap[feature.geometry?.type] || 0,
+            properties: feature.properties || {},
+            id: feature.id,
+            geometry: feature.geometry
+          };
+          return compiledFilter.filter(
+              { zoom: map.getZoom() },
+              wrappedFeature
+          );
+        });
+        source.data.features = filteredFeatures;
       }
       const features = source.data.features.filter(feature=>{
         const bbox = turf.bbox(feature);

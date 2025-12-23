@@ -4,6 +4,7 @@ import {translate as t, registerLanguageChangedListener, unregisterLanguageChang
 import GeoJSONParser from 'jsts/org/locationtech/jts/io/GeoJSONParser';
 import DistanceOp from 'jsts/org/locationtech/jts/operation/distance/DistanceOp';
 import {customSelectCss} from './custom-select-css.js';
+import {getVisibleFeatures} from '../utils/mbox-features.js';
 import './wc-button';
 
 const dummyIcon = svg`<svg height="24" width="24" viewbox="0 0 24 24"><style>.normal{ font: bold 18px sans-serif;}</style><text x="4" y="16" class="normal">A</text></svg>`;
@@ -79,45 +80,9 @@ class MapDataToolShortestDistance extends LitElement {
     const selections = this.shadowRoot.querySelectorAll('select');
     this.buttonEnabled = (selections.length === 2 && (selections[0].value != selections[1].value) && (selections[0].value !== '') && selections[1].value !== '')
   }
-  _getFeatures(layerid) {
-    return new Promise((resolve, reject)=>{
-      const layer = this.map.getLayer(layerid);
-      const source = this.map.getSource(layer.source);
-      switch (source.type) {
-        case "geojson":
-          const urlOrJson = source.serialize().data;
-          if (typeof urlOrJson === "string") {
-            return fetch(urlOrJson).then(response=>{
-              if (!response.ok) {
-                reject(response.statusText);
-              }
-              return response.json();
-            }).then(json=>{
-              resolve(json);
-            })
-          } else {
-            resolve(urlOrJson)
-          }
-          break;
-        case "vector":
-          //const result = this.map.querySourceFeatures(layerid, layer.sourceLayer?{sourceLayer:layer.sourceLayer}:undefined);
-          const result = this.map.queryRenderedFeatures({layers:[layerid]});
-          const geojson = {
-            "type": "FeatureCollection",
-            "features": result.map(vectorFeature=>{
-              return {
-                "type": "Feature",
-                "properties": vectorFeature.properties,
-                "geometry": vectorFeature.geometry
-              }
-            })
-          }
-          resolve(geojson);
-        default:
-          console.log(`unhandled source type: ${source.type}`);
-          return resolve([]);
-      }
-    })
+  async _getFeatures(layerid) {
+    const features = await getVisibleFeatures(this.map, layerid);
+    return {"type":"FeatureCollection", "features": features};
   }
   _turfDistance(sourceFeatures1, sourceFeatures2) {
     const distanceGeojson = {
@@ -144,6 +109,9 @@ class MapDataToolShortestDistance extends LitElement {
     return distanceGeojson;
   }
   _jstsDistance(sourceFeatures1, sourceFeatures2) {
+    // we are using jsts for distance calculations between geometries other than points
+    // jsts does not support geodesic distance calculations, so we need to
+    // project to EPSG:3857 for euclidian distance calculations
     const features1 = GeoJSON._project(sourceFeatures1, 'EPSG:4326', 'EPSG:3857');
     const features2 = GeoJSON._project(sourceFeatures2, 'EPSG:4326', 'EPSG:3857');
 
@@ -169,11 +137,29 @@ class MapDataToolShortestDistance extends LitElement {
       const feature = GeoJSON.Feature("LineString");
       
       feature.geometry.coordinates = [[points[0].x, points[0].y], [points[1].x, points[1].y]]
-      feature.properties.distance = minDistance/1000;
       distanceGeojson.features.push(feature);
     }
-    return GeoJSON._project(distanceGeojson, 'EPSG:3857', 'EPSG:4326')
+    // project back to EPSG:4326 and calculate lengths
+    const result = GeoJSON._project(distanceGeojson, 'EPSG:3857', 'EPSG:4326')
+    result.features.forEach(feature=>{
+      const distance = turf.length(feature, {units: 'meters'});
+      if (distance > 100000) {
+        feature.properties.kmdistance = Math.round(distance / 1000);
+      } else if (distance > 10000) {
+        feature.properties.kmdistance = Math.round(distance / 100) / 10;
+      } else if (distance > 1000) {
+        feature.properties.kmdistance = Math.round(distance / 10) / 100;
+      } else if (distance > 100) {
+        feature.properties.distance = Math.round(distance);
+      } else if (distance > 10) {
+        feature.properties.distance = Math.round(distance * 10) / 10;
+      } else {
+        feature.properties.distance = Math.round(distance * 100) / 100;
+      }
+    })
+    return result;
   }
+
   async _calculateDistances(layer1id, layer2id) {
     this.buttonEnabled = false;
     const sourceFeatures1 = await this._getFeatures(layer1id);
@@ -193,7 +179,13 @@ class MapDataToolShortestDistance extends LitElement {
     const newLayer = {
       id: GeoJSON._uuidv4(),
       metadata: {
-        title: 'Berekende afstanden' + (addedLayerCounter ? ` (${addedLayerCounter + 1})` : '')
+        title: 'Berekende afstanden' + (addedLayerCounter ? ` (${addedLayerCounter + 1})` : ''),
+        attributes: {
+          translations: [
+            {"name": "distance", "unit": " meter"},
+            {'name': "kmdistance", "translation": "distance", "unit": " kilometer"}
+          ]
+        }
       },
       type: "line",
       source : {

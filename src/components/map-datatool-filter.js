@@ -72,7 +72,7 @@ class MapDatatoolFilter extends LitElement {
             ${until (this._renderAttributeList(), html`<p>loading...</p>`)}
             ${this._renderOperatorList()}
             ${this._renderExpression()}
-            ${this._renderLogicalOperators()}
+            <!-- ${this._renderLogicalOperators()} -->
             <input type="text" placeholder="naam van uitvoerlaag" name="outputname" ?disabled="${this.layerid===""}" @keyup="${(e)=>this._outputNameUpdate(e)}" .value="${this.outputLayername}">
             <wc-button class="edugisblue" @click="${e=>this._handleClick(e)}" ?disabled="${!this.buttonEnabled}">Filteren</wc-button><br>
         </div>`
@@ -347,6 +347,12 @@ class MapDatatoolFilter extends LitElement {
             this.dispatchEvent(new CustomEvent('addlayer', {detail: newLayer, bubbles: true, composed: true}));
             setTimeout(() => {
                 this.outputLayer = this.map.getLayer(this.outputLayerId);
+                this.value = undefined;
+                this.selectedProperty = "";
+                this.selectedOperator = "==";
+                this.logicalOperator = "new";
+                this.buttonEnabled = false;
+                this.requestUpdate();
             }, 500);
         } 
     }

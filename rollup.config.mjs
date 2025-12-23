@@ -2,6 +2,7 @@
 import { rollupPluginHTML as html } from "@web/rollup-plugin-html";
 import copy from 'rollup-plugin-copy';
 import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import {terser} from 'rollup-plugin-terser';
 import { minifyTemplateLiterals } from "rollup-plugin-minify-template-literals";
 import summary from 'rollup-plugin-summary';
@@ -30,6 +31,11 @@ export default {
       exportConditions: ['production'],
       extensions: ['.js', '.ts']
     }),
+    // Convert CommonJS deps (e.g. @mapbox/unitbezier) to ESM
+    commonjs({
+      include: /node_modules/,
+      requireReturnsDefault: 'auto'
+    }),
     // Minify HTML template literals
     minifyTemplateLiterals(),
     // Minify JS
@@ -45,7 +51,7 @@ export default {
     copy({
       targets: [
         {src: "images/*", dest: "build/images/", flatten: false}, // deep recursive copy
-        {src: "maps/*", dest: "build/maps/", flatten: false},
+        // {src: "maps/*", dest: "build/maps/", flatten: false},
         {src: "styles/*", dest: "build/styles/", flatten: false},
         {src: "notosans-*woff2", dest: "build/", flatten: false},
         {src: "node_modules/hopscotch/dist/img/sprite-*.png", dest: "build/img/", flatten: true},
