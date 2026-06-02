@@ -50,10 +50,18 @@ class MapInfoFormatted extends LitElement {
     .attributetable {
       width: 100%;
       border-collapse: collapse;
+      margin-bottom: 20px;
     }
     tr.even {background: #f0f0f0;}
     td {width:50%;}
     .attributevalue .clickImage {cursor: pointer;}
+    a[href] {    
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 150px;
+      display: inline-block;
+      white-space: nowrap;
+    }
   `}
   
   constructor() {
